@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { isOwnerEmail } from "@/config/owners";
+import { isOwnerEmail, OWNERS } from "@/config/owners";
 import { initials } from "@/lib/initials";
 import { getSessionUser } from "@/server/auth/session";
 import { db } from "@/server/db";
@@ -17,7 +17,7 @@ export type Viewer = {
   isOwner: boolean;
   // Mockup roleHTML: leader label first, then each staff team.
   teamRoles: TeamRole[];
-  ledTeam: { name: string; color: string } | null;
+  ledTeam: { id: string; name: string; color: string } | null;
   unreadNotifications: number;
 };
 
@@ -42,10 +42,11 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   return {
     id: user.id,
     name: user.name,
-    initials: initials(user.name, otherUsers.map((u) => u.name)),
+    // Owners count even before their first login, so avatars match the team chart.
+    initials: initials(user.name, [...otherUsers.map((u) => u.name), ...OWNERS.map((o) => o.name)].filter((n) => n !== user.name)),
     isOwner,
     teamRoles: isOwner ? [] : teamRoles,
-    ledTeam: ledTeam ? { name: ledTeam.name, color: ledTeam.color } : null,
+    ledTeam: ledTeam ? { id: ledTeam.id, name: ledTeam.name, color: ledTeam.color } : null,
     unreadNotifications,
   };
 });

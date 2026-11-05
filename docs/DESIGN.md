@@ -160,20 +160,19 @@ erDiagram
 
 ## 6. Kontrak API (tRPC)
 
-Semua prosedur butuh sesi. Input divalidasi Zod. Error membawa kode PNG.
+Semua prosedur butuh sesi. Input divalidasi Zod. Error membawa kode PNG. Halaman membaca data langsung lewat service di server, jadi tRPC hanya dipakai untuk perubahan data dan pembacaan dari klien.
 
 | Router | Prosedur | Akses |
 |---|---|---|
 | `auth` | `login`, `logout`, `me` | Publik untuk `login` |
-| `user` | `list` | Semua |
-| `team` | `list`, `get`, `create`, `update` | Tulis: pemilik |
+| `team` | `create`, `update` | Pemilik |
 | `report` | `list`, `get`, `create`, `setStatus`, `reject`, `markDone`, `forward`, `addCc`, `markOpened` | Sesuai PRD 4 |
 | `reportMessage` | `send` | Yang berhak ikut chat |
 | `program` | `list`, `get`, `create`, `close`, `cancel` | Tutup dan batal: leader tim |
 | `task` | `get`, `create`, `remove`, `attachableReports` | Buat dan hapus: pemilik, leader tim |
 | `todo` | `add`, `update`, `move`, `remove`, `toggle` | `toggle`: PIC; lainnya: pemilik, leader tim |
 | `qc` | `approve`, `returnForRevision` | Leader tim |
-| `template` | `list`, `get`, `create`, `update`, `remove` | Leader tim |
+| `template` | `create`, `update`, `remove` | Leader tim |
 | `notification` | `list`, `open`, `markRead`, `undo`, `clearAll` | Pemilik data |
 
 Rute non-tRPC: `POST /api/photos/upload-token` dan `GET /api/photos/[id]`.

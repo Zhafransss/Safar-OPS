@@ -31,6 +31,8 @@ JUBELIO_BASE_URL=http://127.0.0.1:54340
 DEV_LOGIN_PASSWORD=<password pilihan Anda>
 ```
 
+Jalankan `pnpm db:seed-dev` untuk menambahkan Kartika, Zarkasih, Dimas, dan Rudi sebagai pengguna `@safar.local`, supaya pilihan leader dan staff tidak kosong.
+
 | Email | Peran |
 |---|---|
 | `developer@safar.local` | Pemilik, hanya saat `pnpm dev` |

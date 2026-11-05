@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { RegisterServiceWorker } from "@/components/register-service-worker";
+import { ScrollReset } from "@/components/scroll-reset";
+import { ToastProvider } from "@/components/toast";
 import { TrpcProvider } from "@/lib/trpc-client";
 import "@/styles/app.css";
 
@@ -32,14 +34,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="id" className={inter.variable}>
       <body>
         <TrpcProvider>
-          <div className="app-frame">
-            <div id="app">
-              <div className="scroll" id="scr">
-                {children}
+          <ToastProvider>
+            <div className="app-frame">
+              <div id="app">
+                <div className="scroll" id="scr">
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
+          </ToastProvider>
         </TrpcProvider>
+        <ScrollReset />
         <RegisterServiceWorker />
       </body>
     </html>

@@ -3,6 +3,7 @@ import "server-only";
 import { initTRPC, TRPCError } from "@trpc/server";
 
 import { formatError, type ErrorCode } from "@/config/error-codes";
+import { isOwnerEmail } from "@/config/owners";
 import { getSessionUserAndRenew } from "@/server/auth/session";
 
 export async function createContext(opts: { headers: Headers }) {
@@ -30,4 +31,9 @@ export function pngError(
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   return next({ ctx: { ...ctx, user: ctx.user } });
+});
+
+export const ownerProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!isOwnerEmail(ctx.user.email)) throw pngError("PNG-TIM-06", "FORBIDDEN");
+  return next();
 });

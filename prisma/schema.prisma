@@ -84,11 +84,13 @@ model LoginAttempt {
 }
 
 model Team {
-  id       String @id @default(cuid())
-  name     String
+  id        String   @id @default(cuid())
+  name      String
   // Unique constraints enforce K-T70 (one color per team) and K-T20 (one team per leader).
-  color    String @unique
-  leaderId String @unique
+  color     String   @unique
+  leaderId  String   @unique
+  // Screens list teams, staff and templates in the order they were added, like the mockup.
+  createdAt DateTime @default(now())
 
   leader    User         @relation(fields: [leaderId], references: [id])
   members   TeamMember[]
@@ -97,8 +99,9 @@ model Team {
 }
 
 model TeamMember {
-  teamId String
-  userId String
+  teamId    String
+  userId    String
+  sortOrder Int    @default(0)
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
@@ -264,9 +267,10 @@ model RevisionNote {
 }
 
 model Template {
-  id     String @id @default(cuid())
-  teamId String
-  name   String
+  id        String   @id @default(cuid())
+  teamId    String
+  name      String
+  createdAt DateTime @default(now())
 
   team  Team           @relation(fields: [teamId], references: [id])
   todos TemplateTodo[]

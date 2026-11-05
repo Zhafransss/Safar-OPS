@@ -53,24 +53,24 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-QC-02 | BG-02 | Approve | QC | Must | Not Started | TC-QC-02: tugas tertutup, "Lolos QC" |
 | FR-QC-03 | BG-02 | Kembalikan revisi | QC | Must | Not Started | TC-QC-03: PNG-QC-01, 02; jumlah revisi naik |
 | FR-QC-04 | BG-02 | QC pindah ke leader baru | QC | Must | Not Started | TC-QC-04: leader baru bisa approve |
-| FR-TIM-01 | BG-04 | Bagan tim | Pemetaan tim | Must | Not Started | TC-TIM-01: non-pemilik PNG-TIM-06 |
-| FR-TIM-02 | BG-04 | Tambah dan edit tim | Pemetaan tim | Must | Not Started | TC-TIM-02: PNG-TIM-01–04 |
-| FR-TIM-03 | BG-04 | Palet warna | Pemetaan tim | Must | Not Started | TC-TIM-03: PNG-TIM-07, 08 |
+| FR-TIM-01 | BG-04 | Bagan tim | Pemetaan tim | Must | Done | TC-TIM-01: non-pemilik PNG-TIM-06 |
+| FR-TIM-02 | BG-04 | Tambah dan edit tim | Pemetaan tim | Must | Done | TC-TIM-02: PNG-TIM-01–04 |
+| FR-TIM-03 | BG-04 | Palet warna | Pemetaan tim | Must | Done | TC-TIM-03: PNG-TIM-07, 08 |
 | FR-TIM-04 | BG-04 | Staff keluar | Pemetaan tim | Must | Not Started | TC-TIM-04: to-do ditandai, leader dapat notifikasi |
 | FR-TIM-05 | BG-04 | Ganti leader | Pemetaan tim | Must | Not Started | TC-TIM-05: to-do leader lama ditandai |
-| FR-TPL-01 | BG-02 | Kelola template | Template | Must | Not Started | TC-TPL-01: PNG-TPL-01–03 |
+| FR-TPL-01 | BG-02 | Kelola template | Template | Must | Done | TC-TPL-01: PNG-TPL-01–03 |
 | FR-NTF-01 | BG-03 | Daftar berkelompok | Notifikasi | Must | Not Started | TC-NTF-01: angka lonceng = jumlah daftar |
 | FR-NTF-02 | BG-03 | Ketuk membuka target | Notifikasi | Must | Not Started | TC-NTF-02: semua jenis punya tujuan |
 | FR-NTF-03 | BG-03 | Geser dan Batalkan | Notifikasi | Must | Not Started | TC-NTF-03: batalkan dalam 2,5 detik; uji HP nyata |
 | FR-NTF-04 | BG-03 | Bersihkan semua | Notifikasi | Must | Not Started | TC-NTF-04: konfirmasi lalu daftar kosong |
 | FR-NTF-05 | BG-05 | Label CC | Notifikasi | Must | Not Started | TC-NTF-05: hanya laporan CC berlabel |
-| FR-NTF-06 | BG-03 | 15 pemicu | Notifikasi | Must | Not Started | TC-NTF-06: tiap pemicu ke penerima benar; tidak ke diri sendiri |
+| FR-NTF-06 | BG-03 | 15 pemicu | Notifikasi | Must | In Progress | TC-NTF-06: tiap pemicu ke penerima benar; tidak ke diri sendiri |
 | FR-UI-01 | BG-06 | Token dan ukuran mockup | Tampilan | Must | In Progress | TC-UI-01: perbandingan layar terang dan gelap |
 | FR-UI-02 | BG-06 | Area ketuk 44 px | Tampilan | Must | In Progress | TC-UI-02: elemen kecil punya area 44 px |
 | FR-UI-03 | BG-06 | Label peran | Tampilan | Must | Done | TC-UI-03: label per tim dan rangkap |
 | FR-UI-04 | BG-05 | Inisial | Tampilan | Must | Done | TC-UI-04: Ka/Ku, CS, C2 |
 | FR-UI-05 | BG-05 | Umur relatif | Tampilan | Must | Not Started | TC-UI-05: teks benar pada batas hari WIB |
-| FR-UI-06 | BG-04 | Label tim berwarna | Tampilan | Must | Not Started | TC-UI-06: semua nama tim berlabel |
+| FR-UI-06 | BG-04 | Label tim berwarna | Tampilan | Must | In Progress | TC-UI-06: semua nama tim berlabel |
 | FR-PWA-01 | BG-06 | Bisa di-install | PWA | Must | In Progress | TC-PWA-01: install di Android dan iOS |
 | FR-PWA-02 | BG-06 | Cache statis dan halaman offline | PWA | Must | Done | TC-PWA-02: tanpa internet tampil halaman offline, tanpa data pengguna |
 | FR-PWA-03 | BG-03 | Muat ulang saat aktif | PWA | Must | Done | TC-PWA-03: buka kembali aplikasi memperbarui lonceng |
@@ -97,3 +97,13 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-PWA-01 | Manifest dan ikon lolos di Chrome desktop; uji install di HP asli menunggu HTTPS staging |
 | NFR-01 | Beranda dan Hub lolos pada 390 px, terang dan gelap; layar lain menyusul |
 | NFR-08 | Baru diuji di Chrome desktop dengan lebar HP |
+
+## Catatan status Sprint 1 (5 November 2026)
+
+| ID | Sisa pekerjaan |
+|---|---|
+| FR-TIM-01–03, FR-TPL-01 | Selesai. Pemilik, leader, dan staff diuji lewat layar; jalur terlarang diuji langsung ke API |
+| FR-TIM-04, FR-TIM-05 | Sprint 3, karena butuh To-do. Tombol keluarkan staff belum menampilkan konfirmasi to-do aktif |
+| FR-UI-06 | Label tim dipakai di Pemetaan tim, Template, dan label peran; layar lain menyusul |
+| FR-NTF-06 | Baru pemicu Menjadi leader tim. Daftar notifikasi dibuat di Sprint 4 |
+| NFR-01 | Ditambah 4 layar: Pemetaan tim, form tim, Template, form template |
