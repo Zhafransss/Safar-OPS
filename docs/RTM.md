@@ -14,24 +14,24 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-NAV-01 | BG-06 | Beranda | Navigasi | Must | Done | TC-NAV-01: isi Beranda sama dengan mockup |
 | FR-NAV-02 | BG-06 | Hub sesuai peran | Navigasi | Must | In Progress | TC-NAV-02: menu tampil sesuai pemilik, leader, staff |
 | FR-NAV-03 | BG-03 | Lonceng di semua halaman | Navigasi | Must | In Progress | TC-NAV-03: lonceng ada di tiap halaman Penugasan |
-| FR-LAP-01 | BG-05 | Buat laporan | Laporan | Must | Not Started | TC-LAP-01: isian kosong memunculkan PNG-LAP-01–05 |
-| FR-LAP-02 | BG-05 | Nomor YYMM-NNN | Laporan | Must | Not Started | TC-LAP-02: kirim bersamaan tidak dobel; reset bulan baru |
-| FR-LAP-03 | BG-05 | Foto dikompres, maksimal 5 | Laporan | Must | Not Started | TC-LAP-03: foto ke-6 memunculkan PNG-LAP-06 |
-| FR-LAP-04 | BG-05 | Alur status | Laporan | Must | Not Started | TC-LAP-04: hanya pihak berhak bisa mengubah status |
-| FR-LAP-05 | BG-05 | Tolak wajib alasan | Laporan | Must | Not Started | TC-LAP-05: alasan kosong memunculkan PNG-LAP-07 |
-| FR-LAP-06 | BG-05 | Tidak bisa diedit atau dibuka kembali | Laporan | Must | Not Started | TC-LAP-06: laporan tertutup tampil terkunci |
-| FR-LAP-07 | BG-05 | Teruskan | Laporan | Must | Not Started | TC-LAP-07: penerima lama menjadi CC |
-| FR-LAP-08 | BG-05 | Tambah CC | Laporan | Must | Not Started | TC-LAP-08: CC bisa melihat dan chat |
-| FR-LAP-09 | BG-05 | Chat teks dan foto | Laporan | Must | Not Started | TC-LAP-09: pesan kosong PNG-LAP-08; chat tutup setelah Selesai |
-| FR-LAP-10 | BG-05 | Chat tidak realtime | Laporan | Must | Not Started | TC-LAP-10: pesan baru tampil setelah refresh |
-| FR-LAP-11 | BG-05 | Tanda baca | Laporan | Must | Not Started | TC-LAP-11: abu dan biru sesuai peserta; pemilik tidak dihitung |
-| FR-LAP-12 | BG-05 | Foto layar penuh | Laporan | Must | Not Started | TC-LAP-12: geser, penanda "2 / 3", tutup |
-| FR-LAP-13 | BG-05 | Tab per peran | Laporan | Must | Not Started | TC-LAP-13: isi tab sesuai peran |
-| FR-LAP-14 | BG-05 | Filter status | Laporan | Must | Not Started | TC-LAP-14: urutan benar; kembali ke Semua |
-| FR-LAP-15 | BG-05 | Pencarian | Laporan | Must | Not Started | TC-LAP-15: cari nomor dan judul; pesan tidak ditemukan |
-| FR-LAP-16 | BG-05 | Kartu laporan | Laporan | Must | Not Started | TC-LAP-16: titik oranye hilang setelah dibuka penerima |
-| FR-LAP-17 | BG-05 | Hak melihat | Laporan | Must | Not Started | TC-LAP-17: orang lain mendapat PNG-LAP-11 |
-| FR-LAP-18 | BG-05 | Riwayat laporan | Laporan | Must | Not Started | TC-LAP-18: tiap perubahan tercatat |
+| FR-LAP-01 | BG-05 | Buat laporan | Laporan | Must | Done | TC-LAP-01: isian kosong memunculkan PNG-LAP-01–05 |
+| FR-LAP-02 | BG-05 | Nomor YYMM-NNN | Laporan | Must | Done | TC-LAP-02: kirim bersamaan tidak dobel; reset bulan baru |
+| FR-LAP-03 | BG-05 | Foto dikompres, maksimal 5 | Laporan | Must | Done | TC-LAP-03: foto ke-6 memunculkan PNG-LAP-06 |
+| FR-LAP-04 | BG-05 | Alur status | Laporan | Must | Done | TC-LAP-04: hanya pihak berhak bisa mengubah status |
+| FR-LAP-05 | BG-05 | Tolak wajib alasan | Laporan | Must | Done | TC-LAP-05: alasan kosong memunculkan PNG-LAP-07 |
+| FR-LAP-06 | BG-05 | Tidak bisa diedit atau dibuka kembali | Laporan | Must | Done | TC-LAP-06: laporan tertutup tampil terkunci |
+| FR-LAP-07 | BG-05 | Teruskan | Laporan | Must | Done | TC-LAP-07: penerima lama menjadi CC |
+| FR-LAP-08 | BG-05 | Tambah CC | Laporan | Must | Done | TC-LAP-08: CC bisa melihat dan chat |
+| FR-LAP-09 | BG-05 | Chat teks dan foto | Laporan | Must | Done | TC-LAP-09: pesan kosong PNG-LAP-08; chat tutup setelah Selesai |
+| FR-LAP-10 | BG-05 | Chat tidak realtime | Laporan | Must | Done | TC-LAP-10: pesan baru tampil setelah refresh |
+| FR-LAP-11 | BG-05 | Tanda baca | Laporan | Must | Done | TC-LAP-11: abu dan biru sesuai peserta; pemilik tidak dihitung |
+| FR-LAP-12 | BG-05 | Foto layar penuh | Laporan | Must | Done | TC-LAP-12: geser, penanda "2 / 3", tutup |
+| FR-LAP-13 | BG-05 | Tab per peran | Laporan | Must | Done | TC-LAP-13: isi tab sesuai peran |
+| FR-LAP-14 | BG-05 | Filter status | Laporan | Must | Done | TC-LAP-14: urutan benar; kembali ke Semua |
+| FR-LAP-15 | BG-05 | Pencarian | Laporan | Must | Done | TC-LAP-15: cari nomor dan judul; pesan tidak ditemukan |
+| FR-LAP-16 | BG-05 | Kartu laporan | Laporan | Must | Done | TC-LAP-16: titik oranye hilang setelah dibuka penerima |
+| FR-LAP-17 | BG-05 | Hak melihat | Laporan | Must | Done | TC-LAP-17: orang lain mendapat PNG-LAP-11 |
+| FR-LAP-18 | BG-05 | Riwayat laporan | Laporan | Must | In Progress | TC-LAP-18: tiap perubahan tercatat |
 | FR-PRG-01 | BG-01 | Buat program | Program | Must | Not Started | TC-PRG-01: PNG-PRG-01, 02; leader terkunci ke timnya |
 | FR-PRG-02 | BG-01 | Filter status dan jumlah | Program | Must | Not Started | TC-PRG-02: jumlah per filter benar |
 | FR-PRG-03 | BG-01 | Tutup dan batal | Program | Must | Not Started | TC-PRG-03: PNG-PRG-03; batal mengunci tugas |
@@ -69,7 +69,7 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-UI-02 | BG-06 | Area ketuk 44 px | Tampilan | Must | In Progress | TC-UI-02: elemen kecil punya area 44 px |
 | FR-UI-03 | BG-06 | Label peran | Tampilan | Must | Done | TC-UI-03: label per tim dan rangkap |
 | FR-UI-04 | BG-05 | Inisial | Tampilan | Must | Done | TC-UI-04: Ka/Ku, CS, C2 |
-| FR-UI-05 | BG-05 | Umur relatif | Tampilan | Must | Not Started | TC-UI-05: teks benar pada batas hari WIB |
+| FR-UI-05 | BG-05 | Umur relatif | Tampilan | Must | Done | TC-UI-05: teks benar pada batas hari WIB |
 | FR-UI-06 | BG-04 | Label tim berwarna | Tampilan | Must | In Progress | TC-UI-06: semua nama tim berlabel |
 | FR-PWA-01 | BG-06 | Bisa di-install | PWA | Must | In Progress | TC-PWA-01: install di Android dan iOS |
 | FR-PWA-02 | BG-06 | Cache statis dan halaman offline | PWA | Must | Done | TC-PWA-02: tanpa internet tampil halaman offline, tanpa data pengguna |
@@ -77,8 +77,8 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | NFR-01 | Semua | Kesesuaian mockup | Seluruh layar | Must | In Progress | TC-NFR-01: layar berdampingan 390 px |
 | NFR-02 | BG-06 | Aturan akses di server | Keamanan | Must | In Progress | TC-NFR-02: uji akses per peran |
 | NFR-03 | BG-06 | Password dan sesi aman | Keamanan | Must | Done | TC-NFR-03: log bersih; login dibatasi |
-| NFR-04 | BG-05 | Foto privat | Keamanan | Must | Not Started | TC-NFR-04: URL foto ditolak tanpa hak |
-| NFR-05 | BG-01 | Konsistensi data | Data | Must | Not Started | TC-NFR-05: aksi bersamaan tidak merusak data |
+| NFR-04 | BG-05 | Foto privat | Keamanan | Must | In Progress | TC-NFR-04: URL foto ditolak tanpa hak |
+| NFR-05 | BG-01 | Konsistensi data | Data | Must | In Progress | TC-NFR-05: aksi bersamaan tidak merusak data |
 | NFR-06 | BG-03 | Zona waktu Asia/Jakarta | Data | Must | In Progress | TC-NFR-06: pukul 00.30 WIB tetap tanggal yang benar |
 | NFR-07 | BG-06 | Performa | Seluruh layar | Should | Not Started | TC-NFR-07: daftar tampil < 2 detik di 4G |
 | NFR-08 | BG-06 | Kompatibilitas | Seluruh layar | Must | In Progress | TC-NFR-08: uji Chrome Android dan Safari iOS |
@@ -107,3 +107,15 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-UI-06 | Label tim dipakai di Pemetaan tim, Template, dan label peran; layar lain menyusul |
 | FR-NTF-06 | Baru pemicu Menjadi leader tim. Daftar notifikasi dibuat di Sprint 4 |
 | NFR-01 | Ditambah 4 layar: Pemetaan tim, form tim, Template, form template |
+
+## Catatan status Sprint 2 (5 November 2026)
+
+| ID | Sisa pekerjaan |
+|---|---|
+| FR-LAP-01–17 | Selesai, diuji lewat layar dengan 6 pengguna pada PostgreSQL asli |
+| FR-LAP-02 | 12 pengiriman serentak mendapat nomor unik |
+| FR-LAP-18 | Riwayat lampiran ke tugas dibuat di Sprint 3 |
+| NFR-04 | Akses foto selesai; penyimpanan masih disk lokal dan perlu driver sesuai hosting (A-04) |
+| NFR-05 | Laporan selesai; Tugas dan QC menyusul di Sprint 3 |
+| FR-NTF-06 | Pemicu laporan selesai; pemicu Penugasan di Sprint 3 |
+| NFR-01 | Ditambah 3 layar: Laporan, form laporan, detail laporan |

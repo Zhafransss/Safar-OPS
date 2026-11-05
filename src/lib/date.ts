@@ -31,6 +31,36 @@ export function formatFullDate(date: Date): string {
   return `${DAY_NAMES[dayOfWeek]}, ${day} ${MONTH_NAMES[month - 1]} ${year}`;
 }
 
+// Mockup fmt: "27 Okt 2026".
+export function formatDate(date: Date): string {
+  const { year, month, day } = jakartaParts(date);
+  return `${day} ${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+// Mockup fmtS: "27 Okt".
+export function formatShortDate(date: Date): string {
+  const { month, day } = jakartaParts(date);
+  return `${day} ${MONTH_NAMES[month - 1]}`;
+}
+
+function jakartaDayNumber(date: Date): number {
+  const { year, month, day } = jakartaParts(date);
+  return Date.UTC(year, month - 1, day) / 86_400_000;
+}
+
+// Mockup ago (K-T27): calendar days in Jakarta, not elapsed hours.
+export function relativeAge(date: Date, now: Date): string {
+  const days = jakartaDayNumber(now) - jakartaDayNumber(date);
+  if (days <= 0) return "hari ini";
+  return days === 1 ? "1 hari yang lalu" : `${days} hari yang lalu`;
+}
+
+// K-T83: the YYMM prefix of a report number.
+export function reportPeriod(date: Date): string {
+  const { year, month } = jakartaParts(date);
+  return `${String(year).slice(-2)}${String(month).padStart(2, "0")}`;
+}
+
 // CHANGELOG 18: the mockup hardcodes "Selamat Siang" as a sample.
 export function greeting(date: Date): string {
   const { hour } = jakartaParts(date);

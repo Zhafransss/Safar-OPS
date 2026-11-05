@@ -9,12 +9,14 @@ import type { PickerUser } from "@/server/services/team";
 // Mockup openPick with pickUsers.
 export function UserPicker({
   title,
+  placeholder = "Cari",
   users,
   exclude,
   onPick,
   onClose,
 }: {
   title: string;
+  placeholder?: string;
   users: PickerUser[];
   exclude: readonly (string | null)[];
   onPick: (userId: string) => void;
@@ -27,14 +29,14 @@ export function UserPicker({
 
   return (
     <Sheet title={title} onClose={onClose}>
-      <input id="pkQ" className="inp" placeholder="Cari" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input id="pkQ" className="inp" placeholder={placeholder} value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="listbox mt">
         {matches.map((user) => (
           <div key={user.id} className="li" role="button" tabIndex={0} onClick={() => onPick(user.id)}>
             <div className="li-b">
               <b>{user.name}</b>
               <small>
-                <RoleLabel viewer={{ isOwner: false, teamRoles: user.teamRoles }} />
+                <RoleLabel viewer={user} />
               </small>
             </div>
           </div>

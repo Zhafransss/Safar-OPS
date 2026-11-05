@@ -12,4 +12,5 @@ src/generated/
 .vercel/
 .prisma-dev/
 *.log
-.pglite/
+.pgdata/
+.uploads/

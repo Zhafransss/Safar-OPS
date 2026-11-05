@@ -56,7 +56,7 @@ CSS mockup yang tidak dipakai layar mana pun (`.vf`, `.doc`, `.lbl`, bagian Kons
 | Batasan | Penanganan |
 |---|---|
 | Filesystem tidak bisa dipakai menyimpan foto | Vercel Blob, store private |
-| Body request function maksimal 4,5 MB | Foto dikompres di HP dan diunggah langsung ke Blob |
+| Body request function maksimal 4,5 MB | Foto dikompres di HP menjadi di bawah 1 MB, lalu diunggah lewat `POST /api/photos` yang menolak di atas 4 MB |
 | Private Blob dibaca lewat function | Rute `/api/photos/[id]` sekaligus memeriksa hak akses (NFR-04) |
 | Banyak koneksi dari serverless | Prisma memakai URL pooled; migrasi memakai URL direct |
 | Server memakai UTC | Fungsi tanggal terpusat dengan Asia/Jakarta (NFR-06) |
@@ -108,7 +108,9 @@ Trade-off: Serwist menyediakan banyak fitur cache yang tidak dipakai opsi A. Man
 
 ### 4.4 Foto
 
-Kompres di HP (`browser-image-compression`) → minta token unggah → unggah langsung ke Blob → id foto dikirim bersama laporan atau pesan. Berkas HEIC dari iPhone diuji di Sprint 2.
+Kompres di HP (`browser-image-compression`, maksimal 1 MB dan sisi terpanjang 1600 px) → `POST /api/photos` memeriksa isi berkas dan mengembalikan key → key dikirim bersama laporan atau pesan. Key hanya bisa dipakai pengunggahnya.
+
+Trade-off: unggah langsung ke Blob mengurangi beban server, tetapi mengikat kode ke Vercel padahal hosting belum diputuskan. Foto sudah kecil setelah dikompres, jadi **dipilih unggah lewat server** dengan `src/server/integrations/photo-storage.ts` sebagai satu-satunya lapisan penyimpanan. Saat ini berkas disimpan di disk lokal; deploy ke Vercel butuh driver Blob di berkas itu, deploy ke VPS cukup mengatur `PHOTO_STORAGE_DIR`. Foto yang terunggah tetapi laporannya batal dikirim tertinggal sebagai berkas yatim dan belum dibersihkan otomatis. Berkas HEIC dari iPhone belum diuji di HP asli.
 
 ## 5. ERD
 
@@ -166,8 +168,7 @@ Semua prosedur butuh sesi. Input divalidasi Zod. Error membawa kode PNG. Halaman
 |---|---|---|
 | `auth` | `login`, `logout`, `me` | Publik untuk `login` |
 | `team` | `create`, `update` | Pemilik |
-| `report` | `list`, `get`, `create`, `setStatus`, `reject`, `markDone`, `forward`, `addCc`, `markOpened` | Sesuai PRD 4 |
-| `reportMessage` | `send` | Yang berhak ikut chat |
+| `report` | `list`, `create`, `start`, `reject`, `finish`, `forward`, `addCc`, `sendMessage`, `markOpened` | Sesuai PRD 4 |
 | `program` | `list`, `get`, `create`, `close`, `cancel` | Tutup dan batal: leader tim |
 | `task` | `get`, `create`, `remove`, `attachableReports` | Buat dan hapus: pemilik, leader tim |
 | `todo` | `add`, `update`, `move`, `remove`, `toggle` | `toggle`: PIC; lainnya: pemilik, leader tim |
@@ -175,7 +176,7 @@ Semua prosedur butuh sesi. Input divalidasi Zod. Error membawa kode PNG. Halaman
 | `template` | `create`, `update`, `remove` | Leader tim |
 | `notification` | `list`, `open`, `markRead`, `undo`, `clearAll` | Pemilik data |
 
-Rute non-tRPC: `POST /api/photos/upload-token` dan `GET /api/photos/[id]`.
+Rute non-tRPC: `POST /api/photos` dan `GET /api/photos/[id]`.
 
 ## 7. Struktur folder
 

@@ -29,7 +29,7 @@ Urutan mengikuti ketergantungan: login dan pemetaan tim dibutuhkan semua fitur l
 
 ## 3. Branching
 
-`main` (produksi) ← `staging` (uji) ← `feature/*`. Setiap cabang mendapat preview deploy. Perubahan masuk lewat pull request.
+Semua pekerjaan masuk ke `development`. `main` hanya diperbarui saat semua fitur selesai dan siap deploy. Lingkungan staging, jika dipakai, di-deploy dari `development`.
 
 ## 4. Environment variable
 
@@ -39,7 +39,8 @@ Menjadi isi `.env.example` di S0.
 |---|---|
 | `DATABASE_URL` | Koneksi pooled untuk aplikasi |
 | `DIRECT_URL` | Koneksi langsung untuk migrasi Prisma |
-| `BLOB_READ_WRITE_TOKEN` | Akses Vercel Blob private |
+| `PHOTO_STORAGE_DIR` | Folder foto di server, jika hosting memakai disk |
+| `BLOB_READ_WRITE_TOKEN` | Akses Vercel Blob private, jika hosting memakai Vercel |
 | `JUBELIO_BASE_URL` | `https://api2.jubelio.com` |
 | `JUBELIO_SERVICE_EMAIL` | Akun sistem untuk daftar pengguna, jika opsi A terbukti |
 | `JUBELIO_SERVICE_PASSWORD` | Pasangan akun sistem |
@@ -51,4 +52,4 @@ Menjadi isi `.env.example` di S0.
 | URL repo dan akses | Selesai: `developersaefulaskar/SAFAR-OPS-2`, private, masih kosong |
 | Akun Jubelio untuk uji login, diisi sendiri ke `.env.local` | Pemilik |
 | Keputusan hosting dan akses akun | Pemilik |
-| PostgreSQL lokal | Selesai: `pnpm db:local` (PGlite, tanpa Docker atau instalasi) |
+| PostgreSQL lokal | Selesai: `pnpm db:local` (PostgreSQL asli lewat `embedded-postgres`, tanpa Docker atau instalasi) |

@@ -27,7 +27,8 @@
 /* Mockup uses divs with onclick; real links keep the same look. */
 a.menu,
 a.li,
-a.tcard {
+a.tcard,
+a.lapcard {
   color: inherit;
   text-decoration: none;
 }
@@ -39,6 +40,28 @@ a.btn {
 a.menu,
 a.tcard {
   display: block;
+}
+
+/* The mockup shows placeholders; real photos fill the same boxes. */
+.foto {
+  overflow: hidden;
+}
+
+.foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fv-img {
+  background: #000;
+  overflow: hidden;
+}
+
+.fv-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* The mockup avatar is a div. Here it opens logout, so it needs a button with a 44 px target (K-T82). */

@@ -13,12 +13,14 @@ export function PageHeader({
   subtitleIsRoles = false,
   backHref,
   unreadCount,
+  right,
 }: {
   title: string;
   subtitle?: ReactNode;
   subtitleIsRoles?: boolean;
   backHref: string;
   unreadCount: number;
+  right?: ReactNode;
 }) {
   const router = useRouter();
   return (
@@ -30,6 +32,7 @@ export function PageHeader({
         <div className="hd-t">{title}</div>
         {subtitle && <div className={`hd-s ${subtitleIsRoles ? "r" : ""}`}>{subtitle}</div>}
       </div>
+      {right}
       <BellButton count={unreadCount} small />
     </div>
   );

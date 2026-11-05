@@ -4,14 +4,14 @@ import { TRPCError } from "@trpc/server";
 
 import { isOwnerEmail, OWNERS } from "@/config/owners";
 import { TEAM_PALETTE } from "@/config/team-palette";
-import { initials } from "@/lib/initials";
 import { db } from "@/server/db";
+import { loadInitialsResolver } from "@/server/services/names";
 import { notify } from "@/server/services/notifications";
 import { findTeamError, firstFreeColor, normalizeDraft, type TeamDraft } from "@/server/services/team-rules";
 import type { TeamRole } from "@/server/services/viewer";
 import { pngError } from "@/server/trpc";
 
-export type PickerUser = { id: string; name: string; teamRoles: TeamRole[] };
+export type PickerUser = { id: string; name: string; isOwner: boolean; teamRoles: TeamRole[] };
 
 const teamInclude = {
   leader: { select: { id: true, name: true } },
@@ -41,9 +41,7 @@ function rolesOf(userId: string, teams: readonly LoadedTeam[]): TeamRole[] {
 }
 
 export async function getTeamChart() {
-  const [teams, users] = await Promise.all([loadTeams(), db.user.findMany({ select: { name: true } })]);
-  const allNames = [...new Set([...users.map((user) => user.name), ...OWNERS.map((owner) => owner.name)])];
-  const initialsOf = (name: string) => initials(name, allNames.filter((other) => other !== name));
+  const [teams, initialsOf] = await Promise.all([loadTeams(), loadInitialsResolver()]);
 
   return {
     owners: OWNERS.map((owner) => ({ name: owner.name, initials: initialsOf(owner.name) })),
@@ -87,8 +85,23 @@ export async function getTeamFormData(teamId: string | null) {
       .filter((candidate) => candidate.id !== teamId)
       .map((candidate) => ({ color: candidate.color, teamName: candidate.name })),
     defaultColor: firstFreeColor(teams.map((candidate) => candidate.color)) ?? TEAM_PALETTE[0].color,
-    users: users.map((user): PickerUser => ({ id: user.id, name: user.name, teamRoles: rolesOf(user.id, teams) })),
+    users: users.map((user): PickerUser => ({ id: user.id, name: user.name, isOwner: false, teamRoles: rolesOf(user.id, teams) })),
   };
+}
+
+// Everyone a report can go to. Owner emails are known up front, so they are selectable before their first login.
+export async function getReportRecipients(): Promise<PickerUser[]> {
+  await db.user.createMany({ data: OWNERS.map(({ name, email }) => ({ name, email })), skipDuplicates: true });
+  const [teams, users] = await Promise.all([
+    loadTeams(),
+    db.user.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
+  ]);
+  return users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    isOwner: isOwnerEmail(user.email),
+    teamRoles: rolesOf(user.id, teams),
+  }));
 }
 
 function isUniqueViolation(error: unknown): boolean {

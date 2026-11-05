@@ -1,18 +1,28 @@
-// Local PostgreSQL for machines without Docker or a Postgres install. Data lives in .pglite/.
+// Real PostgreSQL for machines without Docker or a system install. Data lives in .pgdata/.
 // Run with: pnpm db:local   Then use DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54330/postgres?sslmode=disable
-import { PGlite } from "@electric-sql/pglite";
-import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
+// It is real PostgreSQL on purpose: row locks and simultaneous report numbers must behave as in production.
+import fs from "node:fs";
+import path from "node:path";
+
+import EmbeddedPostgres from "embedded-postgres";
 
 const PORT = 54330;
+const dataDir = path.resolve(".pgdata");
 
-const db = await PGlite.create(process.env.PGLITE_DIR ?? ".pglite");
-const server = new PGLiteSocketServer({ db, port: PORT, host: "127.0.0.1", maxConnections: 10 });
+const server = new EmbeddedPostgres({
+  databaseDir: dataDir,
+  user: "postgres",
+  password: "postgres",
+  port: PORT,
+  persistent: true,
+});
+
+if (!fs.existsSync(path.join(dataDir, "PG_VERSION"))) await server.initialise();
 await server.start();
 console.log(`Local PostgreSQL listening on 127.0.0.1:${PORT}`);
 
 async function shutdown() {
   await server.stop();
-  await db.close();
   process.exit(0);
 }
 
