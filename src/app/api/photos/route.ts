@@ -1,8 +1,10 @@
 import { getSessionUser } from "@/server/auth/session";
+import { isCrossSite } from "@/server/same-origin";
 import { detectExtension, MAX_PHOTO_BYTES, newPhotoKey, savePhoto } from "@/server/integrations/photo-storage";
 
 // The file is stored first; the report or message claims the returned key when it is sent.
 export async function POST(request: Request) {
+  if (isCrossSite(request)) return new Response(null, { status: 403 });
   const user = await getSessionUser();
   if (!user) return new Response(null, { status: 401 });
 

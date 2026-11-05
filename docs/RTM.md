@@ -9,7 +9,7 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-AUT-01 | BG-06 | Login Jubelio, password tidak disimpan | Akun | Must | In Progress | TC-AUT-01: login benar masuk, salah PNG-AUT-01 |
 | FR-AUT-02 | BG-06 | 4 pemilik dari daftar email | Akun | Must | Done | TC-AUT-02: keempat email berperan Pemilik |
 | FR-AUT-03 | BG-04 | Daftar pengguna dari Jubelio | Akun | Must | In Progress | TC-AUT-03: pilihan penerima dan PIC berisi pengguna Jubelio |
-| FR-AUT-04 | BG-06 | Peran dari Pemetaan tim, aturan di server | Akun | Must | In Progress | TC-AUT-04: panggil API tanpa hak ditolak dengan kode PNG |
+| FR-AUT-04 | BG-06 | Peran dari Pemetaan tim, aturan di server | Akun | Must | Done | TC-AUT-04: panggil API tanpa hak ditolak dengan kode PNG |
 | FR-AUT-05 | BG-06 | Logout | Akun | Must | Done | TC-AUT-05: setelah keluar, halaman kembali ke login |
 | FR-NAV-01 | BG-06 | Beranda | Navigasi | Must | Done | TC-NAV-01: isi Beranda sama dengan mockup |
 | FR-NAV-02 | BG-06 | Hub sesuai peran | Navigasi | Must | Done | TC-NAV-02: menu tampil sesuai pemilik, leader, staff |
@@ -65,7 +65,7 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-NTF-04 | BG-03 | Bersihkan semua | Notifikasi | Must | Done | TC-NTF-04: konfirmasi lalu daftar kosong |
 | FR-NTF-05 | BG-05 | Label CC | Notifikasi | Must | Done | TC-NTF-05: hanya laporan CC berlabel |
 | FR-NTF-06 | BG-03 | 15 pemicu | Notifikasi | Must | Done | TC-NTF-06: tiap pemicu ke penerima benar; tidak ke diri sendiri |
-| FR-UI-01 | BG-06 | Token dan ukuran mockup | Tampilan | Must | In Progress | TC-UI-01: perbandingan layar terang dan gelap |
+| FR-UI-01 | BG-06 | Token dan ukuran mockup | Tampilan | Must | Done | TC-UI-01: perbandingan layar terang dan gelap |
 | FR-UI-02 | BG-06 | Area ketuk 44 px | Tampilan | Must | Done | TC-UI-02: elemen kecil punya area 44 px |
 | FR-UI-03 | BG-06 | Label peran | Tampilan | Must | Done | TC-UI-03: label per tim dan rangkap |
 | FR-UI-04 | BG-05 | Inisial | Tampilan | Must | Done | TC-UI-04: Ka/Ku, CS, C2 |
@@ -74,15 +74,15 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-PWA-01 | BG-06 | Bisa di-install | PWA | Must | In Progress | TC-PWA-01: install di Android dan iOS |
 | FR-PWA-02 | BG-06 | Cache statis dan halaman offline | PWA | Must | Done | TC-PWA-02: tanpa internet tampil halaman offline, tanpa data pengguna |
 | FR-PWA-03 | BG-03 | Muat ulang saat aktif | PWA | Must | Done | TC-PWA-03: buka kembali aplikasi memperbarui lonceng |
-| NFR-01 | Semua | Kesesuaian mockup | Seluruh layar | Must | In Progress | TC-NFR-01: layar berdampingan 390 px |
-| NFR-02 | BG-06 | Aturan akses di server | Keamanan | Must | In Progress | TC-NFR-02: uji akses per peran |
+| NFR-01 | Semua | Kesesuaian mockup | Seluruh layar | Must | Done | TC-NFR-01: layar berdampingan 390 px |
+| NFR-02 | BG-06 | Aturan akses di server | Keamanan | Must | Done | TC-NFR-02: uji akses per peran |
 | NFR-03 | BG-06 | Password dan sesi aman | Keamanan | Must | Done | TC-NFR-03: log bersih; login dibatasi |
-| NFR-04 | BG-05 | Foto privat | Keamanan | Must | In Progress | TC-NFR-04: URL foto ditolak tanpa hak |
+| NFR-04 | BG-05 | Foto privat | Keamanan | Must | Done | TC-NFR-04: URL foto ditolak tanpa hak |
 | NFR-05 | BG-01 | Konsistensi data | Data | Must | Done | TC-NFR-05: aksi bersamaan tidak merusak data |
-| NFR-06 | BG-03 | Zona waktu Asia/Jakarta | Data | Must | In Progress | TC-NFR-06: pukul 00.30 WIB tetap tanggal yang benar |
-| NFR-07 | BG-06 | Performa | Seluruh layar | Should | Not Started | TC-NFR-07: daftar tampil < 2 detik di 4G |
+| NFR-06 | BG-03 | Zona waktu Asia/Jakarta | Data | Must | Done | TC-NFR-06: pukul 00.30 WIB tetap tanggal yang benar |
+| NFR-07 | BG-06 | Performa | Seluruh layar | Should | Done | TC-NFR-07: daftar tampil < 2 detik di 4G |
 | NFR-08 | BG-06 | Kompatibilitas | Seluruh layar | Must | In Progress | TC-NFR-08: uji Chrome Android dan Safari iOS |
-| NFR-09 | BG-06 | Skala | Arsitektur | Should | Not Started | TC-NFR-09: data contoh 8 tim tetap lancar |
+| NFR-09 | BG-06 | Skala | Arsitektur | Should | Done | TC-NFR-09: data contoh 8 tim tetap lancar |
 | NFR-10 | BG-06 | Konfigurasi terpusat | Kode | Should | Done | TC-NFR-10: tambah warna cukup di satu berkas |
 
 ## Catatan status Sprint 0 (5 November 2026)
@@ -140,3 +140,17 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-NTF-06 | 15 pemicu terbukti di uji Sprint 1–4; tidak ada notifikasi atas tindakan sendiri |
 | FR-NAV-02, FR-NAV-03 | Semua menu Hub kini punya layar, dan lonceng aktif di semua halaman |
 | NFR-01 | Ditambah daftar notifikasi |
+
+## Catatan status Sprint 5 (5 November 2026)
+
+| ID | Hasil atau sisa pekerjaan |
+|---|---|
+| NFR-01, FR-UI-01 | Ke-14 layar mockup dibandingkan berdampingan pada 390 px, terang dan gelap |
+| NFR-02 | Semua aturan akses di server; jalur terlarang diuji langsung ke API di Sprint 1–4. Ditambah pemeriksaan Origin untuk aksi yang mengubah data, header keamanan, dan pesan error internal yang disembunyikan |
+| NFR-04 | Driver Cloudflare R2: bucket privat, unggah bertanda tangan, baca lewat tautan 5 menit setelah cek akses. Diuji dengan R2 tiruan; uji bucket asli masuk daftar go-live |
+| NFR-06 | Tanggal, label tenggat, dan nomor laporan memakai Asia/Jakarta; diuji pada pukul 00.30 WIB |
+| NFR-07 | Build produksi dengan 4G tiruan: halaman terberat (620 laporan) 1,5 detik, lainnya di bawah 0,3 detik. Diukur di komputer lokal |
+| NFR-09 | 8 tim, 620 laporan, 375 tugas, 1.818 to-do tanpa masalah |
+| FR-AUT-01, FR-AUT-03 | Menunggu uji akun Jubelio asli (A-01 sampai A-03) |
+| FR-PWA-01, NFR-08 | Menunggu staging HTTPS dan HP asli |
+| Skenario UAT | Draf di `docs/UAT.md` (A-07) |

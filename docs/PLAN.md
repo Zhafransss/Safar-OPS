@@ -39,8 +39,8 @@ Menjadi isi `.env.example` di S0.
 |---|---|
 | `DATABASE_URL` | Koneksi pooled untuk aplikasi |
 | `DIRECT_URL` | Koneksi langsung untuk migrasi Prisma |
-| `PHOTO_STORAGE_DIR` | Folder foto di server, jika hosting memakai disk |
-| `BLOB_READ_WRITE_TOKEN` | Akses Vercel Blob private, jika hosting memakai Vercel |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Cloudflare R2 untuk foto, wajib di Vercel |
+| `PHOTO_STORAGE_DIR` | Folder foto lokal untuk pengembangan |
 | `JUBELIO_BASE_URL` | `https://api2.jubelio.com` |
 | `JUBELIO_SERVICE_EMAIL` | Akun sistem untuk daftar pengguna, jika opsi A terbukti |
 | `JUBELIO_SERVICE_PASSWORD` | Pasangan akun sistem |

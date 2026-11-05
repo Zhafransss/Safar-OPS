@@ -2,12 +2,13 @@ export type PendingPhoto = { file: File; url: string };
 
 export const PHOTO_ERROR = "Foto tidak bisa diproses. Coba foto lain.";
 
-// K-T43. useWebWorker stays off because the library's worker loads a script from a public CDN.
+// K-T43. About 250 KB and 1280 px keeps evidence readable and lets 10 GB of R2 last over two years.
+// useWebWorker stays off because the library's worker loads a script from a public CDN.
 export async function preparePhoto(file: File): Promise<PendingPhoto> {
   const { default: imageCompression } = await import("browser-image-compression");
   const compressed = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1600,
+    maxSizeMB: 0.25,
+    maxWidthOrHeight: 1280,
     fileType: "image/jpeg",
     useWebWorker: false,
   });

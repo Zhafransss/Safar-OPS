@@ -108,9 +108,11 @@ Trade-off: Serwist menyediakan banyak fitur cache yang tidak dipakai opsi A. Man
 
 ### 4.4 Foto
 
-Kompres di HP (`browser-image-compression`, maksimal 1 MB dan sisi terpanjang 1600 px) → `POST /api/photos` memeriksa isi berkas dan mengembalikan key → key dikirim bersama laporan atau pesan. Key hanya bisa dipakai pengunggahnya.
+Kompres di HP (`browser-image-compression`, maksimal 250 KB dan sisi terpanjang 1280 px, diputuskan 5 November; hasil uji: foto 12 MP menjadi sekitar 160 KB dan tulisan label tetap terbaca) → `POST /api/photos` memeriksa isi berkas dan mengembalikan key → key dikirim bersama laporan atau pesan. Key hanya bisa dipakai pengunggahnya.
 
-Trade-off: unggah langsung ke Blob mengurangi beban server, tetapi mengikat kode ke Vercel padahal hosting belum diputuskan. Foto sudah kecil setelah dikompres, jadi **dipilih unggah lewat server** dengan `src/server/integrations/photo-storage.ts` sebagai satu-satunya lapisan penyimpanan. Saat ini berkas disimpan di disk lokal; deploy ke Vercel butuh driver Blob di berkas itu, deploy ke VPS cukup mengatur `PHOTO_STORAGE_DIR`. Foto yang terunggah tetapi laporannya batal dikirim tertinggal sebagai berkas yatim dan belum dibersihkan otomatis. Berkas HEIC dari iPhone belum diuji di HP asli.
+**Penyimpanan diputuskan 5 November: Cloudflare R2.** `photo-storage.ts` memakai R2 bila `R2_BUCKET` diisi dan disk lokal bila tidak. Membaca foto: server memeriksa hak akses, lalu mengarahkan browser ke tautan R2 bertanda tangan yang berlaku 5 menit, sehingga foto tidak memakai kuota transfer Vercel dan bucket tetap privat. Di Vercel tanpa variabel R2, aplikasi menolak menyimpan foto.
+
+Catatan awal: unggah langsung ke Blob mengurangi beban server, tetapi mengikat kode ke Vercel padahal hosting belum diputuskan. Foto sudah kecil setelah dikompres, jadi **dipilih unggah lewat server** dengan `src/server/integrations/photo-storage.ts` sebagai satu-satunya lapisan penyimpanan. Saat ini berkas disimpan di disk lokal; deploy ke Vercel butuh driver Blob di berkas itu, deploy ke VPS cukup mengatur `PHOTO_STORAGE_DIR`. Foto yang terunggah tetapi laporannya batal dikirim tertinggal sebagai berkas yatim dan belum dibersihkan otomatis. Berkas HEIC dari iPhone belum diuji di HP asli.
 
 ## 5. ERD
 

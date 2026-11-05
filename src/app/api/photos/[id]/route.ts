@@ -1,6 +1,6 @@
 import { getSessionUser } from "@/server/auth/session";
 import { db } from "@/server/db";
-import { readPhoto } from "@/server/integrations/photo-storage";
+import { photoResponse } from "@/server/integrations/photo-storage";
 import { canViewViaTask } from "@/server/services/assignment";
 import { userCanSeeReport } from "@/server/services/report";
 
@@ -20,13 +20,5 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const allowed = (await userCanSeeReport(report, user)) || (await canViewViaTask(report.id, user));
   if (!allowed) return new Response(null, { status: 403 });
 
-  const { bytes, contentType } = await readPhoto(photo.blobPath);
-  return new Response(bytes, {
-    headers: {
-      "content-type": contentType,
-      "x-content-type-options": "nosniff",
-      // private: a shared cache must never keep it. Photos never change once sent.
-      "cache-control": "private, max-age=3600",
-    },
-  });
+  return photoResponse(photo.blobPath);
 }

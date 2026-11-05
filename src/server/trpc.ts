@@ -15,7 +15,15 @@ export async function createContext(opts: { headers: Headers }) {
 
 type Context = Awaited<ReturnType<typeof createContext>>;
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({
+  // An unexpected error (a database failure, for example) carries table names and file paths.
+  // Users only need to know it failed; the details stay in the server log.
+  errorFormatter({ shape, error }) {
+    if (error.code !== "INTERNAL_SERVER_ERROR" || process.env.NODE_ENV !== "production") return shape;
+    console.error(error);
+    return { ...shape, message: "Terjadi kesalahan di server.", data: { ...shape.data, stack: undefined } };
+  },
+});
 
 export const router = t.router;
 export const publicProcedure = t.procedure;

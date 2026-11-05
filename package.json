@@ -26,6 +26,7 @@
     "@trpc/client": "^11.24.0",
     "@trpc/server": "^11.24.0",
     "@trpc/tanstack-react-query": "^11.24.0",
+    "aws4fetch": "^1.0.20",
     "browser-image-compression": "^2.0.2",
     "next": "16.4.5",
     "pg": "^8.23.1",
