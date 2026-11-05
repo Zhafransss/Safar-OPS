@@ -12,8 +12,8 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-AUT-04 | BG-06 | Peran dari Pemetaan tim, aturan di server | Akun | Must | In Progress | TC-AUT-04: panggil API tanpa hak ditolak dengan kode PNG |
 | FR-AUT-05 | BG-06 | Logout | Akun | Must | Done | TC-AUT-05: setelah keluar, halaman kembali ke login |
 | FR-NAV-01 | BG-06 | Beranda | Navigasi | Must | Done | TC-NAV-01: isi Beranda sama dengan mockup |
-| FR-NAV-02 | BG-06 | Hub sesuai peran | Navigasi | Must | In Progress | TC-NAV-02: menu tampil sesuai pemilik, leader, staff |
-| FR-NAV-03 | BG-03 | Lonceng di semua halaman | Navigasi | Must | In Progress | TC-NAV-03: lonceng ada di tiap halaman Penugasan |
+| FR-NAV-02 | BG-06 | Hub sesuai peran | Navigasi | Must | Done | TC-NAV-02: menu tampil sesuai pemilik, leader, staff |
+| FR-NAV-03 | BG-03 | Lonceng di semua halaman | Navigasi | Must | Done | TC-NAV-03: lonceng ada di tiap halaman Penugasan |
 | FR-LAP-01 | BG-05 | Buat laporan | Laporan | Must | Done | TC-LAP-01: isian kosong memunculkan PNG-LAP-01–05 |
 | FR-LAP-02 | BG-05 | Nomor YYMM-NNN | Laporan | Must | Done | TC-LAP-02: kirim bersamaan tidak dobel; reset bulan baru |
 | FR-LAP-03 | BG-05 | Foto dikompres, maksimal 5 | Laporan | Must | Done | TC-LAP-03: foto ke-6 memunculkan PNG-LAP-06 |
@@ -59,12 +59,12 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-TIM-04 | BG-04 | Staff keluar | Pemetaan tim | Must | Done | TC-TIM-04: to-do ditandai, leader dapat notifikasi |
 | FR-TIM-05 | BG-04 | Ganti leader | Pemetaan tim | Must | Done | TC-TIM-05: to-do leader lama ditandai |
 | FR-TPL-01 | BG-02 | Kelola template | Template | Must | Done | TC-TPL-01: PNG-TPL-01–03 |
-| FR-NTF-01 | BG-03 | Daftar berkelompok | Notifikasi | Must | Not Started | TC-NTF-01: angka lonceng = jumlah daftar |
-| FR-NTF-02 | BG-03 | Ketuk membuka target | Notifikasi | Must | Not Started | TC-NTF-02: semua jenis punya tujuan |
-| FR-NTF-03 | BG-03 | Geser dan Batalkan | Notifikasi | Must | Not Started | TC-NTF-03: batalkan dalam 2,5 detik; uji HP nyata |
-| FR-NTF-04 | BG-03 | Bersihkan semua | Notifikasi | Must | Not Started | TC-NTF-04: konfirmasi lalu daftar kosong |
-| FR-NTF-05 | BG-05 | Label CC | Notifikasi | Must | Not Started | TC-NTF-05: hanya laporan CC berlabel |
-| FR-NTF-06 | BG-03 | 15 pemicu | Notifikasi | Must | In Progress | TC-NTF-06: tiap pemicu ke penerima benar; tidak ke diri sendiri |
+| FR-NTF-01 | BG-03 | Daftar berkelompok | Notifikasi | Must | Done | TC-NTF-01: angka lonceng = jumlah daftar |
+| FR-NTF-02 | BG-03 | Ketuk membuka target | Notifikasi | Must | Done | TC-NTF-02: semua jenis punya tujuan |
+| FR-NTF-03 | BG-03 | Geser dan Batalkan | Notifikasi | Must | Done | TC-NTF-03: batalkan dalam 2,5 detik; uji HP nyata |
+| FR-NTF-04 | BG-03 | Bersihkan semua | Notifikasi | Must | Done | TC-NTF-04: konfirmasi lalu daftar kosong |
+| FR-NTF-05 | BG-05 | Label CC | Notifikasi | Must | Done | TC-NTF-05: hanya laporan CC berlabel |
+| FR-NTF-06 | BG-03 | 15 pemicu | Notifikasi | Must | Done | TC-NTF-06: tiap pemicu ke penerima benar; tidak ke diri sendiri |
 | FR-UI-01 | BG-06 | Token dan ukuran mockup | Tampilan | Must | In Progress | TC-UI-01: perbandingan layar terang dan gelap |
 | FR-UI-02 | BG-06 | Area ketuk 44 px | Tampilan | Must | Done | TC-UI-02: elemen kecil punya area 44 px |
 | FR-UI-03 | BG-06 | Label peran | Tampilan | Must | Done | TC-UI-03: label per tim dan rangkap |
@@ -130,3 +130,13 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-UI-02 | Kotak centang dan menu "⋯" punya area ketuk 44 px |
 | FR-NTF-06 | Semua 15 pemicu sudah tercatat; daftar notifikasi dan ketuk-buka dibuat di Sprint 4 |
 | NFR-01 | Ditambah 4 layar: Penugasan, detail program, tambah tugas, detail tugas |
+
+## Catatan status Sprint 4 (5 November 2026)
+
+| ID | Sisa pekerjaan |
+|---|---|
+| FR-NTF-01–05 | Selesai, diuji lewat layar: kelompok, label CC, geser kanan dan kiri, Batalkan 2,5 detik, tepi layar, ketuk, bersihkan semua |
+| FR-NTF-03 | Geser diuji dengan mouse di Chrome; uji jari di HP asli masuk Sprint 5 (NFR-08) |
+| FR-NTF-06 | 15 pemicu terbukti di uji Sprint 1–4; tidak ada notifikasi atas tindakan sendiri |
+| FR-NAV-02, FR-NAV-03 | Semua menu Hub kini punya layar, dan lonceng aktif di semua halaman |
+| NFR-01 | Ditambah daftar notifikasi |
