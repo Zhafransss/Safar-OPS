@@ -1,0 +1,61 @@
+/* App-only rules. Everything visual that exists in the mockup stays in mockup.css. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "./mockup.css";
+
+:root {
+  --font: var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Replaces the mockup .phone frame: full screen on phones, a centered column on desktop (CHANGELOG 17). */
+.app-frame {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--appbg);
+}
+
+@media (max-width: 480px) {
+  .app-frame {
+    width: 100%;
+  }
+}
+
+/* Mockup uses divs with onclick; real links keep the same look. */
+a.menu,
+a.li {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.menu {
+  display: block;
+}
+
+/* The mockup avatar is a div. Here it opens logout, so it needs a button with a 44 px target (K-T82). */
+button.ava {
+  position: relative;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 16px;
+}
+
+button.ava::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+}
+
+/* CHANGELOG 15: Safari iOS zooms into inputs under 16 px. */
+@supports (-webkit-touch-callout: none) {
+  .inp,
+  .sel,
+  textarea.inp {
+    font-size: 16px;
+  }
+}

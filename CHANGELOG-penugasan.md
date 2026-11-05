@@ -1,0 +1,27 @@
+# CHANGELOG — Fitur Penugasan
+
+Perbedaan hasil jadi dari PRD v2.0 dan mockup final (PRD bagian 16). Menjadi dasar finalisasi SOP.
+
+**Status:** *Disetujui* = disetujui dalam diskusi proyek 5 November 2026. *Direncanakan* = diusulkan developer dan belum disetujui. Status berubah menjadi *Dibuat* setelah kodenya selesai.
+
+| No | Tanggal | Bagian / keputusan | Yang diminta | Yang dibuat | Alasan | Status |
+|---|---|---|---|---|---|---|
+| 1 | 2026-11-05 | K-T55, PRD 7.4 | DL tidak boleh lewat saat to-do dibuat/diubah; mockup memvalidasi setiap simpan | Validasi hanya jika nilai DL berubah | To-do terlambat harus bisa dialihkan tanpa dipaksa mengganti DL | Disetujui |
+| 2 | 2026-11-05 | K-T34, PRD 7.7 | Mockup tidak menandai to-do leader lama saat leader diganti | To-do aktif leader lama yang sudah tidak di tim ditandai Perlu dialihkan | Mencegah PIC di luar tim | Disetujui |
+| 3 | 2026-11-05 | PRD 7.3 | Minimal 1 to-do; mockup membolehkan menghapus to-do terakhir | To-do terakhir tidak bisa dihapus (PNG-TGS-02) | Tugas tanpa to-do tidak bisa di-QC dan menahan penutupan program | Disetujui |
+| 4 | 2026-11-05 | PRD 4, PRD 13 | Akses tanpa hak menampilkan kode error, tetapi kode untuk Program, Tugas, To-do, QC tidak ada | Kode baru: PNG-PRG-04 "Anda tidak punya akses ke program ini.", PNG-TGS-03 "Anda tidak punya akses ke tugas ini.", PNG-TDO-05 "Anda tidak bisa mengubah to-do ini.", PNG-QC-03 "Hanya leader tim yang bisa melakukan QC." | Nomor lama tidak dipakai ulang | Disetujui |
+| 5 | 2026-11-05 | K-T82 | Area ketuk 44 px; mockup memakai 3 tombol bertumpuk sekitar 22 px | Satu tombol menu "⋯" berisi Naik, Edit, Turun; kotak centang diberi area ketuk 44 px | Tiga tombol 44 px membuat baris to-do setinggi 132 px | Disetujui |
+| 6 | 2026-11-05 | PRD 7.2 | Kartu program: status dan satu label paling mendesak | Mengikuti mockup: tanpa status, dengan persen, progress bar, dan sampai dua label | Mockup sudah lulus uji dan menjadi patokan | Disetujui |
+| 7 | 2026-11-05 | PRD 10.1 | Ketuk notifikasi membuka target; 3 jenis notifikasi tidak punya target di mockup | Program baru ke detail program; Menjadi leader dan Staff keluar ke daftar Penugasan | Ketukan tidak boleh tanpa hasil | Disetujui |
+| 8 | 2026-11-05 | PRD 12 | Model data tidak punya penanda penerima sudah membuka laporan | Field `recipientOpenedAt` di Report | Dibutuhkan titik oranye dan penanda baru | Disetujui |
+| 9 | 2026-11-05 | PRD 7.6, PRD 6.1 | Zona waktu tidak disebut | Semua perhitungan tanggal memakai Asia/Jakarta | Server memakai UTC; label dan nomor bisa meleset | Disetujui |
+| 10 | 2026-11-05 | PRD 12, PRD 7.5 | Todo.isQC, QC sebagai baris to-do | QC tidak disimpan sebagai baris to-do; Task menyimpan waktu dan pelaku approve; penanggung jawab dihitung dari leader tim saat ini | QC tertunda otomatis pindah saat leader diganti, tanpa migrasi data. Tampilan tetap sama | Disetujui |
+| 11 | 2026-11-05 | K-T83 | Nomor YYMM-urut | Counter atomik per bulan (`ReportCounter`) | Mencegah nomor dobel saat kirim bersamaan | Disetujui |
+| 12 | 2026-11-05 | PRD 2 | PWA tidak disebut | PWA opsi A: bisa di-install, file statis di-cache, halaman offline. Tanpa Web Push dan tanpa data offline | Permintaan baru, selaras K-T40 dan K-T42 | Disetujui |
+| 13 | 2026-11-05 | PRD 3 | Login akun Jubelio, mekanisme tidak dirinci | `POST https://api2.jubelio.com/login` seperti proyek E-Commerce | Keputusan 5 November | Disetujui |
+| 14 | 2026-11-05 | K-T42 | Refresh dengan tombol atau buka ulang halaman | Tambahan: data dimuat ulang saat aplikasi kembali aktif. Tidak menambah tombol | Mode ter-install tidak punya tombol reload browser; tampilan tetap sesuai mockup | Disetujui |
+| 15 | 2026-11-05 | K-T82 | Isian memakai teks 14 px | Teks isian 16 px hanya di iOS; tinggi tetap 36 px | Safari iOS melakukan zoom otomatis pada isian di bawah 16 px | Disetujui |
+| 16 | 2026-11-05 | PRD 3 | Login tanpa rancangan layar; mockup tidak punya halaman login dan logout | Halaman login bertema oranye, halaman offline, dan logout lewat ketuk avatar di Beranda. Kode baru: PNG-AUT-01 "Email atau password salah.", PNG-AUT-02 "Layanan login sedang bermasalah. Coba lagi.", PNG-AUT-03 "Terlalu banyak percobaan login. Coba lagi 15 menit lagi." | Wajib ada di aplikasi nyata | Disetujui |
+| 17 | 2026-11-05 | Mockup | Mockup hanya menggambar HP | Desktop memakai kolom tengah selebar HP tanpa bingkai | Menjaga tampilan identik dengan mockup | Disetujui |
+| 18 | 2026-11-05 | Mockup `vHome` | Teks "Selamat Siang" ditulis tetap | Sapaan mengikuti jam (Pagi, Siang, Sore, Malam) | Di mockup hanya contoh | Disetujui |
+| 19 | 2026-11-05 | K-T09, Mockup `vTgsDetail` | Mockup hanya punya hapus to-do, tidak ada hapus Tugas | Tombol "Hapus tugas" di detail Tugas, untuk pemilik dan leader tim, selama tugas belum selesai dan Program masih Aktif. Tugas hilang dari semua daftar, datanya tetap tersimpan di database (`deletedAt`). PIC yang terdampak mendapat notifikasi "[nama tugas]" dihapus, menuju daftar Penugasan. Kode baru: PNG-TGS-04 "Tugas yang sudah selesai atau terkunci tidak bisa dihapus." | Permintaan 5 November: tugas salah buat harus bisa dihapus, bukan diselesaikan paksa. Tampilan memakai pola yang sudah ada di mockup (tombol "Hapus template", konfirmasi "Hapus to-do") | Disetujui |

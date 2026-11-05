@@ -1,0 +1,2 @@
+# Prisma migrate lock file.
+provider = "postgresql"

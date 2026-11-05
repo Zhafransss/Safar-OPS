@@ -1,0 +1,315 @@
+// Data model from docs/DESIGN.md section 5.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReportType {
+  CASE_FINDING
+  REQUEST
+  QUESTION
+  GENERAL
+}
+
+enum ReportStatus {
+  SENT
+  IN_PROGRESS
+  REJECTED
+  DONE
+}
+
+enum ProgramStatus {
+  ACTIVE
+  DONE
+  CANCELLED
+}
+
+enum NotificationCategory {
+  REPORT
+  ASSIGNMENT
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  jubelioUserId String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  sessions           Session[]
+  ledTeam            Team?
+  teamMemberships    TeamMember[]
+  sentReports        Report[]            @relation("ReportFrom")
+  receivedReports    Report[]            @relation("ReportTo")
+  reportCcs          ReportCc[]
+  reportMessages     ReportMessage[]
+  reportMessageReads ReportMessageRead[]
+  createdPrograms    Program[]
+  createdTasks       Task[]              @relation("TaskCreatedBy")
+  qcApprovedTasks    Task[]              @relation("TaskQcApprovedBy")
+  deletedTasks       Task[]              @relation("TaskDeletedBy")
+  assignedTodos      Todo[]
+  revisionNotes      RevisionNote[]
+  notifications      Notification[]
+  activityLogs       ActivityLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ip, createdAt])
+}
+
+model Team {
+  id       String @id @default(cuid())
+  name     String
+  // Unique constraints enforce K-T70 (one color per team) and K-T20 (one team per leader).
+  color    String @unique
+  leaderId String @unique
+
+  leader    User         @relation(fields: [leaderId], references: [id])
+  members   TeamMember[]
+  programs  Program[]
+  templates Template[]
+}
+
+model TeamMember {
+  teamId String
+  userId String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([teamId, userId])
+  @@index([userId])
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  number            String       @unique
+  title             String
+  type              ReportType
+  body              String
+  status            ReportStatus @default(SENT)
+  fromId            String
+  toId              String
+  rejectReason      String?
+  recipientOpenedAt DateTime?
+  createdAt         DateTime     @default(now())
+
+  from     User            @relation("ReportFrom", fields: [fromId], references: [id])
+  to       User            @relation("ReportTo", fields: [toId], references: [id])
+  ccs      ReportCc[]
+  messages ReportMessage[]
+  photos   Photo[]
+  tasks    Task[]
+
+  @@index([toId])
+  @@index([fromId])
+  @@index([status, createdAt])
+}
+
+model ReportCounter {
+  period  String @id // YYMM in Asia/Jakarta
+  lastSeq Int    @default(0)
+}
+
+model ReportCc {
+  reportId String
+  userId   String
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@id([reportId, userId])
+  @@index([userId])
+}
+
+model ReportMessage {
+  id        String   @id @default(cuid())
+  reportId  String
+  senderId  String?
+  body      String
+  isSystem  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  report Report              @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sender User?               @relation(fields: [senderId], references: [id])
+  reads  ReportMessageRead[]
+  photos Photo[]
+
+  @@index([reportId, createdAt])
+}
+
+model ReportMessageRead {
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message ReportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id])
+
+  @@id([messageId, userId])
+}
+
+// A CHECK constraint in the migration requires exactly one of reportId and messageId.
+model Photo {
+  id        String  @id @default(cuid())
+  reportId  String?
+  messageId String?
+  blobPath  String
+  sortOrder Int     @default(0)
+
+  report  Report?        @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  message ReportMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([messageId])
+}
+
+model Program {
+  id          String        @id @default(cuid())
+  name        String
+  teamId      String
+  status      ProgramStatus @default(ACTIVE)
+  createdById String
+  createdAt   DateTime      @default(now())
+
+  team      Team   @relation(fields: [teamId], references: [id])
+  createdBy User   @relation(fields: [createdById], references: [id])
+  tasks     Task[]
+
+  @@index([teamId, status])
+}
+
+model Task {
+  id             String    @id @default(cuid())
+  programId      String
+  name           String
+  reportId       String?
+  // A task is closed when qcApprovedAt is set. QC is computed, not stored as a to-do (CHANGELOG 10).
+  qcApprovedAt   DateTime?
+  qcApprovedById String?
+  // Soft delete (CHANGELOG 19). Read tasks through activeTaskWhere so deleted rows stay hidden.
+  deletedAt      DateTime?
+  deletedById    String?
+  createdById    String
+  createdAt      DateTime  @default(now())
+
+  program      Program @relation(fields: [programId], references: [id])
+  report       Report? @relation(fields: [reportId], references: [id])
+  qcApprovedBy User?   @relation("TaskQcApprovedBy", fields: [qcApprovedById], references: [id])
+  deletedBy    User?   @relation("TaskDeletedBy", fields: [deletedById], references: [id])
+  createdBy    User    @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  todos        Todo[]
+
+  @@index([programId])
+  @@index([reportId])
+}
+
+model Todo {
+  id            String   @id @default(cuid())
+  taskId        String
+  sortOrder     Int
+  name          String
+  picId         String
+  dueDate       DateTime @db.Date
+  instruction   String?
+  isDone        Boolean  @default(false)
+  revisionCount Int      @default(0)
+  needsReassign Boolean  @default(false)
+
+  task          Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  pic           User           @relation(fields: [picId], references: [id])
+  revisionNotes RevisionNote[]
+
+  @@index([taskId])
+  @@index([picId, isDone])
+}
+
+model RevisionNote {
+  id          String   @id @default(cuid())
+  todoId      String
+  note        String
+  createdById String
+  createdAt   DateTime @default(now())
+
+  todo      Todo @relation(fields: [todoId], references: [id], onDelete: Cascade)
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([todoId])
+}
+
+model Template {
+  id     String @id @default(cuid())
+  teamId String
+  name   String
+
+  team  Team           @relation(fields: [teamId], references: [id])
+  todos TemplateTodo[]
+
+  @@index([teamId])
+}
+
+model TemplateTodo {
+  id         String @id @default(cuid())
+  templateId String
+  sortOrder  Int
+  name       String
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+}
+
+model Notification {
+  id         String               @id @default(cuid())
+  userId     String
+  category   NotificationCategory
+  text       String
+  targetType String
+  targetId   String?
+  createdAt  DateTime             @default(now())
+  // Undo clears readAt.
+  readAt     DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  text       String
+  actorId    String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+}
