@@ -7,7 +7,7 @@ export type NotifyInput = {
   actorId: string;
   category: NotificationCategory;
   text: string;
-  targetType: "ASSIGNMENT_LIST" | "REPORT";
+  targetType: "ASSIGNMENT_LIST" | "REPORT" | "PROGRAM" | "TASK";
   targetId?: string;
 };
 

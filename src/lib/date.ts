@@ -55,6 +55,23 @@ export function relativeAge(date: Date, now: Date): string {
   return days === 1 ? "1 hari yang lalu" : `${days} hari yang lalu`;
 }
 
+// Today in Jakarta as YYYY-MM-DD, the form to-do DLs are compared in.
+export function jakartaIsoDate(date: Date): string {
+  const { year, month, day } = jakartaParts(date);
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+// Calendar days from b to a, both YYYY-MM-DD. Negative means a is earlier.
+export function diffDays(a: string, b: string): number {
+  return (Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
+}
+
+// A DL has no time, so it is formatted from its own digits and never shifted by a time zone.
+export function formatIsoShort(iso: string): string {
+  const [, month, day] = iso.split("-").map(Number);
+  return `${day} ${MONTH_NAMES[(month ?? 1) - 1]}`;
+}
+
 // K-T83: the YYMM prefix of a report number.
 export function reportPeriod(date: Date): string {
   const { year, month } = jakartaParts(date);

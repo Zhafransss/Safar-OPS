@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 
 import { Icon } from "@/components/icon";
 
-export type SheetAction = { label: string; variant?: "sec" | "warn"; onClick: () => void; disabled?: boolean };
+export type SheetAction = { label: ReactNode; variant?: "sec" | "warn"; onClick: () => void; disabled?: boolean };
 
 // Mockup renderLayer: bottom sheet with a title, close button and action row.
 // Portaled to #app like the mockup layers: headers set white text and .hd is sticky,
@@ -36,9 +36,9 @@ export function Sheet({
         {children}
         {actions.length > 0 && (
           <div className="btns mt2">
-            {actions.map((action) => (
+            {actions.map((action, index) => (
               <button
-                key={action.label}
+                key={index}
                 className={`btn ${action.variant ?? ""}`}
                 onClick={action.onClick}
                 disabled={action.disabled}

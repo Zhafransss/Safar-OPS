@@ -1,6 +1,32 @@
 import { describe, expect, it } from "vitest";
 
-import { formatDate, formatFullDate, formatShortDate, greeting, jakartaParts, relativeAge, reportPeriod } from "@/lib/date";
+import {
+  diffDays,
+  formatDate,
+  formatFullDate,
+  formatIsoShort,
+  formatShortDate,
+  greeting,
+  jakartaIsoDate,
+  jakartaParts,
+  relativeAge,
+  reportPeriod,
+} from "@/lib/date";
+
+describe("DL date helpers", () => {
+  it("uses the Jakarta date at 00.30 WIB", () => {
+    expect(jakartaIsoDate(new Date("2026-10-26T17:30:00Z"))).toBe("2026-10-27");
+  });
+
+  it("counts calendar days across a month end", () => {
+    expect(diffDays("2026-12-01", "2026-11-30")).toBe(1);
+    expect(diffDays("2026-11-04", "2026-11-05")).toBe(-1);
+  });
+
+  it("formats a DL without any time zone shift", () => {
+    expect(formatIsoShort("2026-11-01")).toBe("1 Nov");
+  });
+});
 
 describe("report date helpers", () => {
   const lateNight = new Date("2026-10-26T17:30:00Z"); // 27 Oct 00.30 WIB

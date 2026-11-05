@@ -15,6 +15,8 @@ const server = new EmbeddedPostgres({
   password: "postgres",
   port: PORT,
   persistent: true,
+  // Without this, initdb takes the Windows code page (WIN1252) and rejects characters such as "→".
+  initdbFlags: ["--encoding=UTF8", "--locale=C"],
 });
 
 if (!fs.existsSync(path.join(dataDir, "PG_VERSION"))) await server.initialise();

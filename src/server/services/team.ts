@@ -7,6 +7,7 @@ import { TEAM_PALETTE } from "@/config/team-palette";
 import { db } from "@/server/db";
 import { loadInitialsResolver } from "@/server/services/names";
 import { notify } from "@/server/services/notifications";
+import { activeTaskWhere } from "@/server/services/task-scope";
 import { findTeamError, firstFreeColor, normalizeDraft, type TeamDraft } from "@/server/services/team-rules";
 import type { TeamRole } from "@/server/services/viewer";
 import { pngError } from "@/server/trpc";
@@ -66,12 +67,28 @@ export async function getTeamChart() {
   };
 }
 
+// Open work of a team: tasks not deleted, not passed QC, in an active program.
+function openTaskInTeam(teamId: string) {
+  return { ...activeTaskWhere, qcApprovedAt: null, program: { teamId, status: "ACTIVE" as const } };
+}
+
 export async function getTeamFormData(teamId: string | null) {
-  const [teams, users] = await Promise.all([loadTeams(), loadAssignableUsers()]);
+  const [teams, users, openTodos] = await Promise.all([
+    loadTeams(),
+    loadAssignableUsers(),
+    teamId
+      ? db.todo.groupBy({
+          by: ["picId"],
+          where: { isDone: false, task: openTaskInTeam(teamId) },
+          _count: { _all: true },
+        })
+      : Promise.resolve([]),
+  ]);
   const team = teamId ? teams.find((candidate) => candidate.id === teamId) : undefined;
   if (teamId && !team) return null;
 
   return {
+    openTodoCounts: Object.fromEntries(openTodos.map((row) => [row.picId, row._count._all])) as Record<string, number>,
     team: team
       ? {
           id: team.id,
@@ -137,8 +154,31 @@ export async function saveTeam(teamId: string | null, input: TeamDraft, actorId:
         await tx.team.create({ data: { ...fields, members: { create: memberRows } } });
         return;
       }
+      const before = await tx.teamMember.findMany({ where: { teamId }, select: { userId: true } });
       await tx.teamMember.deleteMany({ where: { teamId } });
       await tx.team.update({ where: { id: teamId }, data: { ...fields, members: { create: memberRows } } });
+
+      // FR-TIM-04, FR-TIM-05: open to-dos of anyone who left the team now need a new PIC.
+      const stayed = new Set([leaderId, ...draft.staffIds]);
+      const leaving = [...new Set([previous?.leaderId, ...before.map((member) => member.userId)])].filter(
+        (id): id is string => !!id && !stayed.has(id),
+      );
+      for (const userId of leaving) {
+        const { count } = await tx.todo.updateMany({
+          where: { picId: userId, isDone: false, task: { ...openTaskInTeam(teamId) } },
+          data: { needsReassign: true },
+        });
+        if (count === 0) continue;
+        const person = await tx.user.findUnique({ where: { id: userId }, select: { name: true } });
+        await notify(tx, {
+          userId: leaderId,
+          actorId,
+          category: "ASSIGNMENT",
+          text: `${person?.name ?? ""} keluar dari ${draft.name}. Ada to-do yang perlu dialihkan.`,
+          targetType: "ASSIGNMENT_LIST",
+        });
+      }
+
       if (previous && previous.leaderId !== leaderId) {
         await notify(tx, {
           userId: leaderId,

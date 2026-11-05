@@ -9,7 +9,7 @@ Butuh Node 20.9 ke atas dan pnpm.
 ```bash
 pnpm install
 cp .env.example .env.local   # isi DATABASE_URL dan DIRECT_URL, lihat di bawah
-pnpm db:local                # terminal 1: PostgreSQL asli di .pgdata, tanpa Docker
+pnpm db:local                # terminal 1: PostgreSQL asli (UTF-8) di .pgdata, tanpa Docker
 pnpm db:deploy               # terminal 2: terapkan migrasi
 pnpm dev                     # terminal 2: buka http://localhost:3000
 ```

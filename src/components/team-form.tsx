@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { Icon } from "@/components/icon";
 import { TeamChip } from "@/components/role-label";
+import { Sheet } from "@/components/sheet";
 import { useToast } from "@/components/toast";
 import { UserPicker } from "@/components/user-picker";
 import { formatError } from "@/config/error-codes";
@@ -19,16 +20,18 @@ type TeamFormProps = {
   usedColors: { color: string; teamName: string }[];
   defaultColor: string;
   users: PickerUser[];
+  openTodoCounts: Record<string, number>;
 };
 
 // Mockup vTimEdit.
-export function TeamForm({ team, usedColors, defaultColor, users }: TeamFormProps) {
+export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts }: TeamFormProps) {
   const [name, setName] = useState(team?.name ?? "");
   const [color, setColor] = useState(team?.color ?? defaultColor);
   const [leaderId, setLeaderId] = useState<string | null>(team?.leaderId ?? null);
   const [staffIds, setStaffIds] = useState<string[]>(team?.staffIds ?? []);
   const [error, setError] = useState("");
   const [picking, setPicking] = useState<"leader" | "staff" | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
   const router = useRouter();
   const toast = useToast();
@@ -55,6 +58,12 @@ export function TeamForm({ team, usedColors, defaultColor, users }: TeamFormProp
     }
     setColor(candidate);
     if (error.startsWith("PNG-TIM-07")) setError("");
+  }
+
+  // Mockup rmStaff (FR-TIM-04): warn when the person still has open to-dos in this team.
+  function removeStaff(id: string) {
+    if (openTodoCounts[id]) setConfirmRemove(id);
+    else setStaffIds(staffIds.filter((x) => x !== id));
   }
 
   function save() {
@@ -114,8 +123,7 @@ export function TeamForm({ team, usedColors, defaultColor, users }: TeamFormProp
           {staffIds.map((id) => (
             <span key={id} className="mchip">
               {nameOf(id)}
-              {/* Sprint 3 adds the confirmation for staff with open to-dos (FR-TIM-04). */}
-              <button onClick={() => setStaffIds(staffIds.filter((x) => x !== id))} aria-label="Keluarkan">
+              <button onClick={() => removeStaff(id)} aria-label="Keluarkan">
                 <Icon name="x" size={14} />
               </button>
             </span>
@@ -130,6 +138,29 @@ export function TeamForm({ team, usedColors, defaultColor, users }: TeamFormProp
         Simpan tim
       </button>
 
+      {confirmRemove && (
+        <Sheet
+          title={`Keluarkan ${nameOf(confirmRemove)}?`}
+          onClose={() => setConfirmRemove(null)}
+          actions={[
+            { label: "Batal", variant: "sec", onClick: () => setConfirmRemove(null) },
+            {
+              label: "Tetap keluarkan",
+              variant: "warn",
+              onClick: () => {
+                setStaffIds(staffIds.filter((x) => x !== confirmRemove));
+                setConfirmRemove(null);
+              },
+            },
+          ]}
+        >
+          <p className="small" style={{ lineHeight: 1.5, margin: 0 }}>
+            {nameOf(confirmRemove)} masih punya <b>{openTodoCounts[confirmRemove]} to-do aktif</b> di tim ini. Idealnya
+            diselesaikan lewat handover dulu. Jika tetap dikeluarkan, to-do tersebut ditandai <b>Perlu dialihkan</b>{" "}
+            setelah tim disimpan.
+          </p>
+        </Sheet>
+      )}
       {picking === "leader" && (
         <UserPicker
           title="Pilih leader"

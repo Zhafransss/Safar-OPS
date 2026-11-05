@@ -88,3 +88,28 @@ button.ava::after {
     font-size: 16px;
   }
 }
+
+/* CHANGELOG 5, K-T82: 44 px tap targets for the to-do checkbox and its menu. */
+.tbox,
+.tact .tmenu {
+  position: relative;
+}
+
+.tbox::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+
+.tact .tmenu {
+  font: 800 18px var(--font);
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+}
+
+.tact .tmenu::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}

@@ -169,8 +169,8 @@ Semua prosedur butuh sesi. Input divalidasi Zod. Error membawa kode PNG. Halaman
 | `auth` | `login`, `logout`, `me` | Publik untuk `login` |
 | `team` | `create`, `update` | Pemilik |
 | `report` | `list`, `create`, `start`, `reject`, `finish`, `forward`, `addCc`, `sendMessage`, `markOpened` | Sesuai PRD 4 |
-| `program` | `list`, `get`, `create`, `close`, `cancel` | Tutup dan batal: leader tim |
-| `task` | `get`, `create`, `remove`, `attachableReports` | Buat dan hapus: pemilik, leader tim |
+| `program` | `create`, `close`, `cancel` | Buat: pemilik, leader tim. Tutup dan batal: leader tim |
+| `task` | `create`, `remove` | Buat dan hapus: pemilik, leader tim |
 | `todo` | `add`, `update`, `move`, `remove`, `toggle` | `toggle`: PIC; lainnya: pemilik, leader tim |
 | `qc` | `approve`, `returnForRevision` | Leader tim |
 | `template` | `create`, `update`, `remove` | Leader tim |
