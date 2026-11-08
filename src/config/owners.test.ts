@@ -26,6 +26,29 @@ describe("developer owner", () => {
   });
 });
 
+describe("local test owners (CHANGELOG no. 23)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("adds only LOCAL_ACCOUNTS entries marked owner", async () => {
+    vi.resetModules();
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv(
+      "LOCAL_ACCOUNTS",
+      JSON.stringify([
+        { email: "Owner@Velora.com", name: "Owner Uji", hash: "scrypt:00:00", owner: true },
+        { email: "leader@velora.com", name: "Leader Uji", hash: "scrypt:00:00" },
+      ]),
+    );
+    const owners = await import("@/config/owners");
+    expect(owners.OWNERS).toHaveLength(5);
+    expect(owners.findOwner("owner@velora.com")?.name).toBe("Owner Uji");
+    expect(owners.isOwnerEmail("leader@velora.com")).toBe(false);
+  });
+});
+
 describe("owners (K-T72)", () => {
   it("has exactly four accounts", () => {
     expect(OWNERS).toHaveLength(4);

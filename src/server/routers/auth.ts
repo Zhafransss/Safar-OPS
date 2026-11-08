@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { normalizeEmail } from "@/config/owners";
+import { loginWithLocalAccount } from "@/server/auth/local-login";
 import { isLoginThrottled, recordLoginAttempt } from "@/server/auth/login-throttle";
 import { createSession, destroySession } from "@/server/auth/session";
 import { loginWithJubelio } from "@/server/integrations/jubelio";
@@ -14,7 +15,8 @@ export const authRouter = router({
       const email = normalizeEmail(input.email);
       if (await isLoginThrottled(email, ctx.ip)) throw pngError("PNG-AUT-03", "TOO_MANY_REQUESTS");
 
-      const result = await loginWithJubelio(email, input.password);
+      const result =
+        (await loginWithLocalAccount(email, input.password)) ?? (await loginWithJubelio(email, input.password));
       if (!result.ok) {
         // An outage says nothing about the password, so it must not count toward the lockout.
         if (result.reason === "unavailable") throw pngError("PNG-AUT-02", "BAD_GATEWAY");

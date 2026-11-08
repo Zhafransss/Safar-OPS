@@ -40,6 +40,8 @@ Jalankan `pnpm db:seed-dev` untuk menambahkan Kartika, Zarkasih, Dimas, dan Rudi
 
 Email selain `@safar.local` diteruskan ke Jubelio asli. Jangan pasang kedua variabel itu di staging atau produksi. Peran Pemilik developer tidak ada di build produksi.
 
+Untuk menguji aplikasi online tanpa akun Jubelio, pakai `LOCAL_ACCOUNTS` (lihat `docs/DEPLOY.md`).
+
 ## Pemeriksaan
 
 ```bash

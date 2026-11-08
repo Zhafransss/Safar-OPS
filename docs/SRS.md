@@ -93,8 +93,8 @@ Kolom **Mockup** menyebut fungsi tampilan di file mockup sebagai acuan persis.
 
 | ID | Requirement | Sumber | Mockup |
 |---|---|---|---|
-| FR-AUT-01 | Login dengan email dan password Jubelio lewat `POST https://api2.jubelio.com/login`. Password tidak disimpan dan tidak dicatat di log | K-T73, keputusan 5 Nov | Tidak ada, halaman baru |
-| FR-AUT-02 | 4 akun pemilik ditentukan dari daftar email, setara, tidak bisa menjadi leader atau staff | K-T72 | `OWNERS` |
+| FR-AUT-01 | Login dengan email dan password Jubelio lewat `POST https://api2.jubelio.com/login`. Password tidak disimpan dan tidak dicatat di log. Pengecualian untuk uji: akun `LOCAL_ACCOUNTS` dicek dengan hash `scrypt` tanpa Jubelio (CHANGELOG 23) | K-T73, keputusan 5 Nov | Tidak ada, halaman baru |
+| FR-AUT-02 | 4 akun pemilik ditentukan dari daftar email, setara, tidak bisa menjadi leader atau staff. Akun uji `LOCAL_ACCOUNTS` bertanda `owner` ikut menjadi pemilik selama variabelnya diisi (CHANGELOG 23) | K-T72 | `OWNERS` |
 | FR-AUT-03 | Daftar pengguna untuk penerima, CC, leader, staff, dan PIC bersumber dari pengguna Jubelio | K-T16 | `pickUsers` |
 | FR-AUT-04 | Peran dihitung dari Pemetaan tim; semua pembatasan hak akses PRD bagian 4 berlaku di server | PRD 4 | `canManageProg`, `canSeeLap` |
 | FR-AUT-05 | Pengguna bisa keluar (logout) dari ketuk avatar di Beranda | Tambahan, lihat CHANGELOG | Tidak ada |

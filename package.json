@@ -17,7 +17,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:local": "node scripts/local-db.mjs",
     "dev:jubelio": "node scripts/dev-jubelio.mjs",
-    "db:seed-dev": "node scripts/seed-dev.mjs"
+    "db:seed-dev": "node scripts/seed-dev.mjs",
+    "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",

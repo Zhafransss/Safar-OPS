@@ -36,8 +36,25 @@ Versi 1.0, 5 November 2026. Keputusan hosting (SRS A-04): aplikasi di **Vercel**
 | `R2_BUCKET` | Bucket produksi | Bucket terpisah untuk uji |
 | `JUBELIO_BASE_URL` | `https://api2.jubelio.com` | Sama |
 | `DEV_LOGIN_PASSWORD` | **Jangan diisi** | **Jangan diisi** |
+| `LOCAL_ACCOUNTS` | Hanya selama uji, lalu dihapus | Boleh diisi untuk uji |
 
 Tanpa variabel `R2_*`, aplikasi di Vercel menolak menyimpan foto dengan pesan jelas, karena disk Vercel tidak permanen.
+
+### Akun uji tanpa Jubelio (`LOCAL_ACCOUNTS`)
+
+Untuk menguji setiap peran di aplikasi online tanpa akun Jubelio (CHANGELOG 23). Isinya array JSON:
+
+```
+[{"email":"owner@contoh.com","name":"Owner Uji","hash":"scrypt:...","owner":true},
+ {"email":"leader@contoh.com","name":"Leader Uji","hash":"scrypt:..."},
+ {"email":"staff@contoh.com","name":"Staff Uji","hash":"scrypt:..."}]
+```
+
+1. Buat hash setiap password dengan `pnpm hash-password`. Password diketik di prompt, tidak masuk riwayat terminal.
+2. Email di daftar ini tidak pernah diteruskan ke Jubelio. Jangan memakai email karyawan sungguhan.
+3. `"owner": true` menjadikan akun itu pemilik tambahan dengan hak penuh. Akun lain menjadi leader atau staff setelah login sekali dan dipetakan pemilik di menu Tim.
+4. Batas percobaan login (PNG-AUT-03) tetap berlaku. Pakai password yang kuat.
+5. Sebelum dipakai sungguhan: hapus variabel ini, deploy ulang, dan hapus tim uji.
 
 ## 5. Branch dan rilis
 
@@ -81,4 +98,5 @@ Biaya pengembangan (sekali bayar) tidak termasuk di dokumen ini dan dirinci terp
 | 5 | Geser notifikasi dan foto HEIC di iPhone asli | Belum |
 | 6 | Semua skenario `docs/UAT.md` lulus di staging | Belum |
 | 7 | `DEV_LOGIN_PASSWORD` tidak ada di Vercel; akun `@safar.local` tidak bisa masuk | Belum |
+| 7a | `LOCAL_ACCOUNTS` dihapus dari Production; akun uji tidak bisa masuk dan tim uji sudah dihapus | Belum |
 | 8 | Backup database pertama berhasil dipulihkan di database uji | Belum |
