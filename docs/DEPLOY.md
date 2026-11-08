@@ -8,12 +8,12 @@ Versi 1.0, 5 November 2026. Keputusan hosting (SRS A-04): aplikasi di **Vercel**
 |---|---|---|
 | Aplikasi | Vercel, region Singapura (`vercel.json`) | Paket Hobby dilarang untuk pemakaian komersial menurut syarat Vercel; risikonya sudah dijelaskan dan diterima. Log runtime Hobby hanya 1 jam |
 | Database | PostgreSQL, penyedia belum dipilih | Syarat: PostgreSQL 15 ke atas, encoding UTF-8, region Singapura atau terdekat, ada koneksi pooled untuk serverless, backup harian |
-| Foto | Cloudflare R2, bucket privat | Gratis sampai 10 GB. Foto tidak lewat Vercel: server memeriksa hak akses lalu mengarahkan ke tautan R2 bertanda tangan yang berlaku 5 menit |
+| Foto | Cloudflare R2, bucket privat | Gratis sampai 10 GB. Server memeriksa hak akses lalu meneruskan foto dari R2 ke browser. HP tidak pernah membuka domain R2, karena domain R2 diblokir ISP Indonesia |
 | Domain | ops2.saefulaskar.com | SSL otomatis dari Vercel |
 
 ## 2. Menyiapkan Cloudflare R2
 
-1. Di dasbor Cloudflare, buka R2, buat bucket, misalnya `safar-ops2-photos`. Jangan aktifkan akses publik.
+1. Di dasbor Cloudflare, buka R2, buat bucket, misalnya `safar-ops2-photos`, dengan *Location hint* **Asia-Pacific (APAC)** agar dekat dengan Vercel Singapura. Jangan aktifkan akses publik.
 2. Buat API token R2 dengan izin **Object Read & Write** yang dibatasi hanya ke bucket itu.
 3. Catat **Account ID**, **Access Key ID**, dan **Secret Access Key**. Secret hanya tampil sekali.
 4. Tidak perlu aturan CORS: unggahan lewat server aplikasi, dan foto dibuka lewat tautan biasa.
@@ -63,7 +63,7 @@ Tanpa variabel `R2_*`, aplikasi di Vercel menolak menyimpan foto dengan pesan je
 
 | Komponen | Perkiraan per bulan | Catatan |
 |---|---|---|
-| Vercel Hobby | Rp0 | Berhenti sampai 30 hari jika kuota habis; melanggar syarat bila pembuatnya dibayar |
+| Vercel Hobby | Rp0 | Berhenti sampai 30 hari jika kuota habis; melanggar syarat bila pembuatnya dibayar. Foto ikut memakai kuota transfer: 1.000 kali buka foto per hari sekitar 5 GB per bulan |
 | Cloudflare R2 | Rp0 sampai 10 GB | Foto sekitar 165 KB; dengan 50 foto per hari, 10 GB cukup sekitar 3 tahun. Di atas itu sekitar US$0,015 per GB-bulan; unduh gratis |
 | PostgreSQL | Tergantung penyedia | Banyak penyedia punya paket gratis 0,5–1 GB; data teks aplikasi ini kecil |
 | Domain | Sudah dimiliki | Subdomain ops2 tidak menambah biaya |

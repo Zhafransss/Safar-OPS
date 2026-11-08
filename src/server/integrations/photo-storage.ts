@@ -11,8 +11,9 @@ import { AwsClient } from "aws4fetch";
 
 export const MAX_PHOTO_BYTES = 4 * 1024 * 1024; // Under the 4.5 MB Vercel function body limit.
 
-// A signed R2 link lives this long. Short, because anyone holding the link can open the photo.
-const SIGNED_URL_SECONDS = 300;
+// A key never points to different bytes, so the viewer's own browser may keep a photo for a day.
+// Private: shared caches must not store it, because every read is access-checked.
+const PHOTO_CACHE_CONTROL = "private, max-age=86400, immutable";
 
 type PhotoExtension = "jpg" | "png" | "webp";
 
@@ -54,8 +55,9 @@ type PhotoDriver = {
   respond(key: string, contentType: string): Promise<Response>;
 };
 
-// --- Cloudflare R2 (S3 API). The bucket stays private; reads go through a short-lived signed link,
-// so photo bytes never pass through the app server or use its transfer quota.
+// --- Cloudflare R2 (S3 API). The bucket stays private and the app streams photos to the browser.
+// Browsers never contact R2 directly: Indonesian ISPs block the R2 domains, while the
+// server reaches R2 from Singapore.
 function r2Driver(): PhotoDriver {
   const accountId = process.env.R2_ACCOUNT_ID ?? "";
   const bucket = process.env.R2_BUCKET ?? "";
@@ -81,18 +83,15 @@ function r2Driver(): PhotoDriver {
       const response = await client.fetch(urlOf(key), { method: "HEAD" });
       return response.ok;
     },
-    async respond(key) {
-      const signed = await client.sign(new Request(`${urlOf(key)}?X-Amz-Expires=${SIGNED_URL_SECONDS}`), {
-        aws: { signQuery: true },
-      });
-      return new Response(null, {
-        status: 302,
-        headers: {
-          location: signed.url,
-          // Reuse the redirect only while the signed link is still valid.
-          "cache-control": `private, max-age=${SIGNED_URL_SECONDS - 60}`,
-        },
-      });
+    async respond(key, contentType) {
+      const stored = await client.fetch(urlOf(key));
+      if (stored.status === 404) return new Response(null, { status: 404 });
+      if (!stored.ok || !stored.body) throw new Error(`R2 read failed: ${stored.status}`);
+      const headers = new Headers({ "content-type": contentType, "cache-control": PHOTO_CACHE_CONTROL });
+      const length = stored.headers.get("content-length");
+      if (length) headers.set("content-length", length);
+      // Stream the body through instead of buffering the whole photo first.
+      return new Response(stored.body, { headers });
     },
   };
 }
@@ -117,7 +116,7 @@ function diskDriver(): PhotoDriver {
     async respond(key, contentType) {
       const buffer = await fs.readFile(/* turbopackIgnore: true */ fileOf(key));
       return new Response(new Uint8Array(buffer), {
-        headers: { "content-type": contentType, "cache-control": "private, max-age=3600" },
+        headers: { "content-type": contentType, "cache-control": PHOTO_CACHE_CONTROL },
       });
     },
   };

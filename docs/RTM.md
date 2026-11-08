@@ -147,7 +147,7 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 |---|---|
 | NFR-01, FR-UI-01 | Ke-14 layar mockup dibandingkan berdampingan pada 390 px, terang dan gelap |
 | NFR-02 | Semua aturan akses di server; jalur terlarang diuji langsung ke API di Sprint 1–4. Ditambah pemeriksaan Origin untuk aksi yang mengubah data, header keamanan, dan pesan error internal yang disembunyikan |
-| NFR-04 | Driver Cloudflare R2: bucket privat, unggah bertanda tangan, baca lewat tautan 5 menit setelah cek akses. Diuji dengan R2 tiruan; uji bucket asli masuk daftar go-live |
+| NFR-04 | Driver Cloudflare R2: bucket privat, unggah bertanda tangan, foto dialirkan lewat server setelah cek akses, browser tidak membuka domain R2. Diuji dengan R2 tiruan; uji bucket asli masuk daftar go-live |
 | NFR-06 | Tanggal, label tenggat, dan nomor laporan memakai Asia/Jakarta; diuji pada pukul 00.30 WIB |
 | NFR-07 | Build produksi dengan 4G tiruan: halaman terberat (620 laporan) 1,5 detik, lainnya di bawah 0,3 detik. Diukur di komputer lokal |
 | NFR-09 | 8 tim, 620 laporan, 375 tugas, 1.818 to-do tanpa masalah |
