@@ -8,6 +8,7 @@ import {
   participantsOf,
   readReceipt,
   reportActions,
+  reportVersion,
   type ReportActor,
   type ReportParties,
 } from "@/lib/report-rules";
@@ -141,5 +142,23 @@ describe("readReceipt (K-T78)", () => {
 describe("formatReportNumber (K-T83)", () => {
   it("pads the sequence to three digits", () => {
     expect(formatReportNumber("2610", 7)).toBe("2610-007");
+  });
+});
+
+describe("reportVersion (CHANGELOG 24)", () => {
+  const base = { status: "SENT" as const, toId: "zarkasih", ccCount: 1, messageCount: 3, readsOnMyMessages: 2 };
+
+  it("stays the same while nothing visible changed", () => {
+    expect(reportVersion(base)).toBe(reportVersion({ ...base }));
+  });
+
+  it.each([
+    ["a new message", { messageCount: 4 }],
+    ["a new read on my message", { readsOnMyMessages: 3 }],
+    ["a status change", { status: "IN_PROGRESS" as const }],
+    ["a forward", { toId: "dimas" }],
+    ["a new CC", { ccCount: 2 }],
+  ])("changes on %s", (_label, change) => {
+    expect(reportVersion({ ...base, ...change })).not.toBe(reportVersion(base));
   });
 });

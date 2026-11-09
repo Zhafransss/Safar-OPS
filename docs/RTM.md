@@ -23,7 +23,7 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-LAP-07 | BG-05 | Teruskan | Laporan | Must | Done | TC-LAP-07: penerima lama menjadi CC |
 | FR-LAP-08 | BG-05 | Tambah CC | Laporan | Must | Done | TC-LAP-08: CC bisa melihat dan chat |
 | FR-LAP-09 | BG-05 | Chat teks dan foto | Laporan | Must | Done | TC-LAP-09: pesan kosong PNG-LAP-08; chat tutup setelah Selesai |
-| FR-LAP-10 | BG-05 | Chat tidak realtime | Laporan | Must | Done | TC-LAP-10: pesan baru tampil setelah refresh |
+| FR-LAP-10 | BG-05 | Chat tidak realtime, dicek tiap 10 detik (CHANGELOG 24) | Laporan | Must | Done | TC-LAP-10: pesan baru tampil setelah refresh, dan tanpa refresh dalam sekitar 10 detik selama laporan terbuka |
 | FR-LAP-11 | BG-05 | Tanda baca | Laporan | Must | Done | TC-LAP-11: abu dan biru sesuai peserta; pemilik tidak dihitung |
 | FR-LAP-12 | BG-05 | Foto layar penuh | Laporan | Must | Done | TC-LAP-12: geser, penanda "2 / 3", tutup |
 | FR-LAP-13 | BG-05 | Tab per peran | Laporan | Must | Done | TC-LAP-13: isi tab sesuai peran |

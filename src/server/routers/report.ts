@@ -6,6 +6,7 @@ import {
   createReport,
   finishReport,
   forwardReport,
+  getReportVersion,
   listReports,
   markReportOpened,
   rejectReport,
@@ -30,6 +31,10 @@ export const reportRouter = router({
       }),
     )
     .query(({ input, ctx }) => listReports(input, ctx.user)),
+
+  version: protectedProcedure
+    .input(z.object({ number }))
+    .query(({ input, ctx }) => getReportVersion(input.number, ctx.user)),
 
   // Empty values pass here on purpose: report-rules answers with the PNG code the mockup shows.
   create: protectedProcedure

@@ -16,6 +16,7 @@ import {
   readReceipt,
   REPORT_TYPES,
   reportActions,
+  reportVersion,
   STATUS_LABEL,
   type ReportActor,
   type ReportDraft,
@@ -178,6 +179,15 @@ export async function getReportDetail(number: string, user: CurrentUser) {
     photoIds: report.photos.map((photo) => photo.id),
     taskNames: report.tasks.map((task) => task.name),
     actions: reportActions(parties, actor),
+    version: reportVersion({
+      status: report.status,
+      toId: report.toId,
+      ccCount: report.ccs.length,
+      messageCount: report.messages.length,
+      readsOnMyMessages: report.messages
+        .filter((message) => message.senderId === user.id)
+        .reduce((sum, message) => sum + message.reads.length, 0),
+    }),
     logs: logs.map((log) => ({ id: log.id, text: `${formatShortDate(log.createdAt)} · ${log.text}` })),
     messages: report.messages.map((message) => {
       const mine = message.senderId === user.id;
@@ -208,7 +218,26 @@ export async function getReportDetail(number: string, user: CurrentUser) {
   };
 }
 
-export type ReportDetailData = Extract<NonNullable<Awaited<ReturnType<typeof getReportDetail>>>, { denied: false }>;
+// CHANGELOG 24: polled by the open chat, so it stays small: counts only, no message bodies.
+export async function getReportVersion(number: string, user: CurrentUser): Promise<string | null> {
+  const report = await db.report.findUnique({
+    where: { number },
+    include: { ccs: { select: { userId: true } }, _count: { select: { messages: true } } },
+  });
+  if (!report || !(await userCanSeeReport(report, user))) return null;
+  const readsOnMyMessages = await db.reportMessageRead.count({
+    where: { message: { reportId: report.id, senderId: user.id } },
+  });
+  return reportVersion({
+    status: report.status,
+    toId: report.toId,
+    ccCount: report.ccs.length,
+    messageCount: report._count.messages,
+    readsOnMyMessages,
+  });
+}
+
+export type ReportDetailData =Extract<NonNullable<Awaited<ReturnType<typeof getReportDetail>>>, { denied: false }>;
 
 async function assertPhotoKeys(keys: readonly string[], userId: string): Promise<void> {
   if (keys.length > MAX_PHOTOS) throw pngError("PNG-LAP-06");

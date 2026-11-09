@@ -120,7 +120,7 @@ Kolom **Mockup** menyebut fungsi tampilan di file mockup sebagai acuan persis.
 | FR-LAP-07 | Teruskan oleh penerima, leader penerima, atau pemilik; penerima lama jadi CC; tidak tersedia setelah laporan tertutup | K-T29, K-T41, K-T52 | `lapFwd` |
 | FR-LAP-08 | Tambah CC oleh pelapor atau penerima, selama laporan belum tertutup | K-T41 | `lapCC` |
 | FR-LAP-09 | Chat teks dan foto; pesan kosong ditolak (PNG-LAP-08); ditutup setelah Selesai atau Ditolak | K-T24, K-T51 | `sendMsg` |
-| FR-LAP-10 | Chat tidak realtime; diperbarui dengan tombol refresh atau saat halaman dibuka ulang | K-T42 | `vLapDetail` |
+| FR-LAP-10 | Chat tidak realtime; diperbarui dengan tombol refresh, saat halaman dibuka ulang, atau otomatis lewat pengecekan tiap 10 detik selama laporan terbuka (CHANGELOG 24) | K-T42, CHANGELOG 24 | `vLapDetail` |
 | FR-LAP-11 | Tanda baca: centang ganda dan inisial peserta; abu jika belum semua, biru jika semua. Leader dan pemilik yang hanya melihat tidak dihitung | K-T78 | `tickHTML`, `lapParts` |
 | FR-LAP-12 | Foto bisa dibuka layar penuh, digeser, penanda "2 / 3", tutup dengan X atau ketuk luar | K-T76 | `openFoto`, `fotoGo` |
 | FR-LAP-13 | Tab Laporan saya, Laporan tim (leader), Semua laporan (pemilik). Laporan tim tidak mengulang laporan milik sendiri | K-T30, K-T41 | `lapTabs`, `lapsFor` |

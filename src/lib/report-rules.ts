@@ -104,6 +104,21 @@ export function readReceipt(senderId: string, participantIds: readonly string[],
   return { readers, allRead: others.length > 0 && readers.length === others.length };
 }
 
+// CHANGELOG 24: what the open chat compares to know a refresh would show something new.
+// Reads count only on the viewer's own messages, the only ones with read receipts, so the
+// viewer opening a message never changes their own version.
+export type ReportVersionParts = {
+  status: ReportStatus;
+  toId: string;
+  ccCount: number;
+  messageCount: number;
+  readsOnMyMessages: number;
+};
+
+export function reportVersion(parts: ReportVersionParts): string {
+  return [parts.status, parts.toId, parts.ccCount, parts.messageCount, parts.readsOnMyMessages].join(":");
+}
+
 export function formatReportNumber(period: string, sequence: number): string {
   return `${period}-${String(sequence).padStart(3, "0")}`;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
@@ -19,6 +19,10 @@ import type { ReportDetailData } from "@/server/services/report";
 import type { PickerUser } from "@/server/services/team";
 
 type Dialog = "reject" | "finish" | "forward" | "cc" | null;
+
+const POLL_MS = 10_000;
+// Within this distance of the end, the user counts as reading the newest messages.
+const NEAR_BOTTOM_PX = 80;
 
 function Message({ message }: { message: ReportDetailData["messages"][number] }) {
   if (message.isSystem) {
@@ -84,15 +88,36 @@ export function ReportDetail({
     markOpened({ number });
   }, [markOpened, number, messageCount]);
 
-  // Mockup render: a report opens at the newest message. It stays there when the composer grows
-  // with photos or an error, since the messages get less room.
+  // CHANGELOG 24: while the chat is open and on screen, ask for the report's version every 10 s and
+  // refresh only when it changed. TanStack Query pauses the interval while the app is in the background.
+  const { data: latestVersion } = useQuery({
+    ...trpc.report.version.queryOptions({ number }),
+    enabled: !closed,
+    refetchInterval: POLL_MS,
+  });
+  const refreshedFor = useRef<string | null>(null);
   useEffect(() => {
+    if (!latestVersion || latestVersion === report.version || refreshedFor.current === latestVersion) return;
+    refreshedFor.current = latestVersion;
+    router.refresh();
+  }, [latestVersion, report.version, router]);
+
+  // Mockup render: a report opens at the newest message. New messages and a growing composer keep it
+  // there, unless the user scrolled up to read older messages.
+  const stickToBottom = useRef(true);
+  useEffect(() => {
+    if (!stickToBottom.current) return;
     const frame = requestAnimationFrame(() => {
       const scroller = chatScroll.current;
       scroller?.scrollTo(0, scroller.scrollHeight);
     });
     return () => cancelAnimationFrame(frame);
   }, [messageCount, photos.length, error]);
+
+  function trackScroll() {
+    const scroller = chatScroll.current;
+    if (scroller) stickToBottom.current = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < NEAR_BOTTOM_PX;
+  }
 
   function done(message?: string) {
     setDialog(null);
@@ -145,6 +170,7 @@ export function ReportDetail({
       setMessageText("");
       setPhotos([]);
       setError("");
+      stickToBottom.current = true;
       router.refresh();
     } catch (e) {
       setError(errorText(e instanceof Error ? e.message : ""));
@@ -184,7 +210,7 @@ export function ReportDetail({
           </button>
         }
       />
-      <div className="chat-scroll" ref={chatScroll}>
+      <div className="chat-scroll" ref={chatScroll} onScroll={trackScroll}>
         <div className="pad" style={{ paddingBottom: 4 }}>
           <div className="card">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
