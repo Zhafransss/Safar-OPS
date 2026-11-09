@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { detectExtension, isOwnKey, newPhotoKey, photoResponse } from "@/server/integrations/photo-storage";
+import { detectExtension, isOwnKey, newPhotoKey, photoResponse, savePhoto } from "@/server/integrations/photo-storage";
 
 describe("detectExtension", () => {
   it("recognizes real image headers", () => {
@@ -58,6 +58,27 @@ describe("R2 photo reads", () => {
     const request = fetchMock.mock.calls[0]?.[0];
     expect(request?.url).toBe(`https://acct.r2.cloudflarestorage.com/photos/${key}`);
     expect(request?.headers.get("authorization")).toContain("AWS4-HMAC-SHA256");
+  });
+
+  // Next.js rebuilds a Request passed to fetch with a streamed body, so R2 got no Content-Length (411).
+  it("uploads plain bytes through fetch(url, init), never as a Request", async () => {
+    const fetchMock = vi.fn(async (..._args: unknown[]) => new Response(null, { status: 200 }));
+    useR2(new Response(null));
+    vi.stubGlobal("fetch", fetchMock);
+    const key = newPhotoKey("user-a", "jpg");
+    const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
+
+    await savePhoto(key, bytes);
+
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`https://acct.r2.cloudflarestorage.com/photos/${key}`);
+    expect(init.method).toBe("PUT");
+    expect(init.body).toBeInstanceOf(Uint8Array);
+    expect(init.body).toEqual(bytes);
+    const headers = new Headers(init.headers);
+    expect(headers.get("authorization")).toContain("AWS4-HMAC-SHA256");
+    expect(headers.get("x-amz-content-sha256")).toBe("UNSIGNED-PAYLOAD");
+    expect(headers.get("content-type")).toBe("image/jpeg");
   });
 
   it("answers 404 when the object is missing from R2", async () => {

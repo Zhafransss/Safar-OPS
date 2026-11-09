@@ -72,11 +72,11 @@ function r2Driver(): PhotoDriver {
 
   return {
     async save(key, bytes, contentType) {
-      const response = await client.fetch(urlOf(key), {
-        method: "PUT",
-        body: new Uint8Array(bytes),
-        headers: { "content-type": contentType },
-      });
+      // Not client.fetch: it hands fetch a Request, which Next.js rebuilds with the body as a stream.
+      // The upload then goes out without Content-Length and R2 refuses it with 411. Plain bytes in
+      // init keep the length. The S3 signature uses UNSIGNED-PAYLOAD, so the body is not signed.
+      const signed = await client.sign(urlOf(key), { method: "PUT", headers: { "content-type": contentType } });
+      const response = await fetch(signed.url, { method: "PUT", headers: signed.headers, body: new Uint8Array(bytes) });
       if (!response.ok) throw new Error(`R2 upload failed: ${response.status}`);
     },
     async exists(key) {
