@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { NoZoom } from "@/components/no-zoom";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
 import { ScrollReset } from "@/components/scroll-reset";
 import { ToastProvider } from "@/components/toast";
@@ -25,6 +26,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // CHANGELOG 25. Android honors these; Safari iOS needs NoZoom as well.
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   themeColor: "#EE7A1F",
 };
@@ -45,6 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </ToastProvider>
         </TrpcProvider>
         <ScrollReset />
+        <NoZoom />
         <RegisterServiceWorker />
       </body>
     </html>
