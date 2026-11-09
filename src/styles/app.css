@@ -149,11 +149,13 @@ button.ava::after {
   inset: -2px;
 }
 
-/* CHANGELOG 15: Safari iOS zooms into inputs under 16 px. */
+/* CHANGELOG 15: Safari iOS zooms into inputs under 16 px. The zoom outlasts typing, so the
+   chat composer once left the photo viewer enlarged and cut off on the right. */
 @supports (-webkit-touch-callout: none) {
   .inp,
   .sel,
-  textarea.inp {
+  textarea.inp,
+  .composer textarea {
     font-size: 16px;
   }
 }
