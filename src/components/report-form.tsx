@@ -10,7 +10,7 @@ import { useToast } from "@/components/toast";
 import { UserPicker } from "@/components/user-picker";
 import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
-import { PHOTO_ERROR, preparePhoto, uploadPhotos, type PendingPhoto } from "@/lib/photo-upload";
+import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { findReportError, MAX_PHOTOS, REPORT_TYPES, type ReportType } from "@/lib/report-rules";
 import { useTRPC } from "@/lib/trpc-client";
 import type { PickerUser } from "@/server/services/team";
@@ -114,7 +114,10 @@ export function ReportForm({ users, meId }: { users: PickerUser[]; meId: string 
         />
 
         <label className="lab mt">Foto (opsional)</label>
-        <PhotoThumbs sources={photos.map((photo) => photo.url)}>
+        <PhotoThumbs
+          sources={photos.map((photo) => photo.url)}
+          onRemove={(index) => setPhotos((current) => withoutPhoto(current, index))}
+        >
           <button
             className="foto"
             style={{ border: "1.5px dashed var(--line)", cursor: "pointer" }}

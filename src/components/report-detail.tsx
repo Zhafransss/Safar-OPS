@@ -12,7 +12,7 @@ import { useToast } from "@/components/toast";
 import { UserPicker } from "@/components/user-picker";
 import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
-import { PHOTO_ERROR, preparePhoto, uploadPhotos, type PendingPhoto } from "@/lib/photo-upload";
+import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-rules";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
@@ -281,7 +281,10 @@ export function ReportDetail({
           {photos.length > 0 && (
             <div className="fcount">
               {photos.length}/{MAX_PHOTOS} foto siap dikirim
-              <PhotoThumbs sources={photos.map((photo) => photo.url)} />
+              <PhotoThumbs
+                sources={photos.map((photo) => photo.url)}
+                onRemove={(index) => setPhotos((current) => withoutPhoto(current, index))}
+              />
             </div>
           )}
           <div className="composer">

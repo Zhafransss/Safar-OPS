@@ -15,6 +15,13 @@ export async function preparePhoto(file: File): Promise<PendingPhoto> {
   return { file: compressed, url: URL.createObjectURL(compressed) };
 }
 
+// Drops a photo the user removed before sending, and frees its preview.
+export function withoutPhoto(photos: readonly PendingPhoto[], index: number): PendingPhoto[] {
+  const removed = photos[index];
+  if (removed) URL.revokeObjectURL(removed.url);
+  return photos.filter((_, position) => position !== index);
+}
+
 export async function uploadPhotos(photos: readonly PendingPhoto[]): Promise<string[]> {
   return Promise.all(
     photos.map(async ({ file }) => {
