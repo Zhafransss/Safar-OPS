@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { DateInput } from "@/components/date-input";
 import { Icon } from "@/components/icon";
 import { TeamChip } from "@/components/role-label";
 import { ReportPopup } from "@/components/report-popup";
@@ -129,7 +130,7 @@ function TodoFormSheet({
           <label className="lab" htmlFor="teD">
             DL
           </label>
-          <input id="teD" type="date" className="inp" value={dueIso} onChange={(e) => setDueIso(e.target.value)} />
+          <DateInput id="teD" value={dueIso} onChange={(e) => setDueIso(e.target.value)} />
         </div>
       </div>
       {todo?.needsReassign && <div className="alert err mt small">PIC lama sudah tidak di tim. Pilih PIC baru.</div>}

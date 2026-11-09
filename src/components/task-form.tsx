@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { DateInput } from "@/components/date-input";
 import { Icon } from "@/components/icon";
 import { PickSheet } from "@/components/pick-sheet";
 import { ReportPopup } from "@/components/report-popup";
@@ -166,10 +167,8 @@ export function TaskForm({ form }: { form: TaskFormData }) {
                 </option>
               ))}
             </select>
-            <input
+            <DateInput
               id={`tdl${index}`}
-              type="date"
-              className="inp"
               value={todo.dueIso}
               onChange={(e) => update(todo.key, { dueIso: e.target.value })}
               aria-label="DL"

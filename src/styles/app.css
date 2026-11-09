@@ -89,6 +89,52 @@ button.ava::after {
   }
 }
 
+/* Safari iOS gives a date input a fixed native width, which pushed the DL field out of its .g2 column. */
+.g2 > * {
+  min-width: 0;
+}
+
+input[type="date"].inp {
+  display: block;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"].inp::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* DateInput: "Deadline" hint while the DL is empty and not being edited. */
+.date-box {
+  position: relative;
+}
+
+.date-hint {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font: 500 14px var(--font);
+  pointer-events: none;
+}
+
+/* Matches the 16 px iOS input text (CHANGELOG 15). */
+@supports (-webkit-touch-callout: none) {
+  .date-hint {
+    font-size: 16px;
+  }
+}
+
+.date-box .inp.empty:not(:focus)::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.date-box .inp:focus + .date-hint {
+  display: none;
+}
+
 /* CHANGELOG 5, K-T82: 44 px tap targets for the to-do checkbox and its menu. */
 .tbox,
 .tact .tmenu {
