@@ -69,6 +69,7 @@ export function ReportDetail({
   const [reasonError, setReasonError] = useState("");
   const [sending, setSending] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const chatScroll = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   const toast = useToast();
@@ -83,14 +84,15 @@ export function ReportDetail({
     markOpened({ number });
   }, [markOpened, number, messageCount]);
 
-  // Mockup render: a report opens at the newest message. The frame lets ScrollReset run first.
+  // Mockup render: a report opens at the newest message. It stays there when the composer grows
+  // with photos or an error, since the messages get less room.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      const scroller = document.getElementById("scr");
+      const scroller = chatScroll.current;
       scroller?.scrollTo(0, scroller.scrollHeight);
     });
     return () => cancelAnimationFrame(frame);
-  }, [messageCount]);
+  }, [messageCount, photos.length, error]);
 
   function done(message?: string) {
     setDialog(null);
@@ -163,7 +165,7 @@ export function ReportDetail({
   }
 
   return (
-    <>
+    <div className="chat-screen">
       <PageHeader
         title={number}
         subtitle={report.typeLabel}
@@ -182,102 +184,102 @@ export function ReportDetail({
           </button>
         }
       />
-      <div className="pad" style={{ paddingBottom: 4 }}>
-        <div className="card">
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
-            <b style={{ fontSize: 15, lineHeight: 1.3 }}>{report.title}</b>
-            <span className={`badge ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
-          </div>
-          <p style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>{report.body}</p>
-          {report.photoIds.length > 0 && <PhotoThumbs sources={report.photoIds.map(photoUrl)} />}
-          <div className="mt">
-            <div className="row">
-              <span>Pelapor</span>
-              <span>{report.fromName}</span>
+      <div className="chat-scroll" ref={chatScroll}>
+        <div className="pad" style={{ paddingBottom: 4 }}>
+          <div className="card">
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start" }}>
+              <b style={{ fontSize: 15, lineHeight: 1.3 }}>{report.title}</b>
+              <span className={`badge ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
             </div>
-            <div className="row">
-              <span>Penerima</span>
-              <span>{report.toName}</span>
-            </div>
-            {report.ccNames.length > 0 && (
+            <p style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>{report.body}</p>
+            {report.photoIds.length > 0 && <PhotoThumbs sources={report.photoIds.map(photoUrl)} />}
+            <div className="mt">
               <div className="row">
-                <span>CC</span>
-                <span>{report.ccNames.join(", ")}</span>
+                <span>Pelapor</span>
+                <span>{report.fromName}</span>
+              </div>
+              <div className="row">
+                <span>Penerima</span>
+                <span>{report.toName}</span>
+              </div>
+              {report.ccNames.length > 0 && (
+                <div className="row">
+                  <span>CC</span>
+                  <span>{report.ccNames.join(", ")}</span>
+                </div>
+              )}
+              <div className="row">
+                <span>Dibuat</span>
+                <span>{report.created}</span>
+              </div>
+              {report.taskNames.length > 0 && (
+                <div className="row">
+                  <span>Tugas</span>
+                  <span style={{ whiteSpace: "pre-line" }}>{report.taskNames.join("\n")}</span>
+                </div>
+              )}
+            </div>
+            {(actions.canStart || actions.canReject || actions.canFinish || actions.canForward || actions.canAddCc) && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                {actions.canStart && (
+                  <button className="btn sm" onClick={() => start.mutate({ number })} disabled={start.isPending}>
+                    Tindak lanjuti
+                  </button>
+                )}
+                {actions.canReject && (
+                  <button className="btn sm warn" onClick={openReject}>
+                    Tolak
+                  </button>
+                )}
+                {actions.canFinish && (
+                  <button className="btn sm" onClick={() => setDialog("finish")}>
+                    Tandai selesai
+                  </button>
+                )}
+                {actions.canForward && (
+                  <button className="btn sm sec" onClick={() => setDialog("forward")}>
+                    <Icon name="fwd" size={15} /> Teruskan
+                  </button>
+                )}
+                {actions.canAddCc && (
+                  <button className="btn sm sec" onClick={() => setDialog("cc")}>
+                    <Icon name="plus" size={15} /> CC
+                  </button>
+                )}
               </div>
             )}
-            <div className="row">
-              <span>Dibuat</span>
-              <span>{report.created}</span>
-            </div>
-            {report.taskNames.length > 0 && (
-              <div className="row">
-                <span>Tugas</span>
-                <span style={{ whiteSpace: "pre-line" }}>{report.taskNames.join("\n")}</span>
-              </div>
-            )}
+            {actions.viewsAsLeader && <div className="alert info mt small">Dilihat sebagai leader {report.toName}.</div>}
           </div>
-          {(actions.canStart || actions.canReject || actions.canFinish || actions.canForward || actions.canAddCc) && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
-              {actions.canStart && (
-                <button className="btn sm" onClick={() => start.mutate({ number })} disabled={start.isPending}>
-                  Tindak lanjuti
-                </button>
-              )}
-              {actions.canReject && (
-                <button className="btn sm warn" onClick={openReject}>
-                  Tolak
-                </button>
-              )}
-              {actions.canFinish && (
-                <button className="btn sm" onClick={() => setDialog("finish")}>
-                  Tandai selesai
-                </button>
-              )}
-              {actions.canForward && (
-                <button className="btn sm sec" onClick={() => setDialog("forward")}>
-                  <Icon name="fwd" size={15} /> Teruskan
-                </button>
-              )}
-              {actions.canAddCc && (
-                <button className="btn sm sec" onClick={() => setDialog("cc")}>
-                  <Icon name="plus" size={15} /> CC
-                </button>
-              )}
-            </div>
-          )}
-          {actions.viewsAsLeader && <div className="alert info mt small">Dilihat sebagai leader {report.toName}.</div>}
+          <details className="box">
+            <summary>Riwayat ({report.logs.length})</summary>
+            {report.logs.map((log) => (
+              <div key={log.id} className="log">
+                {log.text}
+              </div>
+            ))}
+          </details>
         </div>
-        <details className="box">
-          <summary>Riwayat ({report.logs.length})</summary>
-          {report.logs.map((log) => (
-            <div key={log.id} className="log">
-              {log.text}
-            </div>
+
+        <div className="chat">
+          {report.messages.map((message) => (
+            <Message key={message.id} message={message} />
           ))}
-        </details>
-      </div>
-
-      <div className="chat">
-        {report.messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
-        {report.messages.length === 0 && <div className="sysmsg">Belum ada balasan.</div>}
-      </div>
-
-      {closed ? (
-        <div className="pad">
-          <div className="lock-note">
-            <Icon name="lock" size={14} /> Laporan sudah {STATUS_LABEL[status].toLowerCase()} dan tidak bisa dibuka
-            kembali. Buat laporan baru jika masalah muncul lagi.
-          </div>
+          {report.messages.length === 0 && <div className="sysmsg">Belum ada balasan.</div>}
         </div>
-      ) : (
-        <>
-          {error && (
-            <div className="pad" style={{ paddingBottom: 0 }}>
-              <div className="alert err">{error}</div>
+
+        {closed && (
+          <div className="pad">
+            <div className="lock-note">
+              <Icon name="lock" size={14} /> Laporan sudah {STATUS_LABEL[status].toLowerCase()} dan tidak bisa dibuka
+              kembali. Buat laporan baru jika masalah muncul lagi.
             </div>
-          )}
+          </div>
+        )}
+      </div>
+
+      {!closed && (
+        <div className="dock">
+          {error && <div className="alert err">{error}</div>}
           {photos.length > 0 && (
             <div className="fcount">
               {photos.length}/{MAX_PHOTOS} foto siap dikirim
@@ -302,7 +304,7 @@ export function ReportDetail({
               <Icon name="send" size={18} />
             </button>
           </div>
-        </>
+        </div>
       )}
 
       {dialog === "reject" && (
@@ -361,6 +363,6 @@ export function ReportDetail({
           onPick={(userId) => addCc.mutate({ number, userId })}
         />
       )}
-    </>
+    </div>
   );
 }

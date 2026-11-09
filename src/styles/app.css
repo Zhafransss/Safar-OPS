@@ -53,6 +53,47 @@ a.tcard {
   object-fit: cover;
 }
 
+/* Report chat: the header stays on top, only the messages scroll, and the composer with its
+   pending photos is always the last thing on screen, so no message can show below it. */
+.scroll:has(> .chat-screen) {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.chat-screen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+.dock {
+  flex: none;
+  background: var(--appbg);
+  border-top: 1px solid var(--line);
+}
+
+.dock .alert {
+  margin: 10px 12px 0;
+}
+
+.dock .fcount {
+  padding: 10px 14px 0;
+}
+
+.dock .composer {
+  position: static;
+  border-top: 0;
+}
+
 /* No mockup pattern: an X in the corner removes a photo before it is sent. */
 .foto-wrap {
   position: relative;
