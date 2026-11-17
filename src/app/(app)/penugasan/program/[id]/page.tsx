@@ -52,7 +52,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
   if (program.denied) {
     return (
       <>
-        <PageHeader title="Program" backHref="/penugasan/program" unreadCount={viewer.unreadNotifications} />
+        <PageHeader title="Detail program" backHref="/penugasan/program" unreadCount={viewer.unreadNotifications} />
         <div className="pad">
           <div className="alert err">{formatError("PNG-PRG-04")}</div>
         </div>

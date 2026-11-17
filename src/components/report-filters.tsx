@@ -27,7 +27,7 @@ export function useReportFilters(): Filters {
 let rememberedTab: ReportTab = "saya";
 
 // Mounted by the Laporan layout: filters survive list to detail and back,
-// and reset when the menu is opened again from the hub (K-T75).
+// and reset when the Laporan card is opened again from Beranda (K-T75).
 export function ReportFiltersProvider({ children }: { children: ReactNode }) {
   const [tab, setTabState] = useState<ReportTab>(rememberedTab);
   const [status, setStatus] = useState<ReportStatus | "ALL">("ALL");

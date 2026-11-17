@@ -1,17 +1,50 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { AvatarMenu } from "@/components/avatar-menu";
 import { BellButton } from "@/components/bell-button";
 import { Icon } from "@/components/icon";
+import type { IconName } from "@/components/icons";
 import { RoleLabel } from "@/components/role-label";
 import { formatFullDate, greeting } from "@/lib/date";
-import { getViewer } from "@/server/services/viewer";
+import { getViewer, getWorkSummary } from "@/server/services/viewer";
 
-// Mockup vHome.
+// Mockup menu tile. `count` carries the summary the removed hub showed (CHANGELOG 26).
+function MenuCard({
+  href,
+  icon,
+  title,
+  count,
+  children,
+}: {
+  href: string;
+  icon: IconName;
+  title: string;
+  count?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link className="menu hot" href={href}>
+      <div className="ico">
+        <Icon name={icon} />
+      </div>
+      <b>{title}</b>
+      <small>{children}</small>
+      {count && (
+        <small>
+          <b className="menu-cnt">{count}</b>
+        </small>
+      )}
+    </Link>
+  );
+}
+
+// Mockup vHome, with the Pekerjaan section from 02-navigasi-penugasan (CHANGELOG 26).
 export default async function HomePage() {
   const viewer = await getViewer();
   if (!viewer) redirect("/login");
+  const { newReports, myTodos } = await getWorkSummary(viewer.id);
   const now = new Date();
 
   return (
@@ -40,15 +73,20 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
-      <div className="sect-t">Penugasan</div>
+      <div className="sect-t">Pekerjaan</div>
       <div className="grid3">
-        <Link className="menu hot" href="/penugasan">
-          <div className="ico">
-            <Icon name="list" />
-          </div>
-          <b>Penugasan</b>
-          <small>Laporan &amp; tugas tim</small>
-        </Link>
+        <MenuCard href="/penugasan/program" icon="list" title="Tugas" count={myTodos > 0 ? `${myTodos} to-do saya` : undefined}>
+          Program dan to-do tim
+        </MenuCard>
+        <MenuCard href="/penugasan/laporan" icon="chat" title="Laporan" count={newReports > 0 ? `${newReports} baru` : undefined}>
+          Lapor dan tanggapi
+        </MenuCard>
+        {/* V1.0: the team chart stays owner-only; everyone sees it from V2.0. */}
+        {viewer.isOwner && (
+          <MenuCard href="/penugasan/tim" icon="users" title="Tim">
+            Susunan tim
+          </MenuCard>
+        )}
       </div>
       <div style={{ height: 20 }} />
     </>

@@ -49,19 +49,19 @@
 
 | No | Skenario | Langkah | Hasil yang diharapkan | Hasil | Catatan |
 |---|---|---|---|---|---|
-| D-01 | Buat tim | Penugasan, Pemetaan tim, Tambah tim, isi nama, warna, leader, staff | Tim tampil di bagan dengan warna pilihan | | |
+| D-01 | Buat tim | Kartu Tim, Tambah tim, isi nama, warna, leader, staff | Tim tampil di bagan dengan warna pilihan | | |
 | D-02 | Warna dipakai | Pilih warna bertanda silang | Tampil "PNG-TIM-07" dengan nama tim pemakainya | | |
 | D-03 | Satu leader satu tim | Pilih leader yang sudah memimpin tim lain | Tampil "PNG-TIM-03" | | |
 | D-04 | Keluarkan staff yang masih punya to-do | Edit tim, keluarkan staff yang punya to-do aktif, simpan | Muncul konfirmasi; to-do-nya berlabel Perlu dialihkan dan leader mendapat notifikasi | | |
 | D-05 | Ganti leader | Edit tim, ganti leader, simpan | Leader baru mendapat notifikasi; QC yang tertunda menjadi tugas leader baru | | |
 | D-06 | Semua laporan | Laporan, tab Semua laporan | Semua laporan perusahaan tampil | | |
-| D-07 | Buat program untuk tim | Penugasan, Buat program, pilih tim | Program tampil, leader tim itu mendapat notifikasi | | |
+| D-07 | Buat program untuk tim | Kartu Tugas, Buat program, pilih tim | Program tampil, leader tim itu mendapat notifikasi | | |
 
 ## E. Leader
 
 | No | Skenario | Langkah | Hasil yang diharapkan | Hasil | Catatan |
 |---|---|---|---|---|---|
-| E-01 | Template | Template to-do list, Buat template berisi 3 to-do | Template tersimpan untuk tim sendiri | | |
+| E-01 | Template | Kartu Tugas, Template To-do, Buat template berisi 3 to-do | Template tersimpan untuk tim sendiri | | |
 | E-02 | Tugas dari template | Di program, Tambah tugas, Pakai template, isi PIC dan DL tiap to-do, simpan | Tugas dibuat, setiap PIC mendapat notifikasi | | |
 | E-03 | DL di masa lalu | Isi DL kemarin | Tampil "PNG-TDO-04" | | |
 | E-04 | Lampirkan laporan | Saat membuat tugas, pilih No. Laporan berstatus Terkirim | Laporan otomatis Ditindaklanjuti dan pelapor mendapat notifikasi | | |
@@ -82,5 +82,22 @@
 | F-02 | Centang to-do | Centang to-do milik sendiri | Progress bertambah; jika semua selesai, leader mendapat notifikasi siap QC | | |
 | F-03 | To-do orang lain | Coba centang to-do milik orang lain | Kotak centang tidak bisa ditekan | | |
 | F-04 | Batal centang | Batalkan centang sebelum QC | Centang hilang dan progress berkurang | | |
-| F-05 | Tidak bisa membuat program | Buka Penugasan | Tidak ada tombol Buat program; tampil keterangan hanya melihat tugas sendiri | | |
+| F-05 | Tidak bisa membuat program | Buka kartu Tugas | Tidak ada tombol Buat program; tampil keterangan hanya melihat tugas sendiri | | |
 | F-06 | Staff di dua tim | Masuk sebagai staff yang ada di dua tim | Label peran menampilkan kedua tim dengan warnanya | | |
+
+## G. Navigasi
+
+Cek cepat dari `docs/02-navigasi-penugasan.md` bagian 6.
+
+| No | Skenario | Langkah | Hasil yang diharapkan | Hasil | Catatan |
+|---|---|---|---|---|---|
+| NAV-P01 | Beranda staff | Staff membuka beranda | Bagian PEKERJAAN tampil dengan kartu Tugas dan Laporan (Tim bila berhak) | | |
+| NAV-P02 | Daftar Program leader | Leader membuka kartu Tugas | Halaman Daftar Program tampil dengan tombol Template To-do | | |
+| NAV-P03 | Kembali dari Template To-do | Leader menekan Template To-do, lalu kembali | Daftar template tampil; tombol kembali menuju Daftar Program | | |
+| NAV-P04 | Pemetaan Tim pemilik | Pemilik membuka kartu Tim | Pemetaan Tim tampil dan bisa diubah | | |
+| NAV-P05 | Notifikasi laporan | Mengetuk notifikasi laporan di lonceng | Halaman laporan terbuka seperti sebelumnya | | |
+| NAV-P06 | Kembali dari Laporan | Menekan kembali dari halaman Laporan | Kembali ke Beranda | | |
+| NAV-N01 | Template To-do staff | Staff membuka kartu Tugas | Tombol Template To-do tidak tampil | | |
+| NAV-N02 | Template To-do pemilik | Pemilik membuka kartu Tugas | Tombol Template To-do tidak tampil | | |
+| NAV-N03 | Nama Penugasan | Mencari kartu atau halaman bernama "Penugasan" | Tidak ada lagi | | |
+| NAV-N04 | Tautan lama hub | Membuka tautan lama halaman hub | Diarahkan ke Beranda | | |

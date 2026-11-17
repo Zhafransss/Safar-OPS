@@ -10,19 +10,19 @@ Rute mengikuti 14 layar mockup. Modal dan lapisan (sheet, pilih, foto, toast, no
 |---|---|---|
 | `/login` | Baru | Publik |
 | `/offline` | Baru | Publik |
-| `/` | `vHome` | Semua |
-| `/penugasan` | `vHub` | Semua |
+| `/` | `vHome`, bagian PEKERJAAN (CHANGELOG 26) | Semua |
+| `/penugasan` | `vHub` dihapus; dialihkan ke `/` (CHANGELOG 26) | Semua |
 | `/penugasan/laporan` | `vLapList` | Semua |
 | `/penugasan/laporan/baru` | `vLapNew` | Semua |
 | `/penugasan/laporan/[no]` | `vLapDetail` | Yang berhak melihat |
-| `/penugasan/program` | `vPrgList` | Semua |
+| `/penugasan/program` | `vPrgList`, judul Daftar Program | Semua |
 | `/penugasan/program/baru` | `vPrgNew` | Pemilik, leader |
 | `/penugasan/program/[id]` | `vPrgDetail` | Sesuai visibilitas |
 | `/penugasan/program/[id]/tugas/baru` | `vTgsNew` | Pemilik, leader tim |
 | `/penugasan/tugas/[id]` | `vTgsDetail` | Sesuai visibilitas |
-| `/penugasan/tim` | `vTim` | Pemilik |
+| `/penugasan/tim` | `vTim`, judul Pemetaan Tim | Pemilik |
 | `/penugasan/tim/[id]` (`baru` untuk tambah) | `vTimEdit` | Pemilik |
-| `/penugasan/template` | `vTpl` | Leader |
+| `/penugasan/template` | `vTpl`, judul Template To-do, dibuka dari Daftar Program | Leader |
 | `/penugasan/template/[id]` (`baru` untuk tambah) | `vTplEdit` | Leader |
 
 ## 2. Cara menjaga kesesuaian dengan mockup

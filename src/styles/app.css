@@ -235,3 +235,10 @@ input[type="date"].inp::-webkit-date-and-time-value {
   position: absolute;
   inset: -6px;
 }
+
+/* CHANGELOG 26: the count the removed hub showed, under a Beranda menu card. */
+.menu .menu-cnt {
+  display: inline;
+  font-size: inherit;
+  color: var(--acc);
+}

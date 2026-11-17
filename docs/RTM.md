@@ -1,6 +1,6 @@
 # RTM — Fitur Penugasan, SAFAR OPS 2
 
-Terakhir diperbarui: 5 November 2026. Kolom **Status** wajib diperbarui tiap sesi: Not Started → In Progress → Done. Requirement UI baru boleh Done setelah lolos NFR-01. Tujuan bisnis ada di `docs/SRS.md` bagian 1.2.
+Terakhir diperbarui: 17 November 2026. Kolom **Status** wajib diperbarui tiap sesi: Not Started → In Progress → Done. Requirement UI baru boleh Done setelah lolos NFR-01. Tujuan bisnis ada di `docs/SRS.md` bagian 1.2.
 
 Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 
@@ -11,9 +11,9 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-AUT-03 | BG-04 | Daftar pengguna dari Jubelio | Akun | Must | In Progress | TC-AUT-03: pilihan penerima dan PIC berisi pengguna Jubelio |
 | FR-AUT-04 | BG-06 | Peran dari Pemetaan tim, aturan di server | Akun | Must | Done | TC-AUT-04: panggil API tanpa hak ditolak dengan kode PNG |
 | FR-AUT-05 | BG-06 | Logout | Akun | Must | Done | TC-AUT-05: setelah keluar, halaman kembali ke login |
-| FR-NAV-01 | BG-06 | Beranda | Navigasi | Must | Done | TC-NAV-01: isi Beranda sama dengan mockup |
-| FR-NAV-02 | BG-06 | Hub sesuai peran | Navigasi | Must | Done | TC-NAV-02: menu tampil sesuai pemilik, leader, staff |
-| FR-NAV-03 | BG-03 | Lonceng di semua halaman | Navigasi | Must | Done | TC-NAV-03: lonceng ada di tiap halaman Penugasan |
+| FR-NAV-01 | BG-06 | Beranda dengan bagian PEKERJAAN | Navigasi | Must | Done | TC-NAV-01: isi Beranda sama dengan mockup; kartu Tugas, Laporan, Tim sesuai peran (NAV-P01) |
+| FR-NAV-02 | BG-06 | Tanpa hub; Template To-do di Daftar Program | Navigasi | Must | Done | TC-NAV-02: NAV-P02–P06 dan NAV-N01–N04 di `docs/02-navigasi-penugasan.md` |
+| FR-NAV-03 | BG-03 | Lonceng di semua halaman | Navigasi | Must | Done | TC-NAV-03: lonceng ada di Beranda dan tiap halaman fitur |
 | FR-LAP-01 | BG-05 | Buat laporan | Laporan | Must | Done | TC-LAP-01: isian kosong memunculkan PNG-LAP-01–05 |
 | FR-LAP-02 | BG-05 | Nomor YYMM-NNN | Laporan | Must | Done | TC-LAP-02: kirim bersamaan tidak dobel; reset bulan baru |
 | FR-LAP-03 | BG-05 | Foto dikompres, maksimal 5 | Laporan | Must | Done | TC-LAP-03: foto ke-6 memunculkan PNG-LAP-06 |
@@ -154,3 +154,9 @@ Test Case di sini sementara, sampai skenario uji final per role tersedia (A-07).
 | FR-AUT-01, FR-AUT-03 | Menunggu uji akun Jubelio asli (A-01 sampai A-03) |
 | FR-PWA-01, NFR-08 | Menunggu staging HTTPS dan HP asli |
 | Skenario UAT | Draf di `docs/UAT.md` (A-07) |
+
+## Catatan perubahan navigasi (17 November 2026)
+
+| ID | Hasil |
+|---|---|
+| FR-NAV-01, FR-NAV-02 | Perubahan dari `docs/02-navigasi-penugasan.md` (CHANGELOG 26–28): hub dihapus, Beranda berisi kartu Tugas, Laporan, Tim; Template To-do di Daftar Program. Cek cepat NAV-P01–N04 ditambahkan ke `docs/UAT.md` bagian G |

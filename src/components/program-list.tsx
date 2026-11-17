@@ -25,7 +25,15 @@ export function Flags({ flags }: { flags: { text: string; badge: string }[] }) {
 }
 
 // Mockup vPrgList.
-export function ProgramList({ programs, canCreate }: { programs: ProgramCard[]; canCreate: boolean }) {
+export function ProgramList({
+  programs,
+  canCreate,
+  showTemplates,
+}: {
+  programs: ProgramCard[];
+  canCreate: boolean;
+  showTemplates: boolean;
+}) {
   const [filter, setFilterState] = useState<ProgramStatus>(rememberedFilter);
   const setFilter = (next: ProgramStatus) => {
     rememberedFilter = next;
@@ -36,9 +44,17 @@ export function ProgramList({ programs, canCreate }: { programs: ProgramCard[]; 
   return (
     <div className="pad">
       {canCreate ? (
-        <Link className="btn block" href="/penugasan/program/baru">
-          <Icon name="plus" size={18} /> Buat program
-        </Link>
+        <div className="btns">
+          <Link className="btn" href="/penugasan/program/baru">
+            <Icon name="plus" size={18} /> Buat program
+          </Link>
+          {/* CHANGELOG 26: Template To-do moved here from the removed hub. */}
+          {showTemplates && (
+            <Link className="btn sec" href="/penugasan/template">
+              <Icon name="tpl" size={18} /> Template To-do
+            </Link>
+          )}
+        </div>
       ) : (
         <p className="small muted" style={{ margin: 0 }}>
           Anda melihat tugas yang berisi to-do milik Anda.

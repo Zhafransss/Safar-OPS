@@ -23,7 +23,7 @@ export default async function ReportsPage() {
         title="Laporan"
         subtitle={<RoleLabel viewer={viewer} />}
         subtitleIsRoles={viewer.teamRoles.length > 0}
-        backHref="/penugasan"
+        backHref="/"
         unreadCount={viewer.unreadNotifications}
       />
       <ReportList tabs={tabs} />

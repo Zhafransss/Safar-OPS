@@ -7,7 +7,7 @@ import { getSessionUser } from "@/server/auth/session";
 import { getProgramList } from "@/server/services/assignment";
 import { getViewer } from "@/server/services/viewer";
 
-// Mockup vPrgList.
+// Mockup vPrgList. Opened from the Tugas card on Beranda (CHANGELOG 26).
 export default async function ProgramsPage() {
   const [viewer, user] = await Promise.all([getViewer(), getSessionUser()]);
   if (!viewer || !user) redirect("/login");
@@ -16,13 +16,14 @@ export default async function ProgramsPage() {
   return (
     <>
       <PageHeader
-        title="Penugasan"
+        title="Daftar Program"
         subtitle={<RoleLabel viewer={viewer} />}
         subtitleIsRoles={viewer.teamRoles.length > 0}
-        backHref="/penugasan"
+        backHref="/"
         unreadCount={viewer.unreadNotifications}
       />
-      <ProgramList programs={programs} canCreate={canCreate} />
+      {/* K-T39: Template To-do is for leaders only; owners never lead a team. */}
+      <ProgramList programs={programs} canCreate={canCreate} showTemplates={viewer.ledTeam !== null} />
     </>
   );
 }

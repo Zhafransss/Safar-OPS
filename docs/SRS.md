@@ -6,13 +6,13 @@
 | **Aplikasi** | ops2.saefulaskar.com, nama tampilan SAFAR OPS 2 |
 | **Tim developer** | Velora |
 | **Pemilik keputusan** | Chaesar Syaefuddin (Direktur) |
-| **Dokumen terkait** | `docs/RTM.md`, `docs/DESIGN.md`, `docs/PLAN.md`, `CHANGELOG-penugasan.md` |
+| **Dokumen terkait** | `docs/RTM.md`, `docs/DESIGN.md`, `docs/PLAN.md`, `CHANGELOG-penugasan.md`, `docs/02-navigasi-penugasan.md` |
 
 ## 0. Urutan acuan
 
 Jika dua sumber berbeda, yang lebih atas yang berlaku:
 
-1. **Keputusan 5 November 2026** yang tercatat di `CHANGELOG-penugasan.md` (PWA opsi A, celah 1–9, login Jubelio).
+1. **Keputusan 5 November 2026** yang tercatat di `CHANGELOG-penugasan.md` (PWA opsi A, celah 1–9, login Jubelio), dan **perubahan navigasi 10 November 2026** di `docs/02-navigasi-penugasan.md` (disetujui Direktur, CHANGELOG 26–28).
 2. **Mockup final** `02-mockup-final-fitur-penugasan.html`: tampilan, teks, alur, dan perilaku. Ini patokan utama proyek.
 3. **PRD v2.0** `02-PRD-fitur-penugasan (1).md`: aturan yang tidak bisa dilihat di mockup, seperti hak akses server dan 4 akun pemilik.
 4. **Catatan keputusan** `02-fitur-penugasan (2).md`: riwayat K-T01–K-T83.
@@ -103,9 +103,9 @@ Kolom **Mockup** menyebut fungsi tampilan di file mockup sebagai acuan persis.
 
 | ID | Requirement | Sumber | Mockup |
 |---|---|---|---|
-| FR-NAV-01 | Beranda: nama aplikasi, sapaan, label peran, lonceng, avatar, kartu tanggal, menu Penugasan | K-T17, K-T80 | `vHome` |
-| FR-NAV-02 | Hub: Laporan, Penugasan, Pemetaan tim (pemilik), Template (leader), dengan ringkasan "n baru" dan "n to-do saya" | K-T17 | `vHub` |
-| FR-NAV-03 | Lonceng notifikasi tampil di semua halaman Penugasan | K-T57 | `bellBtn`, `hd` |
+| FR-NAV-01 | Beranda: nama aplikasi, sapaan, label peran, lonceng, avatar, kartu tanggal, bagian PEKERJAAN dengan kartu Tugas, Laporan, dan Tim (Tim hanya untuk pemilik di V1.0). Kartu Tugas dan Laporan menampilkan "n to-do saya" dan "n baru" | K-T17, K-T80, navigasi 10 Nov | `vHome` |
+| FR-NAV-02 | Tidak ada halaman hub; tautan lama ke hub diarahkan ke Beranda. Kartu Tugas membuka Daftar Program, yang berisi tombol Template To-do khusus leader. Kembali dari Daftar Program, Laporan, dan Pemetaan Tim ke Beranda; dari Template To-do ke Daftar Program. Nama "Penugasan" tidak dipakai sebagai nama menu atau halaman | K-T17, K-T39, navigasi 10 Nov | `vHub` (dihapus) |
+| FR-NAV-03 | Lonceng notifikasi tampil di Beranda dan semua halaman fitur | K-T57 | `bellBtn`, `hd` |
 
 ### 2.3 Laporan (LAP)
 

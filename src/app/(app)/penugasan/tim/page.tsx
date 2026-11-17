@@ -19,7 +19,7 @@ export default async function TeamsPage() {
   if (!viewer.isOwner) {
     return (
       <>
-        <PageHeader title="Pemetaan tim" backHref="/penugasan" unreadCount={viewer.unreadNotifications} />
+        <PageHeader title="Pemetaan Tim" backHref="/" unreadCount={viewer.unreadNotifications} />
         <div className="pad">
           <div className="alert err">{formatError("PNG-TIM-06")}</div>
         </div>
@@ -32,9 +32,9 @@ export default async function TeamsPage() {
   return (
     <>
       <PageHeader
-        title="Pemetaan tim"
+        title="Pemetaan Tim"
         subtitle="Hanya pemilik"
-        backHref="/penugasan"
+        backHref="/"
         unreadCount={viewer.unreadNotifications}
       />
       <div className="pad">

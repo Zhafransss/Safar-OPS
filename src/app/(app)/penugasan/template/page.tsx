@@ -17,7 +17,7 @@ export default async function TemplatesPage() {
   if (!team) {
     return (
       <>
-        <PageHeader title="Template to-do list" backHref="/penugasan" unreadCount={viewer.unreadNotifications} />
+        <PageHeader title="Template To-do" backHref="/penugasan/program" unreadCount={viewer.unreadNotifications} />
         <div className="pad">
           <div className="alert err">{formatError("PNG-TPL-03")}</div>
         </div>
@@ -30,9 +30,9 @@ export default async function TemplatesPage() {
   return (
     <>
       <PageHeader
-        title="Template to-do list"
+        title="Template To-do"
         subtitle={<TeamChip color={team.color}>{team.name}</TeamChip>}
-        backHref="/penugasan"
+        backHref="/penugasan/program"
         unreadCount={viewer.unreadNotifications}
       />
       <div className="pad">

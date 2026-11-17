@@ -51,7 +51,8 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   };
 });
 
-export async function getHubSummary(userId: string) {
+// The counts on the Beranda menu cards: new reports to me and my open to-dos.
+export async function getWorkSummary(userId: string) {
   const [newReports, myTodos] = await Promise.all([
     db.report.count({ where: { toId: userId, status: "SENT", recipientOpenedAt: null } }),
     db.todo.count({

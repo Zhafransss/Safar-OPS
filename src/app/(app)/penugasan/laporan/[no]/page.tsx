@@ -20,7 +20,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ n
   if (report.denied) {
     return (
       <>
-        <PageHeader title="Laporan" backHref="/penugasan/laporan" unreadCount={viewer.unreadNotifications} />
+        <PageHeader title="Detail laporan" backHref="/penugasan/laporan" unreadCount={viewer.unreadNotifications} />
         <div className="pad">
           <div className="alert err">{formatError("PNG-LAP-11")}</div>
         </div>

@@ -19,7 +19,7 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
   if (task.denied) {
     return (
       <>
-        <PageHeader title="Tugas" backHref="/penugasan/program" unreadCount={viewer.unreadNotifications} />
+        <PageHeader title="Detail tugas" backHref="/penugasan/program" unreadCount={viewer.unreadNotifications} />
         <div className="pad">
           <div className="alert err">{formatError("PNG-TGS-03")}</div>
         </div>
