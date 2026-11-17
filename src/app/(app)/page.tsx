@@ -51,7 +51,7 @@ export default async function HomePage() {
     <>
       <div className="home-hd">
         <div>
-          <div className="h1">SAFAR OPS 2</div>
+          <div className="h1">HRIS</div>
           <div className="hi">Hi, {viewer.name}</div>
           <div className="hi" style={{ fontSize: 12 }}>
             <RoleLabel viewer={viewer} />

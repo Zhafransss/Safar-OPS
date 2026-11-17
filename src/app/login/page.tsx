@@ -14,7 +14,7 @@ export default async function LoginPage() {
     <>
       <div className="home-hd">
         <div>
-          <div className="h1">SAFAR OPS 2</div>
+          <div className="h1">HRIS</div>
           <div className="hi">Masuk untuk melanjutkan</div>
         </div>
       </div>

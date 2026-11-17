@@ -1,4 +1,4 @@
-# Development Plan — SAFAR OPS 2
+# Development Plan — HRIS
 
 Versi 1.0, 5 November 2026. Estimasi berikut perkiraan awal untuk 1 developer dan belum menjadi komitmen tanggal, karena PRD tidak menetapkan deadline.
 

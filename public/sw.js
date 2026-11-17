@@ -1,6 +1,7 @@
 // PWA option A: caches static files and the offline page only. User data and pages always
 // go to the network, so one account can never see another account's cached data (FR-PWA-02).
-const CACHE = "ops2-static-v1";
+// Bump the version when the precached offline page changes, so installed apps fetch it again.
+const CACHE = "ops2-static-v2";
 const OFFLINE_URL = "/offline";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png"];
 

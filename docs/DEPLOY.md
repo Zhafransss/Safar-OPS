@@ -1,4 +1,4 @@
-# Rencana Deploy — SAFAR OPS 2
+# Rencana Deploy — HRIS
 
 Versi 1.0, 5 November 2026. Keputusan hosting (SRS A-04): aplikasi di **Vercel**, data di **PostgreSQL**, foto di **Cloudflare R2**.
 

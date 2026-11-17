@@ -1,4 +1,4 @@
-# Skenario UAT — Fitur Penugasan, SAFAR OPS 2
+# Skenario UAT — Fitur Penugasan, HRIS
 
 **Status: draf.** PRD bagian 15 menyebut skenario uji final per role yang diturunkan dari 57 skenario uji mockup. Berkas itu belum diterima (SRS A-07), jadi draf ini disusun dari PRD v2.0 dan `docs/RTM.md`. Jika berkas skenario asli tersedia, draf ini dicocokkan dengannya dan skenario yang belum ada ditambahkan.
 
@@ -15,7 +15,7 @@
 |---|---|---|---|---|---|
 | A-01 | Masuk dengan akun Jubelio | Buka aplikasi, isi email dan password Jubelio, ketuk Masuk | Beranda tampil dengan nama, label peran, dan tanggal hari ini | | |
 | A-02 | Password salah | Isi password yang salah | Tampil "PNG-AUT-01: Email atau password salah." | | |
-| A-03 | Pasang di layar utama | Android: menu browser, Pasang aplikasi. iPhone: Bagikan, Tambahkan ke Layar Utama | Ikon SAFAR OPS 2 muncul dan aplikasi terbuka tanpa bilah browser | | |
+| A-03 | Pasang di layar utama | Android: menu browser, Pasang aplikasi. iPhone: Bagikan, Tambahkan ke Layar Utama | Ikon HRIS muncul dan aplikasi terbuka tanpa bilah browser | | |
 | A-04 | Tanpa internet | Matikan data dan Wi-Fi, buka aplikasi | Tampil halaman "Anda sedang offline" | | |
 | A-05 | Keluar | Ketuk avatar di Beranda, ketuk Keluar | Kembali ke halaman masuk | | |
 | A-06 | Buat laporan | Laporan, Buat laporan, isi judul, jenis, isi, 1 foto, pilih penerima, Kirim | Laporan bernomor seperti 2611-001 terkirim, penerima mendapat notifikasi | | |

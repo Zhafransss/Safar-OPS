@@ -1,4 +1,4 @@
-# Design & Architecture — SAFAR OPS 2
+# Design & Architecture — HRIS
 
 Versi 1.0, 5 November 2026. Acuan requirement: `docs/SRS.md`.
 
@@ -101,7 +101,7 @@ Opsi A dipakai jika terbukti di Sprint 0. Jika tidak ada, opsi B dipakai dan dic
 
 Trade-off: Serwist menyediakan banyak fitur cache yang tidak dipakai opsi A. Manifest bawaan Next.js dan service worker kecil yang ditulis sendiri lebih ringkas. **Dipilih yang ditulis sendiri.**
 
-- `app/manifest.ts`: nama SAFAR OPS 2, `display: standalone`, warna tema oranye, ikon 192, 512, dan maskable.
+- `app/manifest.ts`: nama HRIS, `display: standalone`, warna tema oranye, ikon 192, 512, dan maskable.
 - `public/sw.js`: cache `/_next/static`, ikon, dan `/offline`. Rute `/api/*` dan halaman selalu lewat jaringan.
 - Muat ulang saat aplikasi kembali aktif, tanpa polling: TanStack Query untuk data di klien, `RefreshOnFocus` untuk halaman yang dirender di server.
 - iOS tidak punya tombol install otomatis, jadi panduan "Tambahkan ke Layar Utama" masuk manual book.

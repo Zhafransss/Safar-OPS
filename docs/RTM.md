@@ -1,4 +1,4 @@
-# RTM — Fitur Penugasan, SAFAR OPS 2
+# RTM — Fitur Penugasan, HRIS
 
 Terakhir diperbarui: 17 November 2026. Kolom **Status** wajib diperbarui tiap sesi: Not Started → In Progress → Done. Requirement UI baru boleh Done setelah lolos NFR-01. Tujuan bisnis ada di `docs/SRS.md` bagian 1.2.
 

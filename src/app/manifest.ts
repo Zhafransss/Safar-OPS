@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "SAFAR OPS 2",
-    short_name: "SAFAR OPS 2",
+    name: "HRIS",
+    short_name: "HRIS",
     description: "Laporan dan penugasan tim Saeful Askar",
     start_url: "/",
     scope: "/",

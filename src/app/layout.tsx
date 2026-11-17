@@ -17,9 +17,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SAFAR OPS 2",
+  title: "HRIS",
   description: "Laporan dan penugasan tim Saeful Askar",
-  appleWebApp: { capable: true, title: "SAFAR OPS 2", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "HRIS", statusBarStyle: "default" },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 

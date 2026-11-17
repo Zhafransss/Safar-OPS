@@ -1,4 +1,4 @@
-# SAFAR OPS 2
+# HRIS
 
 Fitur Penugasan untuk ops2.saefulaskar.com. Acuan kebenaran ada di `docs/SRS.md`, `docs/RTM.md`, dan `CHANGELOG-penugasan.md`. Tampilan mengikuti `02-mockup-final-fitur-penugasan.html`.
 

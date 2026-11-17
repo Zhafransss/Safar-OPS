@@ -4,7 +4,7 @@ export default function OfflinePage() {
     <>
       <div className="home-hd">
         <div>
-          <div className="h1">SAFAR OPS 2</div>
+          <div className="h1">HRIS</div>
           <div className="hi">Anda sedang offline</div>
         </div>
       </div>
