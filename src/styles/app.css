@@ -12,6 +12,16 @@ html {
   touch-action: manipulation;
 }
 
+/* CHANGELOG 30: the iPhone status bar sits over the root's top padding. Paint that strip with the
+   header orange, so going back to Beranda (no sticky header) no longer flashes the dark page color
+   there. The rest keeps --page, and the root never bounces, so the orange never shows below. */
+html {
+  background:
+    linear-gradient(var(--page), var(--page)) bottom / 100% calc(100% - env(safe-area-inset-top, 0px)) no-repeat,
+    #ee7a1f;
+  overscroll-behavior: none;
+}
+
 /* Replaces the mockup .phone frame: full screen on phones, a centered column on desktop (CHANGELOG 17). */
 .app-frame {
   position: relative;
@@ -163,52 +173,18 @@ button.ava::after {
   .composer textarea {
     font-size: 16px;
   }
-}
 
-/* Safari iOS gives a date input a fixed native width, which pushed the DL field out of its .g2 column. */
-.g2 > * {
-  min-width: 0;
-}
-
-input[type="date"].inp {
-  display: block;
-  min-width: 0;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-input[type="date"].inp::-webkit-date-and-time-value {
-  text-align: left;
-}
-
-/* DateInput: "Deadline" hint while the DL is empty and not being edited. */
-.date-box {
-  position: relative;
-}
-
-.date-hint {
-  position: absolute;
-  left: 13px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font: 500 14px var(--font);
-  pointer-events: none;
-}
-
-/* Matches the 16 px iOS input text (CHANGELOG 15). */
-@supports (-webkit-touch-callout: none) {
-  .date-hint {
-    font-size: 16px;
+  /* U-05: the taller 16 px line made text fields 38 px. Less padding keeps them at 36 (K-T82);
+     min-height still sets the height and the text stays centered. */
+  input.inp {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 }
 
-.date-box .inp.empty:not(:focus)::-webkit-datetime-edit {
-  color: transparent;
-}
-
-.date-box .inp:focus + .date-hint {
-  display: none;
+/* PIC and DL share a row; a long value must not widen its column. */
+.g2 > * {
+  min-width: 0;
 }
 
 /* CHANGELOG 5, K-T82: 44 px tap targets for the to-do checkbox and its menu. */
@@ -241,4 +217,324 @@ input[type="date"].inp::-webkit-date-and-time-value {
   display: inline;
   font-size: inherit;
   color: var(--acc);
+}
+
+/* U-06 ChoiceSheet, values from the Hasil Uji 1 simulation (.opt, .more, .nores). The list keeps
+   the height of three rows and the hint, so it does not shrink while a search finds fewer. */
+.choice-list {
+  min-height: 162px;
+}
+
+.choice-list.has-sub {
+  min-height: 178px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--text);
+  font: 500 14px var(--font);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Not .sel or .act: mockup.css already styles those (a select box, an action tile). */
+.choice.is-picked {
+  background: var(--accbg);
+}
+
+.choice svg {
+  margin-left: auto;
+  flex: none;
+  color: var(--acc);
+}
+
+.choice-b {
+  flex: 1;
+  min-width: 0;
+}
+
+.choice-b small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.choice-more {
+  padding: 10px 6px 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.choice-none {
+  padding: 14px 6px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* U-08: a long press drags the row, so it must not select text or open the iOS callout. */
+.todo.sortable {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.todo.dragging {
+  position: relative;
+  z-index: 2;
+  background: var(--surface);
+  box-shadow: var(--sh);
+}
+
+/* U-07 team filter, values from the Hasil Uji 1 simulation (.tf, .dd). */
+/* The team filter on the left, Riwayat on the right (CHANGELOG 38). */
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.team-filter {
+  position: relative;
+}
+
+.tf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 12.5px var(--font);
+  cursor: pointer;
+}
+
+.tf.is-picked {
+  border-color: #e8650a;
+  background: var(--accbg);
+}
+
+.team-dd {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  width: 250px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+}
+
+/* U-06 PIC field and Q-02 DL field: 36 px pickers side by side; a long value is cut, not widened. */
+.pic-field,
+.date-field {
+  min-width: 0;
+}
+
+.date-field svg {
+  flex: none;
+  color: var(--muted);
+}
+
+.pic-field > span:first-child,
+.date-field > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Q-02 option C: the DL calendar sheet, values from the option page the Direktur chose. The calendar
+   is react-day-picker (the base of the shadcn/ui Calendar) in ops2 colors; prev, caption and next sit
+   in one row above the grid. */
+.cal-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.cal-preset {
+  position: relative;
+  min-height: 30px;
+  padding: 4px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 12.5px var(--font);
+  cursor: pointer;
+}
+
+/* K-T82: a 44 px tap area around the 30 px chip. */
+.cal-preset::after {
+  content: "";
+  position: absolute;
+  inset: -7px -2px;
+}
+
+.cal-preset.on {
+  border-color: transparent;
+  background: var(--btn);
+  color: var(--btntext);
+}
+
+.cal-month {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  row-gap: 6px;
+}
+
+.cal-caption {
+  text-align: center;
+  font: 700 14px var(--font);
+}
+
+.cal-nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.cal-nav[aria-disabled="true"] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cal-chevron {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.cal-grid {
+  grid-column: 1 / -1;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.cal-weekday {
+  padding: 4px 0;
+  font: 600 11px var(--font);
+  color: var(--muted);
+}
+
+.cal-day {
+  padding: 0;
+  text-align: center;
+}
+
+.cal-day-btn {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: 500 13.5px var(--font);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cal-day-btn:hover:not(:disabled) {
+  background: var(--surface2);
+}
+
+.cal-day.is-today .cal-day-btn {
+  box-shadow: inset 0 0 0 1.5px #e8650a;
+  font-weight: 700;
+}
+
+.cal-day.is-selected .cal-day-btn {
+  background: var(--btn);
+  color: var(--btntext);
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.cal-day.is-disabled .cal-day-btn {
+  color: var(--muted);
+  opacity: 0.38;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.cal-day.is-outside,
+.cal-day.is-hidden {
+  visibility: hidden;
+}
+
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.cal-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  border-radius: 4px;
+  vertical-align: -2px;
+}
+
+.cal-legend .key-today {
+  box-shadow: inset 0 0 0 1.5px #e8650a;
+}
+
+.cal-legend .key-selected {
+  background: var(--btn);
+}
+
+.cal-legend .key-off {
+  background: var(--line);
+}
+
+/* U-08 in the new-task form: the "To-do n" row is the drag handle, so a long press there must not
+   select text or open the iOS callout. The dragged card lifts above the others. */
+.todo-ed .drag-handle {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  cursor: grab;
+}
+
+.drag-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.todo-ed.dragging {
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--sh);
 }

@@ -1,19 +1,28 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/server/db", () => ({ db: {} }));
+const upsert = vi.fn(async (args: unknown) => args);
+vi.mock("@/server/db", () => ({ db: { user: { upsert: (args: unknown) => upsert(args) } } }));
 
-import { displayNameFor } from "@/server/integrations/user-directory";
+import { registerUserAtLogin } from "@/server/integrations/user-directory";
 
-describe("displayNameFor", () => {
-  it("uses the configured name for owners", () => {
-    expect(displayNameFor("wahyudinst@gmail.com", "wahyudinst@gmail.com")).toBe("Wahyudin");
+describe("registerUserAtLogin (U-01)", () => {
+  beforeEach(() => upsert.mockClear());
+
+  it("stores and refreshes the Jubelio name, owners included", async () => {
+    await registerUserAtLogin(" SaefulAskarCompany@gmail.com ", "Saeful Askar");
+    expect(upsert).toHaveBeenCalledWith({
+      where: { email: "saefulaskarcompany@gmail.com" },
+      create: { email: "saefulaskarcompany@gmail.com", name: "Saeful Askar" },
+      update: { isActive: true, name: "Saeful Askar" },
+    });
   });
 
-  it("uses a real name when Jubelio returns one", () => {
-    expect(displayNameFor("rudi@example.com", "Rudi Hartono")).toBe("Rudi Hartono");
-  });
-
-  it("falls back to the email local part", () => {
-    expect(displayNameFor("rudi@example.com", "rudi@example.com")).toBe("rudi");
+  it("starts a new user without a name as the email local part and keeps a known name", async () => {
+    await registerUserAtLogin("rudi@example.com", null);
+    expect(upsert).toHaveBeenCalledWith({
+      where: { email: "rudi@example.com" },
+      create: { email: "rudi@example.com", name: "rudi" },
+      update: { isActive: true },
+    });
   });
 });

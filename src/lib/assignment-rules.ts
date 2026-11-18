@@ -95,6 +95,15 @@ export function findRevisionError(picks: readonly RevisionPick[]): RuleError | n
   return missing ? { code: "PNG-QC-02", params: { "nama to-do": missing.todoName } } : null;
 }
 
+// U-08: the order after dragging one to-do to another position. Out-of-range moves change nothing.
+export function moveItem<T>(items: readonly T[], from: number, to: number): T[] {
+  if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return [...items];
+  const next = [...items];
+  const [moved] = next.splice(from, 1) as [T];
+  next.splice(to, 0, moved);
+  return next;
+}
+
 // Mockup visibleTugas (K-T15): managers see all tasks, others only tasks with a to-do of theirs.
 export function isTaskVisible(canManage: boolean, todos: readonly { picId: string }[], userId: string): boolean {
   return canManage || todos.some((todo) => todo.picId === userId);

@@ -28,6 +28,7 @@ import { isOwnKey, photoExists } from "@/server/integrations/photo-storage";
 import { loadInitialsResolver } from "@/server/services/names";
 import { notify } from "@/server/services/notifications";
 import { activeTaskWhere } from "@/server/services/task-scope";
+import { activeTeamWhere } from "@/server/services/team-scope";
 import { pngError } from "@/server/trpc";
 
 type Tx = Prisma.TransactionClient;
@@ -39,7 +40,10 @@ const typeLabel = (value: string) => REPORT_TYPES.find((type) => type.value === 
 
 // Mockup leadersOf: the leaders of every team the recipient is staff in.
 async function recipientLeaderIds(tx: Tx, toId: string): Promise<string[]> {
-  const teams = await tx.team.findMany({ where: { members: { some: { userId: toId } } }, select: { leaderId: true } });
+  const teams = await tx.team.findMany({
+    where: { ...activeTeamWhere, members: { some: { userId: toId } } },
+    select: { leaderId: true },
+  });
   return teams.map((team) => team.leaderId);
 }
 
@@ -66,7 +70,7 @@ export async function listReports(input: { tab: ReportTab; status: ReportStatus 
   let scope: Prisma.ReportWhereInput;
   if (input.tab === "tim") {
     // K-T41: reports addressed to the team's staff, without repeating the leader's own.
-    const team = await db.team.findUnique({ where: { leaderId: user.id }, include: { members: true } });
+    const team = await db.team.findFirst({ where: { leaderId: user.id, ...activeTeamWhere }, include: { members: true } });
     if (!team) return [];
     scope = { toId: { in: team.members.map((member) => member.userId) }, NOT: mine };
   } else if (input.tab === "semua") {

@@ -1,8 +1,10 @@
 // Data model from docs/DESIGN.md section 5.
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  // Team color and leader are unique among teams that are not deleted (U-09).
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
@@ -43,7 +45,8 @@ model User {
   createdAt     DateTime @default(now())
 
   sessions           Session[]
-  ledTeam            Team?
+  ledTeams           Team[]              @relation("TeamLeader")
+  deletedTeams       Team[]              @relation("TeamDeletedBy")
   teamMemberships    TeamMember[]
   sentReports        Report[]            @relation("ReportFrom")
   receivedReports    Report[]            @relation("ReportTo")
@@ -84,18 +87,26 @@ model LoginAttempt {
 }
 
 model Team {
-  id        String   @id @default(cuid())
-  name      String
-  // Unique constraints enforce K-T70 (one color per team) and K-T20 (one team per leader).
-  color     String   @unique
-  leaderId  String   @unique
+  id          String    @id @default(cuid())
+  name        String
+  color       String
+  leaderId    String
   // Screens list teams, staff and templates in the order they were added, like the mockup.
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+  // Soft delete (U-09): old programs keep showing the team. Read teams through activeTeamWhere.
+  deletedAt   DateTime?
+  deletedById String?
 
-  leader    User         @relation(fields: [leaderId], references: [id])
+  leader    User         @relation("TeamLeader", fields: [leaderId], references: [id])
+  deletedBy User?        @relation("TeamDeletedBy", fields: [deletedById], references: [id])
   members   TeamMember[]
   programs  Program[]
   templates Template[]
+
+  // K-T70 (one color per team) and K-T20 (one team per leader), among teams not deleted, so a
+  // deleted team frees its color and its leader (U-09).
+  @@unique([color], where: raw("\"deletedAt\" IS NULL"))
+  @@unique([leaderId], where: raw("\"deletedAt\" IS NULL"))
 }
 
 model TeamMember {

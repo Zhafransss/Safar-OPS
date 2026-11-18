@@ -25,6 +25,6 @@ export async function loginWithLocalAccount(email: string, password: string): Pr
   const account = parseLocalAccounts(process.env.LOCAL_ACCOUNTS).find((candidate) => candidate.email === target);
   if (!account) return null;
   return (await verifyPassword(password, account.hash))
-    ? { ok: true, userName: account.name }
+    ? { ok: true, name: account.name }
     : { ok: false, reason: "invalid_credentials" };
 }

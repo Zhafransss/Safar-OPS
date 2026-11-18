@@ -25,7 +25,7 @@ export const authRouter = router({
       }
 
       await recordLoginAttempt(email, ctx.ip, true);
-      const user = await registerUserAtLogin(email, result.userName);
+      const user = await registerUserAtLogin(email, result.name);
       await createSession(user.id);
       return { ok: true };
     }),

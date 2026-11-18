@@ -1,5 +1,6 @@
 // Local stand-in for POST /login, for developers without a Jubelio account. Run with: pnpm dev:jubelio
 // Accepts any @safar.local email with DEV_LOGIN_PASSWORD and forwards every other email to real Jubelio.
+// Other GET calls (the U-01 name lookup) go to real Jubelio too, except with the dev token.
 // Set JUBELIO_BASE_URL=http://127.0.0.1:54340 in .env.local only. Passwords are never logged.
 import http from "node:http";
 
@@ -39,8 +40,21 @@ async function handleLogin(raw, res) {
   res.end(await upstream.text());
 }
 
+// Real accounts carry a real token, so their name lookup is answered by real Jubelio.
+async function handleGet(req, res) {
+  const token = req.headers.authorization;
+  if (!token || token === "dev") return send(res, 404, {});
+  const upstream = await fetch(`${REAL_JUBELIO}${req.url}`, {
+    headers: { authorization: token },
+    signal: AbortSignal.timeout(10_000),
+  });
+  res.writeHead(upstream.status, { "content-type": "application/json" });
+  res.end(await upstream.text());
+}
+
 http
   .createServer((req, res) => {
+    if (req.method === "GET") return void handleGet(req, res).catch(() => send(res, 502, {}));
     if (req.method !== "POST" || req.url !== "/login") return send(res, 404, {});
     let raw = "";
     req.on("data", (chunk) => (raw += chunk));

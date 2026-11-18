@@ -7,9 +7,9 @@ import {
   closeProgram,
   createProgram,
   createTask,
-  moveTodo,
   removeTask,
   removeTodo,
+  reorderTodo,
   returnForRevision,
   toggleTodo,
   updateTodo,
@@ -59,9 +59,9 @@ export const todoRouter = router({
     .input(todoDraft.extend({ todoId: id }))
     .mutation(({ input, ctx }) => updateTodo(input, ctx.user)),
 
-  move: protectedProcedure
-    .input(z.object({ todoId: id, direction: z.union([z.literal(-1), z.literal(1)]) }))
-    .mutation(({ input, ctx }) => moveTodo(input.todoId, input.direction, ctx.user)),
+  reorder: protectedProcedure
+    .input(z.object({ todoId: id, toIndex: z.number().int().min(0).max(99) }))
+    .mutation(({ input, ctx }) => reorderTodo(input.todoId, input.toIndex, ctx.user)),
 
   remove: protectedProcedure
     .input(z.object({ todoId: id }))

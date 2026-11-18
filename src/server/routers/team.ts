@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { TEAM_PALETTE } from "@/config/team-palette";
-import { saveTeam } from "@/server/services/team";
+import { deleteTeam, saveTeam } from "@/server/services/team";
 import { ownerProcedure, router } from "@/server/trpc";
 
 const colors = TEAM_PALETTE.map((entry) => entry.color) as [string, ...string[]];
@@ -20,4 +20,6 @@ export const teamRouter = router({
   update: ownerProcedure
     .input(teamInput.extend({ id: z.string() }))
     .mutation(({ input: { id, ...draft }, ctx }) => saveTeam(id, draft, ctx.user.id)),
+
+  remove: ownerProcedure.input(z.object({ id: z.string() })).mutation(({ input, ctx }) => deleteTeam(input.id, ctx.user.id)),
 });

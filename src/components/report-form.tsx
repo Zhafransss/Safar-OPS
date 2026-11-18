@@ -165,6 +165,7 @@ export function ReportForm({ users, meId }: { users: PickerUser[]; meId: string 
           title="Pilih penerima"
           users={users}
           exclude={[]}
+          selectedId={toId}
           onClose={() => setPicking(null)}
           onPick={(id) => {
             setToId(id);

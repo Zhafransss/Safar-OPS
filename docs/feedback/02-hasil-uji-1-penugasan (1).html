@@ -1,0 +1,472 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hasil Uji 1 Penugasan</title>
+<style>
+:root{--bg:#FAF9F6;--sf:#fff;--tx:#1F1B12;--mu:#6F695C;--ln:#E8E2D4;--ac:#D9590A;--acbg:#FDEDE0;--ok:#2D7A4E;--okbg:#E5F3EA;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16130F;--sf:#201C16;--tx:#F2EEE6;--mu:#A9A190;--ln:#3A3328;--ac:#F08A3A;--acbg:#3B2414;--ok:#7CCB9B;--okbg:#17301F;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.hero{background:linear-gradient(160deg,#EE7A1F,#C94E06);color:#fff;padding:40px 20px 34px}
+.hero .in,main{max-width:960px;margin:0 auto}
+.hero h1{margin:0;font-size:30px;line-height:1.2}.hero p{margin:6px 0 0;opacity:.92}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px}
+.st{background:rgba(255,255,255,.16);border-radius:12px;padding:12px 14px}.st b{display:block;font-size:30px;line-height:1.1}.st span{font-size:13px;opacity:.95}
+main{padding:12px 20px 80px}
+h2{font-size:22px;margin:34px 0 10px;padding-top:14px;border-top:2px solid var(--ln)}
+h3{font-size:18px;margin:26px 0 8px}h3.u{background:var(--sf);border:1px solid var(--ln);border-left:5px solid var(--ac);border-radius:10px;padding:10px 12px}
+.code{background:var(--ac);color:#fff;border-radius:6px;padding:1px 8px;margin-right:8px;font-size:15px}
+.lb{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}.lb.w{background:var(--acbg);color:var(--ac)}.lb.m{background:var(--okbg);color:var(--ok)}
+.tw{overflow-x:auto;border:1px solid var(--ln);border-radius:10px;background:var(--sf);margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{text-align:left;vertical-align:top;padding:9px 11px;border-bottom:1px solid var(--ln)}th{background:var(--acbg)}tr:last-child td{border-bottom:0}
+code{background:var(--acbg);padding:1px 5px;border-radius:5px;font-size:14px}
+pre{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:12px;overflow-x:auto;font-size:14px;line-height:1.4}pre code{background:none;padding:0}
+blockquote{margin:12px 0;padding:10px 14px;border-left:4px solid var(--ac);background:var(--acbg);border-radius:0 10px 10px 0}blockquote p{margin:0}
+.sim{margin:12px 0;background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:6px 6px 0;text-align:center}.sim iframe{width:100%;max-width:430px;height:600px;border:0;display:block;margin:0 auto}.sim .cap{font-size:13px;color:var(--mu);margin:4px 0 10px}
+</style></head><body>
+<div class="hero"><div class="in"><h1>Hasil Uji 1 — Fitur Penugasan</h1><p>SAFAR OPS 2 · 18 November 2026 · untuk tim Velora</p>
+<div class="stats"><div class="st"><b>21</b><span>skenario lulus</span></div><div class="st"><b>0</b><span>gagal</span></div><div class="st"><b>3</b><span>belum diuji</span></div><div class="st"><b>9</b><span>temuan U-01 – U-09</span></div><div class="st"><b>2</b><span>pertanyaan untuk dev</span></div></div></div></div>
+<main><h2>1. Ringkasan</h2>
+<ul>
+<li><strong>21 skenario alur kritis lulus, 0 gagal.</strong> Alur Tim, Laporan, Program, Tugas, Template, QC, revisi, dan penutupan program berjalan sesuai PRD.</li>
+<li>3 skenario belum diuji: E-01 (label Terlambat, dicek keesokan hari), E-02 (batalkan program), E-03 (pengalihan to-do saat staff keluar).</li>
+<li>Ada <strong>9 temuan</strong> (U-01 sampai U-09) dan <strong>2 pertanyaan</strong> untuk developer.</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kelompok</th>
+<th>Skenario</th>
+<th>Hasil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A · Tim dan akses</td>
+<td>A-01 s.d. A-03</td>
+<td>3 lulus</td>
+</tr>
+<tr>
+<td>B · Laporan</td>
+<td>B-01 s.d. B-07</td>
+<td>7 lulus</td>
+</tr>
+<tr>
+<td>C · Program, template, tugas</td>
+<td>C-01 s.d. C-05</td>
+<td>5 lulus</td>
+</tr>
+<tr>
+<td>D · Pengerjaan dan QC</td>
+<td>D-01 s.d. D-06</td>
+<td>6 lulus</td>
+</tr>
+<tr>
+<td>E · Tenggat, pengalihan, batal</td>
+<td>E-01 s.d. E-03</td>
+<td>belum diuji</td>
+</tr>
+</tbody>
+</table></div>
+<h2>2. Temuan dan permintaan</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kode</th>
+<th>Area</th>
+<th>Ringkas</th>
+<th>Label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U-01</td>
+<td>Semua</td>
+<td>Nama pengguna harus dari Jubelio</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-02</td>
+<td>Laporan</td>
+<td>Sembunyikan nama sendiri dari pilihan penerima</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-03</td>
+<td>Tugas</td>
+<td>Tombol "Pakai template" diperkecil</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-04</td>
+<td>Tugas</td>
+<td>Ikon titik tiga di to-do diganti pensil</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-05</td>
+<td>Semua form</td>
+<td>Kotak isian terlalu besar, cek ukuran</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-06</td>
+<td>Semua dropdown</td>
+<td>Tampilkan 3 teratas, sisanya lewat cari</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-07</td>
+<td>Tugas (pemilik)</td>
+<td>Filter tim di daftar program</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+<tr>
+<td>U-08</td>
+<td>Tugas</td>
+<td>Geser urutan to-do dengan tekan lama</td>
+<td><span class="lb m">Bisa menyusul</span></td>
+</tr>
+<tr>
+<td>U-09</td>
+<td>Tim</td>
+<td>Hapus tim</td>
+<td><span class="lb w">Wajib tahap 1</span></td>
+</tr>
+</tbody>
+</table></div>
+<h3 class="u"><span class="code">U-01</span> · Nama pengguna harus diambil dari Jubelio</h3>
+<ul>
+<li><strong>Yang terjadi:</strong> nama pengguna yang tampil berupa email. Khusus akun <code>saefulaskarcompany@gmail.com</code> tampil "Chaesar Syaefuddin", padahal nama penggunanya di Jubelio "Saeful Askar".</li>
+<li><strong>Yang diharapkan:</strong> semua nama pengguna, termasuk 4 akun pemilik, diambil dari <strong>nama pengguna di Jubelio</strong>. Berlaku di semua tampilan: sapaan beranda, Tim, penerima/CC/teruskan laporan, PIC to-do, riwayat, dan inisial avatar (K-T79).</li>
+<li><strong>Klarifikasi PRD:</strong> kolom "Nama tampilan" di tabel akun pemilik (PRD v2.0 bagian 3) hanya penanda akun. Pemilik dikenali dari <strong>email</strong>; namanya tetap dari Jubelio.</li>
+</ul>
+<h3 class="u"><span class="code">U-02</span> · Sembunyikan nama sendiri dari pilihan penerima laporan</h3>
+<ul>
+<li>Di pilihan <strong>penerima, CC, dan teruskan</strong> laporan, nama pengguna yang sedang login tidak ditampilkan.</li>
+<li><strong>Tidak berlaku untuk PIC to-do:</strong> leader tetap bisa memilih dirinya sendiri sebagai PIC, karena leader juga mengerjakan to-do.</li>
+<li>Kode error PNG-LAP-05 tetap dipertahankan di server sebagai pengaman.</li>
+</ul>
+<h3 class="u"><span class="code">U-03</span> · Tombol template di form tugas</h3>
+<ul>
+<li>Teks "Pakai template" dipersingkat menjadi <strong>"Template"</strong>.</li>
+<li>Ukuran tombol kecil (32 px, sesuai K-T82).</li>
+<li>Posisi dipindah <strong>sebaris dengan judul bagian "To-do"</strong>, rata kanan.</li>
+</ul>
+<pre><code>To-do                         [ Template ]
+┌──────────────────────────────────────┐
+│ Foto produk                          │
+</code></pre>
+<h3 class="u"><span class="code">U-04</span> · Ikon edit to-do</h3>
+<ul>
+<li>Ikon <strong>titik tiga</strong> di baris to-do diganti ikon <strong>pensil</strong>.</li>
+<li>Diketuk langsung membuka form edit to-do (tanpa menu perantara).</li>
+<li>Hapus to-do tetap tersedia di dalam form edit.</li>
+</ul>
+<h3 class="u"><span class="code">U-05</span> · Kotak isian form masih terlalu besar</h3>
+<ul>
+<li>Penguji menilai hampir semua kotak isian di form masih terlalu besar.</li>
+<li><strong>Mohon dicek terhadap PRD v2.0 bagian 11 (K-T82):</strong> isian dan dropdown <strong>36 px</strong>, sudut 8; tombol kecil 32 px; jarak dalam kartu 12 px. Jika ukuran saat ini lebih besar, sesuaikan ke angka tersebut.</li>
+<li>Jika sudah sesuai 36 px tetapi masih terasa besar, kabari kami; kemungkinan yang besar adalah jarak antar isian atau padding form, bukan tinggi kotaknya.</li>
+</ul>
+<h3 class="u"><span class="code">U-06</span> · Dropdown dan popup pilihan: 3 teratas + pencarian</h3>
+<p>Berlaku untuk <strong>semua dropdown dan popup pilihan</strong> di ops2 (penerima, CC, teruskan, PIC, leader, staff, no. laporan, dan seterusnya). Aturan ini juga akan dipakai di fitur Absensi.</p>
+<ul>
+<li>Saat dibuka, tampilkan <strong>3 pilihan teratas</strong> saja.</li>
+<li>Urutan <strong>alfabetis berdasarkan nama</strong>.</li>
+<li>Kotak cari selalu ada di atas daftar. Pilihan lain muncul saat mengetik; hasil pencarian juga <strong>maksimal 3</strong>, urut alfabet.</li>
+<li>Kotak cari mencakup <strong>data yang kemungkinan dicari</strong> (untuk orang: nama; untuk laporan: nomor dan judul).</li>
+<li>Di bawah 3 pilihan, tampilkan keterangan jumlah sisanya, misalnya <em>"Ketik untuk mencari 15 lainnya"</em>. Jika pencarian tidak menemukan apa pun: <em>"Tidak ada hasil"</em>.</li>
+<li>Tinggi popup/daftar <strong>tetap</strong> saat hasil pencarian kurang dari 3 (tidak mengecil).</li>
+</ul>
+<div class="sim"><iframe title="Simulasi U-06" loading="lazy" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;id&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;Simulasi U-06 &amp;amp; U-07 — Penugasan (SAFAR OPS 2)&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--font:&#x27;Inter&#x27;,system-ui,sans-serif;--page:#ECEAE4;--appbg:#FAF9F6;--surface:#fff;--surface2:#F6F3EC;--text:#1F1B12;--muted:#7A7468;--line:#ECE6D8;--accbg:#FDEDE0;--btn:#D9590A;--green:#2D7A4E}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--page);color:var(--text)}
+button,input{font-family:var(--font)}
+.top{display:flex;justify-content:center;gap:4px;padding:12px}
+.top button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:10px;font:600 13px var(--font);color:var(--muted);cursor:pointer}
+.top button.on{background:var(--btn);color:#fff;border-color:transparent}
+.phone{width:390px;max-width:100%;height:min(780px,calc(100vh - 80px));margin:0 auto 20px;border:10px solid #1E1C18;border-radius:44px;overflow:hidden;position:relative;background:var(--appbg)}
+@media (max-width:480px){.phone{border:0;border-radius:0;height:calc(100vh - 64px)}}
+.hd{background:linear-gradient(180deg,#EE7A1F,#DC5F0A);color:#fff;padding:10px 14px;min-height:52px;display:flex;align-items:center}
+.hd b{font-size:17px;font-weight:800}
+.pad{padding:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.lab{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px}
+.picker{display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 12px;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:500 14px var(--font);color:var(--text);cursor:pointer;text-align:left}
+.ph{color:var(--muted)}
+.inp{width:100%;padding:8px 12px 8px 34px;min-height:36px;border:1px solid var(--line);border-radius:8px;font:500 14px var(--font)}
+.qbox{position:relative}.qbox svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+/* popup */
+.ov{position:absolute;inset:0;background:rgba(25,18,5,.48);display:flex;align-items:flex-end}
+.sheet{background:var(--surface);width:100%;max-height:75%;overflow:auto;border-radius:22px 22px 0 0;padding:14px 14px 20px}
+.sh-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sh-h b{font-size:16px}
+.x{border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px}
+.opt{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:8px 6px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font:500 14px var(--font);color:var(--text);cursor:pointer}
+.opt.sel{background:var(--accbg)}
+.opt .ck{margin-left:auto;color:#E8650A;font-weight:800}
+.more{font-size:12px;color:var(--muted);padding:10px 6px 2px}
+.nores{font-size:13px;color:var(--muted);padding:14px 6px;text-align:center}
+/* tinggi daftar tetap walau hasil cari kurang dari 3 */
+#l,#dl{min-height:170px}
+/* program */
+.tf{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;min-height:32px;font:600 12.5px var(--font);cursor:pointer}
+.tf.act{border-color:#E8650A;background:var(--accbg)}
+.wrap{position:relative}
+.dd{position:absolute;top:calc(100% + 6px);left:0;width:250px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.16);z-index:5;padding:8px}
+.pills{display:flex;gap:6px;margin-top:10px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;min-height:26px;font:600 12px var(--font);cursor:pointer}
+.pill.on{background:var(--btn);color:#fff;border-color:transparent}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.tcard b{font-size:14px}
+.ts{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;gap:6px;align-items:center}
+.tchip{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:999px;font-weight:700;font-size:11px;line-height:18px}
+.tchip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px}
+.top{display:none}.phone{margin-top:10px}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;top&quot;&gt;
+  &lt;button id=&quot;b1&quot; class=&quot;on&quot; onclick=&quot;show(1)&quot;&gt;U-06 · Dropdown&lt;/button&gt;
+  &lt;button id=&quot;b2&quot; onclick=&quot;show(2)&quot;&gt;U-07 · Filter tim&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class=&quot;phone&quot; id=&quot;app&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+const ME=&#x27;Saeful Askar&#x27;;
+const ORANG=[&#x27;Saeful Askar&#x27;,&#x27;Chaesar 2&#x27;,&#x27;Wahyudin&#x27;,&#x27;Nasuroh&#x27;,&#x27;Kartika&#x27;,&#x27;Zarkasih&#x27;,&#x27;Agus Salim&#x27;,&#x27;Bayu Pratama&#x27;,&#x27;Citra Lestari&#x27;,&#x27;Dedi Kurniawan&#x27;,&#x27;Eka Putri&#x27;,&#x27;Fajar Nugroho&#x27;,&#x27;Gilang Ramadhan&#x27;,&#x27;Hana Safitri&#x27;,&#x27;Indra Wijaya&#x27;,&#x27;Joko Susilo&#x27;,&#x27;Lina Marlina&#x27;,&#x27;Mega Ayu&#x27;,&#x27;Rina Oktaviani&#x27;];
+const TIM=[[&#x27;Tim Produk&#x27;,&#x27;#7C4DCC&#x27;],[&#x27;Gudang&#x27;,&#x27;#138A8A&#x27;],[&#x27;Customer Service&#x27;,&#x27;#2F6FD8&#x27;],[&#x27;Teknisi&#x27;,&#x27;#2E8B57&#x27;],[&#x27;Marketing&#x27;,&#x27;#3F51B5&#x27;]];
+const PROG=[[&#x27;PO-130 Barang Baru&#x27;,&#x27;Tim Produk&#x27;,&#x27;Aktif&#x27;],[&#x27;Bundling Ramadan&#x27;,&#x27;Tim Produk&#x27;,&#x27;Aktif&#x27;],[&#x27;Foto ulang sepeda listrik&#x27;,&#x27;Tim Produk&#x27;,&#x27;Selesai&#x27;],
+ [&#x27;Stock opname November&#x27;,&#x27;Gudang&#x27;,&#x27;Aktif&#x27;],[&#x27;Rapikan rak sparepart&#x27;,&#x27;Gudang&#x27;,&#x27;Selesai&#x27;],[&#x27;Template balasan chat&#x27;,&#x27;Customer Service&#x27;,&#x27;Aktif&#x27;],
+ [&#x27;Kalibrasi alat servis&#x27;,&#x27;Teknisi&#x27;,&#x27;Aktif&#x27;],[&#x27;Konten TikTok Desember&#x27;,&#x27;Marketing&#x27;,&#x27;Aktif&#x27;],[&#x27;Katalog cetak&#x27;,&#x27;Marketing&#x27;,&#x27;Dibatalkan&#x27;]];
+const az=(a,b)=&gt;a.localeCompare(b,&#x27;id&#x27;);
+const warna=n=&gt;TIM.find(t=&gt;t[0]===n)[1];
+const chip=n=&gt;`&lt;span class=&quot;tchip&quot; style=&quot;color:${warna(n)};background:${warna(n)}1f&quot;&gt;&lt;i&gt;&lt;/i&gt;${n}&lt;/span&gt;`;
+const cari=&#x27;&lt;svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;&gt;&lt;circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/&gt;&lt;path d=&quot;M20 20l-3.5-3.5&quot;/&gt;&lt;/svg&gt;&#x27;;
+let S={layar:1,penerima:null,popup:false,q:&#x27;&#x27;,tim:&#x27;Semua tim&#x27;,status:&#x27;Aktif&#x27;,dd:false,dq:&#x27;&#x27;};
+
+/* Aturan U-06: 3 teratas urut alfabet, sisanya lewat cari */
+function daftar(items,q,dipilih,fn,depan=&#x27;&#x27;){
+  items=items.slice().sort(az);
+  const row=n=&gt;`&lt;button class=&quot;opt ${n===dipilih?&#x27;sel&#x27;:&#x27;&#x27;}&quot; onclick=&quot;${fn}(&#x27;${n}&#x27;)&quot;&gt;${n}${n===dipilih?&#x27;&lt;span class=&quot;ck&quot;&gt;✓&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;/button&gt;`;
+  q=q.trim().toLowerCase();
+  if(q){const m=items.filter(n=&gt;n.toLowerCase().includes(q));return m.length?m.slice(0,3).map(row).join(&#x27;&#x27;):&#x27;&lt;div class=&quot;nores&quot;&gt;Tidak ada hasil&lt;/div&gt;&#x27;;}
+  const sisa=items.length-3;
+  return depan+items.slice(0,3).map(row).join(&#x27;&#x27;)+(sisa&gt;0?`&lt;div class=&quot;more&quot;&gt;Ketik untuk mencari ${sisa} lainnya&lt;/div&gt;`:&#x27;&#x27;);
+}
+
+function render(){
+  const app=document.getElementById(&#x27;app&#x27;);
+  if(S.layar===1){
+    app.innerHTML=`&lt;div class=&quot;hd&quot;&gt;&lt;b&gt;Buat laporan&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;pad&quot;&gt;&lt;div class=&quot;card&quot;&gt;
+      &lt;label class=&quot;lab&quot;&gt;Penerima&lt;/label&gt;
+      &lt;button class=&quot;picker&quot; onclick=&quot;S.popup=true;S.q=&#x27;&#x27;;render();document.getElementById(&#x27;q&#x27;).focus()&quot;&gt;${S.penerima||&#x27;&lt;span class=&quot;ph&quot;&gt;Pilih penerima&lt;/span&gt;&#x27;}&lt;span&gt;▾&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+      ${S.popup?`&lt;div class=&quot;ov&quot; onclick=&quot;if(event.target===this){S.popup=false;render()}&quot;&gt;&lt;div class=&quot;sheet&quot;&gt;
+        &lt;div class=&quot;sh-h&quot;&gt;&lt;b&gt;Pilih penerima&lt;/b&gt;&lt;button class=&quot;x&quot; onclick=&quot;S.popup=false;render()&quot;&gt;×&lt;/button&gt;&lt;/div&gt;
+        &lt;div class=&quot;qbox&quot;&gt;${cari}&lt;input id=&quot;q&quot; class=&quot;inp&quot; placeholder=&quot;Cari nama&quot; value=&quot;${S.q}&quot; oninput=&quot;S.q=this.value;document.getElementById(&#x27;l&#x27;).innerHTML=listOrang()&quot;&gt;&lt;/div&gt;
+        &lt;div id=&quot;l&quot;&gt;${listOrang()}&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}`;
+  } else {
+    const dasar=PROG.filter(p=&gt;S.tim===&#x27;Semua tim&#x27;||p[1]===S.tim);
+    const isi=dasar.filter(p=&gt;p[2]===S.status);
+    const pill=k=&gt;`&lt;button class=&quot;pill ${S.status===k?&#x27;on&#x27;:&#x27;&#x27;}&quot; onclick=&quot;S.status=&#x27;${k}&#x27;;S.dd=false;render()&quot;&gt;${k} (${dasar.filter(p=&gt;p[2]===k).length})&lt;/button&gt;`;
+    app.innerHTML=`&lt;div class=&quot;hd&quot;&gt;&lt;b&gt;Daftar Program&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;pad&quot; onclick=&quot;if(S.dd&amp;&amp;!event.target.closest(&#x27;.wrap&#x27;)){S.dd=false;render()}&quot;&gt;
+      &lt;div class=&quot;wrap&quot;&gt;&lt;button class=&quot;tf ${S.tim!==&#x27;Semua tim&#x27;?&#x27;act&#x27;:&#x27;&#x27;}&quot; onclick=&quot;S.dd=!S.dd;S.dq=&#x27;&#x27;;render()&quot;&gt;${S.tim===&#x27;Semua tim&#x27;?&#x27;Semua tim&#x27;:chip(S.tim)} ▾&lt;/button&gt;
+      ${S.dd?`&lt;div class=&quot;dd&quot;&gt;&lt;div class=&quot;qbox&quot;&gt;${cari}&lt;input class=&quot;inp&quot; placeholder=&quot;Cari tim&quot; oninput=&quot;S.dq=this.value;document.getElementById(&#x27;dl&#x27;).innerHTML=listTim()&quot;&gt;&lt;/div&gt;&lt;div id=&quot;dl&quot;&gt;${listTim()}&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}&lt;/div&gt;
+      &lt;div class=&quot;pills&quot;&gt;${pill(&#x27;Aktif&#x27;)}${pill(&#x27;Selesai&#x27;)}${pill(&#x27;Dibatalkan&#x27;)}&lt;/div&gt;
+      ${isi.map(p=&gt;`&lt;div class=&quot;tcard&quot;&gt;&lt;b&gt;${p[0]}&lt;/b&gt;&lt;div class=&quot;ts&quot;&gt;${chip(p[1])}&lt;/div&gt;&lt;/div&gt;`).join(&#x27;&#x27;)||&#x27;&lt;div class=&quot;empty&quot;&gt;Belum ada program.&lt;/div&gt;&#x27;}&lt;/div&gt;`;
+  }
+}
+function listOrang(){return daftar(ORANG.filter(n=&gt;n!==ME),S.q,S.penerima,&#x27;pilihOrang&#x27;);}
+function pilihOrang(n){S.penerima=n;S.popup=false;render();}
+function listTim(){
+  const semua=`&lt;button class=&quot;opt ${S.tim===&#x27;Semua tim&#x27;?&#x27;sel&#x27;:&#x27;&#x27;}&quot; onclick=&quot;pilihTim(&#x27;Semua tim&#x27;)&quot;&gt;Semua tim${S.tim===&#x27;Semua tim&#x27;?&#x27;&lt;span class=&quot;ck&quot;&gt;✓&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;/button&gt;`;
+  return daftar(TIM.map(t=&gt;t[0]),S.dq,S.tim,&#x27;pilihTim&#x27;,semua).replace(/&gt;([^&lt;&gt;]+?)(&lt;span class=&quot;ck&quot;&gt;✓&lt;\/span&gt;)?&lt;\/button&gt;/g,(m,n,c)=&gt;TIM.some(t=&gt;t[0]===n)?`&gt;${chip(n)}${c||&#x27;&#x27;}&lt;/button&gt;`:m);
+}
+function pilihTim(n){S.tim=n;S.dd=false;render();}
+function show(n){S.layar=n;S.dd=false;S.popup=false;document.getElementById(&#x27;b1&#x27;).classList.toggle(&#x27;on&#x27;,n===1);document.getElementById(&#x27;b2&#x27;).classList.toggle(&#x27;on&#x27;,n===2);render();}
+show(1);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><p class="cap">Simulasi interaktif: silakan diketuk. File terpisah: <code>02-simulasi-u06-u07-penugasan.html</code></p></div>
+<blockquote>
+<p>Jika ada perbedaan antara deskripsi dan simulasi, simulasi yang dipakai.</p>
+</blockquote>
+<h3 class="u"><span class="code">U-07</span> · Filter tim di daftar program (pemilik)</h3>
+<ul>
+<li>Di halaman Daftar Program, <strong>pemilik</strong> mendapat filter tim.</li>
+<li>Bentuk: satu tombol/kotak (mis. <strong>"Semua tim ▾"</strong>). Saat diketuk, muncul <strong>daftar yang turun ke bawah</strong> berisi "Semua tim" dan nama-nama tim (dengan label warna tim). Pilih satu tim → daftar program hanya menampilkan program tim itu.</li>
+<li>Filter tim bekerja bersama filter status yang sudah ada (Aktif / Selesai / Dibatalkan).</li>
+<li>Untuk leader dan staff tidak perlu ditampilkan.</li>
+</ul>
+<ul>
+<li>"Semua tim" selalu di urutan paling atas dan tidak dihitung dalam 3 teratas; daftar tim mengikuti aturan U-06.</li>
+<li>Angka di filter status (Aktif/Selesai/Dibatalkan) menghitung program tim yang sedang dipilih.</li>
+</ul>
+<div class="sim"><iframe title="Simulasi U-07" loading="lazy" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;id&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;Simulasi U-06 &amp;amp; U-07 — Penugasan (SAFAR OPS 2)&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--font:&#x27;Inter&#x27;,system-ui,sans-serif;--page:#ECEAE4;--appbg:#FAF9F6;--surface:#fff;--surface2:#F6F3EC;--text:#1F1B12;--muted:#7A7468;--line:#ECE6D8;--accbg:#FDEDE0;--btn:#D9590A;--green:#2D7A4E}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--page);color:var(--text)}
+button,input{font-family:var(--font)}
+.top{display:flex;justify-content:center;gap:4px;padding:12px}
+.top button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:10px;font:600 13px var(--font);color:var(--muted);cursor:pointer}
+.top button.on{background:var(--btn);color:#fff;border-color:transparent}
+.phone{width:390px;max-width:100%;height:min(780px,calc(100vh - 80px));margin:0 auto 20px;border:10px solid #1E1C18;border-radius:44px;overflow:hidden;position:relative;background:var(--appbg)}
+@media (max-width:480px){.phone{border:0;border-radius:0;height:calc(100vh - 64px)}}
+.hd{background:linear-gradient(180deg,#EE7A1F,#DC5F0A);color:#fff;padding:10px 14px;min-height:52px;display:flex;align-items:center}
+.hd b{font-size:17px;font-weight:800}
+.pad{padding:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px}
+.lab{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px}
+.picker{display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 12px;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font:500 14px var(--font);color:var(--text);cursor:pointer;text-align:left}
+.ph{color:var(--muted)}
+.inp{width:100%;padding:8px 12px 8px 34px;min-height:36px;border:1px solid var(--line);border-radius:8px;font:500 14px var(--font)}
+.qbox{position:relative}.qbox svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+/* popup */
+.ov{position:absolute;inset:0;background:rgba(25,18,5,.48);display:flex;align-items:flex-end}
+.sheet{background:var(--surface);width:100%;max-height:75%;overflow:auto;border-radius:22px 22px 0 0;padding:14px 14px 20px}
+.sh-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sh-h b{font-size:16px}
+.x{border:0;background:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px 8px}
+.opt{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:8px 6px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font:500 14px var(--font);color:var(--text);cursor:pointer}
+.opt.sel{background:var(--accbg)}
+.opt .ck{margin-left:auto;color:#E8650A;font-weight:800}
+.more{font-size:12px;color:var(--muted);padding:10px 6px 2px}
+.nores{font-size:13px;color:var(--muted);padding:14px 6px;text-align:center}
+/* tinggi daftar tetap walau hasil cari kurang dari 3 */
+#l,#dl{min-height:170px}
+/* program */
+.tf{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;min-height:32px;font:600 12.5px var(--font);cursor:pointer}
+.tf.act{border-color:#E8650A;background:var(--accbg)}
+.wrap{position:relative}
+.dd{position:absolute;top:calc(100% + 6px);left:0;width:250px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.16);z-index:5;padding:8px}
+.pills{display:flex;gap:6px;margin-top:10px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;min-height:26px;font:600 12px var(--font);cursor:pointer}
+.pill.on{background:var(--btn);color:#fff;border-color:transparent}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.tcard b{font-size:14px}
+.ts{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;gap:6px;align-items:center}
+.tchip{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:999px;font-weight:700;font-size:11px;line-height:18px}
+.tchip i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:22px}
+.top{display:none}.phone{margin-top:10px}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;top&quot;&gt;
+  &lt;button id=&quot;b1&quot; class=&quot;on&quot; onclick=&quot;show(1)&quot;&gt;U-06 · Dropdown&lt;/button&gt;
+  &lt;button id=&quot;b2&quot; onclick=&quot;show(2)&quot;&gt;U-07 · Filter tim&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class=&quot;phone&quot; id=&quot;app&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+const ME=&#x27;Saeful Askar&#x27;;
+const ORANG=[&#x27;Saeful Askar&#x27;,&#x27;Chaesar 2&#x27;,&#x27;Wahyudin&#x27;,&#x27;Nasuroh&#x27;,&#x27;Kartika&#x27;,&#x27;Zarkasih&#x27;,&#x27;Agus Salim&#x27;,&#x27;Bayu Pratama&#x27;,&#x27;Citra Lestari&#x27;,&#x27;Dedi Kurniawan&#x27;,&#x27;Eka Putri&#x27;,&#x27;Fajar Nugroho&#x27;,&#x27;Gilang Ramadhan&#x27;,&#x27;Hana Safitri&#x27;,&#x27;Indra Wijaya&#x27;,&#x27;Joko Susilo&#x27;,&#x27;Lina Marlina&#x27;,&#x27;Mega Ayu&#x27;,&#x27;Rina Oktaviani&#x27;];
+const TIM=[[&#x27;Tim Produk&#x27;,&#x27;#7C4DCC&#x27;],[&#x27;Gudang&#x27;,&#x27;#138A8A&#x27;],[&#x27;Customer Service&#x27;,&#x27;#2F6FD8&#x27;],[&#x27;Teknisi&#x27;,&#x27;#2E8B57&#x27;],[&#x27;Marketing&#x27;,&#x27;#3F51B5&#x27;]];
+const PROG=[[&#x27;PO-130 Barang Baru&#x27;,&#x27;Tim Produk&#x27;,&#x27;Aktif&#x27;],[&#x27;Bundling Ramadan&#x27;,&#x27;Tim Produk&#x27;,&#x27;Aktif&#x27;],[&#x27;Foto ulang sepeda listrik&#x27;,&#x27;Tim Produk&#x27;,&#x27;Selesai&#x27;],
+ [&#x27;Stock opname November&#x27;,&#x27;Gudang&#x27;,&#x27;Aktif&#x27;],[&#x27;Rapikan rak sparepart&#x27;,&#x27;Gudang&#x27;,&#x27;Selesai&#x27;],[&#x27;Template balasan chat&#x27;,&#x27;Customer Service&#x27;,&#x27;Aktif&#x27;],
+ [&#x27;Kalibrasi alat servis&#x27;,&#x27;Teknisi&#x27;,&#x27;Aktif&#x27;],[&#x27;Konten TikTok Desember&#x27;,&#x27;Marketing&#x27;,&#x27;Aktif&#x27;],[&#x27;Katalog cetak&#x27;,&#x27;Marketing&#x27;,&#x27;Dibatalkan&#x27;]];
+const az=(a,b)=&gt;a.localeCompare(b,&#x27;id&#x27;);
+const warna=n=&gt;TIM.find(t=&gt;t[0]===n)[1];
+const chip=n=&gt;`&lt;span class=&quot;tchip&quot; style=&quot;color:${warna(n)};background:${warna(n)}1f&quot;&gt;&lt;i&gt;&lt;/i&gt;${n}&lt;/span&gt;`;
+const cari=&#x27;&lt;svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;&gt;&lt;circle cx=&quot;11&quot; cy=&quot;11&quot; r=&quot;7&quot;/&gt;&lt;path d=&quot;M20 20l-3.5-3.5&quot;/&gt;&lt;/svg&gt;&#x27;;
+let S={layar:1,penerima:null,popup:false,q:&#x27;&#x27;,tim:&#x27;Semua tim&#x27;,status:&#x27;Aktif&#x27;,dd:false,dq:&#x27;&#x27;};
+
+/* Aturan U-06: 3 teratas urut alfabet, sisanya lewat cari */
+function daftar(items,q,dipilih,fn,depan=&#x27;&#x27;){
+  items=items.slice().sort(az);
+  const row=n=&gt;`&lt;button class=&quot;opt ${n===dipilih?&#x27;sel&#x27;:&#x27;&#x27;}&quot; onclick=&quot;${fn}(&#x27;${n}&#x27;)&quot;&gt;${n}${n===dipilih?&#x27;&lt;span class=&quot;ck&quot;&gt;✓&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;/button&gt;`;
+  q=q.trim().toLowerCase();
+  if(q){const m=items.filter(n=&gt;n.toLowerCase().includes(q));return m.length?m.slice(0,3).map(row).join(&#x27;&#x27;):&#x27;&lt;div class=&quot;nores&quot;&gt;Tidak ada hasil&lt;/div&gt;&#x27;;}
+  const sisa=items.length-3;
+  return depan+items.slice(0,3).map(row).join(&#x27;&#x27;)+(sisa&gt;0?`&lt;div class=&quot;more&quot;&gt;Ketik untuk mencari ${sisa} lainnya&lt;/div&gt;`:&#x27;&#x27;);
+}
+
+function render(){
+  const app=document.getElementById(&#x27;app&#x27;);
+  if(S.layar===1){
+    app.innerHTML=`&lt;div class=&quot;hd&quot;&gt;&lt;b&gt;Buat laporan&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;pad&quot;&gt;&lt;div class=&quot;card&quot;&gt;
+      &lt;label class=&quot;lab&quot;&gt;Penerima&lt;/label&gt;
+      &lt;button class=&quot;picker&quot; onclick=&quot;S.popup=true;S.q=&#x27;&#x27;;render();document.getElementById(&#x27;q&#x27;).focus()&quot;&gt;${S.penerima||&#x27;&lt;span class=&quot;ph&quot;&gt;Pilih penerima&lt;/span&gt;&#x27;}&lt;span&gt;▾&lt;/span&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+      ${S.popup?`&lt;div class=&quot;ov&quot; onclick=&quot;if(event.target===this){S.popup=false;render()}&quot;&gt;&lt;div class=&quot;sheet&quot;&gt;
+        &lt;div class=&quot;sh-h&quot;&gt;&lt;b&gt;Pilih penerima&lt;/b&gt;&lt;button class=&quot;x&quot; onclick=&quot;S.popup=false;render()&quot;&gt;×&lt;/button&gt;&lt;/div&gt;
+        &lt;div class=&quot;qbox&quot;&gt;${cari}&lt;input id=&quot;q&quot; class=&quot;inp&quot; placeholder=&quot;Cari nama&quot; value=&quot;${S.q}&quot; oninput=&quot;S.q=this.value;document.getElementById(&#x27;l&#x27;).innerHTML=listOrang()&quot;&gt;&lt;/div&gt;
+        &lt;div id=&quot;l&quot;&gt;${listOrang()}&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}`;
+  } else {
+    const dasar=PROG.filter(p=&gt;S.tim===&#x27;Semua tim&#x27;||p[1]===S.tim);
+    const isi=dasar.filter(p=&gt;p[2]===S.status);
+    const pill=k=&gt;`&lt;button class=&quot;pill ${S.status===k?&#x27;on&#x27;:&#x27;&#x27;}&quot; onclick=&quot;S.status=&#x27;${k}&#x27;;S.dd=false;render()&quot;&gt;${k} (${dasar.filter(p=&gt;p[2]===k).length})&lt;/button&gt;`;
+    app.innerHTML=`&lt;div class=&quot;hd&quot;&gt;&lt;b&gt;Daftar Program&lt;/b&gt;&lt;/div&gt;&lt;div class=&quot;pad&quot; onclick=&quot;if(S.dd&amp;&amp;!event.target.closest(&#x27;.wrap&#x27;)){S.dd=false;render()}&quot;&gt;
+      &lt;div class=&quot;wrap&quot;&gt;&lt;button class=&quot;tf ${S.tim!==&#x27;Semua tim&#x27;?&#x27;act&#x27;:&#x27;&#x27;}&quot; onclick=&quot;S.dd=!S.dd;S.dq=&#x27;&#x27;;render()&quot;&gt;${S.tim===&#x27;Semua tim&#x27;?&#x27;Semua tim&#x27;:chip(S.tim)} ▾&lt;/button&gt;
+      ${S.dd?`&lt;div class=&quot;dd&quot;&gt;&lt;div class=&quot;qbox&quot;&gt;${cari}&lt;input class=&quot;inp&quot; placeholder=&quot;Cari tim&quot; oninput=&quot;S.dq=this.value;document.getElementById(&#x27;dl&#x27;).innerHTML=listTim()&quot;&gt;&lt;/div&gt;&lt;div id=&quot;dl&quot;&gt;${listTim()}&lt;/div&gt;&lt;/div&gt;`:&#x27;&#x27;}&lt;/div&gt;
+      &lt;div class=&quot;pills&quot;&gt;${pill(&#x27;Aktif&#x27;)}${pill(&#x27;Selesai&#x27;)}${pill(&#x27;Dibatalkan&#x27;)}&lt;/div&gt;
+      ${isi.map(p=&gt;`&lt;div class=&quot;tcard&quot;&gt;&lt;b&gt;${p[0]}&lt;/b&gt;&lt;div class=&quot;ts&quot;&gt;${chip(p[1])}&lt;/div&gt;&lt;/div&gt;`).join(&#x27;&#x27;)||&#x27;&lt;div class=&quot;empty&quot;&gt;Belum ada program.&lt;/div&gt;&#x27;}&lt;/div&gt;`;
+  }
+}
+function listOrang(){return daftar(ORANG.filter(n=&gt;n!==ME),S.q,S.penerima,&#x27;pilihOrang&#x27;);}
+function pilihOrang(n){S.penerima=n;S.popup=false;render();}
+function listTim(){
+  const semua=`&lt;button class=&quot;opt ${S.tim===&#x27;Semua tim&#x27;?&#x27;sel&#x27;:&#x27;&#x27;}&quot; onclick=&quot;pilihTim(&#x27;Semua tim&#x27;)&quot;&gt;Semua tim${S.tim===&#x27;Semua tim&#x27;?&#x27;&lt;span class=&quot;ck&quot;&gt;✓&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;/button&gt;`;
+  return daftar(TIM.map(t=&gt;t[0]),S.dq,S.tim,&#x27;pilihTim&#x27;,semua).replace(/&gt;([^&lt;&gt;]+?)(&lt;span class=&quot;ck&quot;&gt;✓&lt;\/span&gt;)?&lt;\/button&gt;/g,(m,n,c)=&gt;TIM.some(t=&gt;t[0]===n)?`&gt;${chip(n)}${c||&#x27;&#x27;}&lt;/button&gt;`:m);
+}
+function pilihTim(n){S.tim=n;S.dd=false;render();}
+function show(n){S.layar=n;S.dd=false;S.popup=false;document.getElementById(&#x27;b1&#x27;).classList.toggle(&#x27;on&#x27;,n===1);document.getElementById(&#x27;b2&#x27;).classList.toggle(&#x27;on&#x27;,n===2);render();}
+show(2);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><p class="cap">Simulasi interaktif: silakan diketuk. File terpisah: <code>02-simulasi-u06-u07-penugasan.html</code></p></div>
+<h3 class="u"><span class="code">U-08</span> · Geser urutan to-do dengan tekan lama — <em><span class="lb m">Bisa menyusul</span></em></h3>
+<ul>
+<li>Saat ini urutan to-do diubah dengan tombol naik/turun.</li>
+<li>Keinginan ke depan: <strong>tekan lama lalu seret</strong> untuk memindah urutan. To-do QC tetap terkunci di urutan terakhir.</li>
+<li>Tidak wajib untuk rilis tahap 1.</li>
+</ul>
+<h3 class="u"><span class="code">U-09</span> · Hapus tim</h3>
+<p>Saat ini belum ada opsi menghapus tim di menu Tim.</p>
+<ul>
+<li>Hanya <strong>pemilik</strong> yang bisa menghapus tim.</li>
+<li>Tim <strong>hanya bisa dihapus jika tidak punya program berstatus Aktif.</strong> Jika masih ada, tampilkan pesan, usulan: <code>PNG-TIM-09: Tim ini masih punya program aktif. Selesaikan atau batalkan dulu.</code></li>
+<li>Program lama (Selesai/Dibatalkan) <strong>tetap tersimpan</strong> dan tetap bisa dilihat, beserta nama timnya.</li>
+<li>Warna tim yang dihapus <strong>kembali bebas</strong> dipakai tim lain.</li>
+<li>Gunakan dialog konfirmasi berisi konsekuensinya, dengan tombol Batal dan Hapus berjejer kiri–kanan berwarna berbeda (pola umum aplikasi).</li>
+<li>Template to-do milik tim tersebut ikut terhapus atau diarsipkan — mohon usulan dari developer.</li>
+</ul>
+<h2>3. Pertanyaan untuk developer</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>Pertanyaan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q-01</td>
+<td>Di kalender DL to-do, bisakah <strong>tanggal sebelum hari ini dinonaktifkan</strong> (tidak bisa dipilih), bukan hanya ditolak setelah disimpan (PNG-TDO-04)?</td>
+</tr>
+<tr>
+<td>Q-02</td>
+<td>Bisakah <strong>desain kalender pemilih tanggal diganti</strong> agar lebih sesuai tampilan aplikasi? Mohon tunjukkan opsi yang tersedia di shadcn/ui.</td>
+</tr>
+</tbody>
+</table></div>
+<h2>4. Langkah berikutnya</h2>
+<ol>
+<li>Developer menindaklanjuti U-01 s.d. U-07 dan U-09, serta menjawab Q-01 dan Q-02.</li>
+<li>Simulasi U-06 dan U-07 sudah ada di dokumen ini dan di file <code>02-simulasi-u06-u07-penugasan.html</code>; developer mengerjakan mengikuti simulasi.</li>
+<li>Pemilik menguji E-01 s.d. E-03, lalu uji ulang semua temuan setelah perbaikan.</li>
+<li>Setiap perbedaan hasil dicatat di <code>CHANGELOG-penugasan.md</code> dengan kode U-xx.</li>
+</ol></main></body></html>

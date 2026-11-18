@@ -2,11 +2,12 @@ import "server-only";
 
 import { cache } from "react";
 
-import { isOwnerEmail, OWNERS } from "@/config/owners";
-import { initials } from "@/lib/initials";
+import { isOwnerEmail } from "@/config/owners";
 import { getSessionUser } from "@/server/auth/session";
 import { db } from "@/server/db";
+import { loadInitialsResolver } from "@/server/services/names";
 import { activeTaskWhere } from "@/server/services/task-scope";
+import { activeTeamWhere } from "@/server/services/team-scope";
 
 export type TeamRole = { role: "Leader" | "Staff"; teamName: string; color: string };
 
@@ -26,10 +27,10 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const user = await getSessionUser();
   if (!user) return null;
 
-  const [ledTeam, memberships, otherUsers, unreadNotifications] = await Promise.all([
-    db.team.findUnique({ where: { leaderId: user.id } }),
-    db.teamMember.findMany({ where: { userId: user.id }, include: { team: true } }),
-    db.user.findMany({ where: { id: { not: user.id }, isActive: true }, select: { name: true } }),
+  const [ledTeam, memberships, initialsOf, unreadNotifications] = await Promise.all([
+    db.team.findFirst({ where: { leaderId: user.id, ...activeTeamWhere } }),
+    db.teamMember.findMany({ where: { userId: user.id, team: activeTeamWhere }, include: { team: true } }),
+    loadInitialsResolver(),
     db.notification.count({ where: { userId: user.id, readAt: null } }),
   ]);
 
@@ -42,8 +43,8 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   return {
     id: user.id,
     name: user.name,
-    // Owners count even before their first login, so avatars match the team chart.
-    initials: initials(user.name, [...otherUsers.map((u) => u.name), ...OWNERS.map((o) => o.name)].filter((n) => n !== user.name)),
+    // Same resolver as the team chart, so an avatar shows the same initials everywhere.
+    initials: initialsOf(user.name),
     isOwner,
     teamRoles: isOwner ? [] : teamRoles,
     ledTeam: ledTeam ? { id: ledTeam.id, name: ledTeam.name, color: ledTeam.color } : null,

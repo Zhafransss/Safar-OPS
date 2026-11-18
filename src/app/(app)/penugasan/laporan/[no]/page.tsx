@@ -29,7 +29,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ n
   }
 
   const needsPicker = report.actions.canForward || report.actions.canAddCc;
-  const users = needsPicker ? await getReportRecipients() : [];
+  const users = needsPicker ? await getReportRecipients(viewer.id) : [];
 
   return <ReportDetail report={report} users={users} unreadCount={viewer.unreadNotifications} />;
 }

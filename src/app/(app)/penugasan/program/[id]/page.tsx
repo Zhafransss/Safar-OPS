@@ -72,7 +72,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             {teamChip} · dibuat {program.created}
           </>
         }
-        backHref="/penugasan/program"
+        // CHANGELOG 38: a deleted team's program is opened from Riwayat Program.
+        backHref={program.teamDeleted ? "/penugasan/program/riwayat" : "/penugasan/program"}
         unreadCount={viewer.unreadNotifications}
       />
       <div className="pad">

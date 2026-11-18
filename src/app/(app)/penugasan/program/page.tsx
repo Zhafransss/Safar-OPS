@@ -11,7 +11,7 @@ import { getViewer } from "@/server/services/viewer";
 export default async function ProgramsPage() {
   const [viewer, user] = await Promise.all([getViewer(), getSessionUser()]);
   if (!viewer || !user) redirect("/login");
-  const { programs, canCreate } = await getProgramList(user);
+  const { programs, canCreate, teams } = await getProgramList(user);
 
   return (
     <>
@@ -23,7 +23,13 @@ export default async function ProgramsPage() {
         unreadCount={viewer.unreadNotifications}
       />
       {/* K-T39: Template To-do is for leaders only; owners never lead a team. */}
-      <ProgramList programs={programs} canCreate={canCreate} showTemplates={viewer.ledTeam !== null} />
+      <ProgramList
+        programs={programs}
+        teams={teams}
+        canCreate={canCreate}
+        showTemplates={viewer.ledTeam !== null}
+        showHistory={viewer.isOwner}
+      />
     </>
   );
 }

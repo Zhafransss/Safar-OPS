@@ -2,12 +2,13 @@ import "server-only";
 
 import { TRPCError } from "@trpc/server";
 
-import { isOwnerEmail, OWNERS } from "@/config/owners";
+import { isOwnerEmail, OWNERS, placeholderName } from "@/config/owners";
 import { TEAM_PALETTE } from "@/config/team-palette";
 import { db } from "@/server/db";
 import { loadInitialsResolver } from "@/server/services/names";
 import { notify } from "@/server/services/notifications";
 import { activeTaskWhere } from "@/server/services/task-scope";
+import { activeTeamWhere } from "@/server/services/team-scope";
 import { findTeamError, firstFreeColor, normalizeDraft, type TeamDraft } from "@/server/services/team-rules";
 import type { TeamRole } from "@/server/services/viewer";
 import { pngError } from "@/server/trpc";
@@ -20,7 +21,7 @@ const teamInclude = {
 } as const;
 
 function loadTeams() {
-  return db.team.findMany({ include: teamInclude, orderBy: { createdAt: "asc" } });
+  return db.team.findMany({ where: activeTeamWhere, include: teamInclude, orderBy: { createdAt: "asc" } });
 }
 
 type LoadedTeam = Awaited<ReturnType<typeof loadTeams>>[number];
@@ -41,11 +42,29 @@ function rolesOf(userId: string, teams: readonly LoadedTeam[]): TeamRole[] {
   return [...led, ...staff];
 }
 
+// Owner emails are known up front, so they are listed and selectable before their first login.
+// Their name is a placeholder until that login brings Jubelio's name (U-01).
+async function ensureOwnerUsers() {
+  await db.user.createMany({
+    data: OWNERS.map((owner) => ({ email: owner.email, name: placeholderName(owner) })),
+    skipDuplicates: true,
+  });
+}
+
 export async function getTeamChart() {
-  const [teams, initialsOf] = await Promise.all([loadTeams(), loadInitialsResolver()]);
+  await ensureOwnerUsers();
+  const [teams, initialsOf, ownerUsers] = await Promise.all([
+    loadTeams(),
+    loadInitialsResolver(),
+    db.user.findMany({ where: { email: { in: OWNERS.map((owner) => owner.email) } }, select: { email: true, name: true } }),
+  ]);
+  const ownerName = (email: string) => ownerUsers.find((user) => user.email === email)?.name ?? email;
 
   return {
-    owners: OWNERS.map((owner) => ({ name: owner.name, initials: initialsOf(owner.name) })),
+    owners: OWNERS.map((owner) => {
+      const name = ownerName(owner.email);
+      return { name, initials: initialsOf(name) };
+    }),
     paletteFull: firstFreeColor(teams.map((team) => team.color)) === null,
     teams: teams.map((team) => ({
       id: team.id,
@@ -73,7 +92,7 @@ function openTaskInTeam(teamId: string) {
 }
 
 export async function getTeamFormData(teamId: string | null) {
-  const [teams, users, openTodos] = await Promise.all([
+  const [teams, users, openTodos, activePrograms, templateCount] = await Promise.all([
     loadTeams(),
     loadAssignableUsers(),
     teamId
@@ -83,11 +102,16 @@ export async function getTeamFormData(teamId: string | null) {
           _count: { _all: true },
         })
       : Promise.resolve([]),
+    // U-09: what deleting the team would be blocked by, and what it takes with it.
+    teamId ? db.program.count({ where: { teamId, status: "ACTIVE" } }) : Promise.resolve(0),
+    teamId ? db.template.count({ where: { teamId } }) : Promise.resolve(0),
   ]);
   const team = teamId ? teams.find((candidate) => candidate.id === teamId) : undefined;
   if (teamId && !team) return null;
 
   return {
+    activePrograms,
+    templateCount,
     openTodoCounts: Object.fromEntries(openTodos.map((row) => [row.picId, row._count._all])) as Record<string, number>,
     team: team
       ? {
@@ -106,12 +130,13 @@ export async function getTeamFormData(teamId: string | null) {
   };
 }
 
-// Everyone a report can go to. Owner emails are known up front, so they are selectable before their first login.
-export async function getReportRecipients(): Promise<PickerUser[]> {
-  await db.user.createMany({ data: OWNERS.map(({ name, email }) => ({ name, email })), skipDuplicates: true });
+// Everyone a report can go to, owners included before their first login.
+// U-02: the viewer is left out of recipient, CC and forward; PNG-LAP-05 still guards the server.
+export async function getReportRecipients(viewerId: string): Promise<PickerUser[]> {
+  await ensureOwnerUsers();
   const [teams, users] = await Promise.all([
     loadTeams(),
-    db.user.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
+    db.user.findMany({ where: { isActive: true, id: { not: viewerId } }, orderBy: { name: "asc" } }),
   ]);
   return users.map((user) => ({
     id: user.id,
@@ -132,7 +157,7 @@ export async function saveTeam(teamId: string | null, input: TeamDraft, actorId:
   const draft = normalizeDraft(input, new Set(nameById.keys()));
 
   async function assertValid() {
-    const teams = await db.team.findMany();
+    const teams = await db.team.findMany({ where: activeTeamWhere });
     if (!teamId && firstFreeColor(teams.map((team) => team.color)) === null) throw pngError("PNG-TIM-08");
     const error = findTeamError(draft, teamId, teams, nameOf);
     if (error) throw pngError(error.code, "BAD_REQUEST", error.params);
@@ -154,6 +179,10 @@ export async function saveTeam(teamId: string | null, input: TeamDraft, actorId:
         await tx.team.create({ data: { ...fields, members: { create: memberRows } } });
         return;
       }
+      // U-09: waits for a delete of this team in progress, so a save never refills a deleted team.
+      const locked = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM "Team" WHERE id = ${teamId} AND "deletedAt" IS NULL FOR UPDATE`;
+      if (locked.length === 0) throw new TRPCError({ code: "NOT_FOUND" });
       const before = await tx.teamMember.findMany({ where: { teamId }, select: { userId: true } });
       await tx.teamMember.deleteMany({ where: { teamId } });
       await tx.team.update({ where: { id: teamId }, data: { ...fields, members: { create: memberRows } } });
@@ -199,4 +228,22 @@ export async function saveTeam(teamId: string | null, input: TeamDraft, actorId:
   return {
     message: leaderChanged ? `Tim disimpan. QC yang tertunda pindah ke ${nameOf(leaderId)}.` : "Tim disimpan.",
   };
+}
+
+// U-09: owners delete a team once it has no active program. The row stays, so finished and
+// cancelled programs still show their team; staff leave it and its templates are deleted, since
+// tasks copied their to-dos when they were made (CHANGELOG 37). Color and leader become free.
+export async function deleteTeam(teamId: string, actorId: string): Promise<void> {
+  await db.$transaction(async (tx) => {
+    // Row lock: a program created for this team at the same moment waits for the delete (NFR-05).
+    await tx.$queryRaw`SELECT id FROM "Team" WHERE id = ${teamId} FOR UPDATE`;
+    const team = await tx.team.findFirst({ where: { id: teamId, ...activeTeamWhere } });
+    if (!team) throw new TRPCError({ code: "NOT_FOUND" });
+    const active = await tx.program.count({ where: { teamId, status: "ACTIVE" } });
+    if (active > 0) throw pngError("PNG-TIM-09");
+
+    await tx.teamMember.deleteMany({ where: { teamId } });
+    await tx.template.deleteMany({ where: { teamId } });
+    await tx.team.update({ where: { id: teamId }, data: { deletedAt: new Date(), deletedById: actorId } });
+  });
 }

@@ -11,6 +11,7 @@ import {
   findTaskError,
   findTodoError,
   isTaskVisible,
+  moveItem,
   progressOf,
   worstDue,
   worstDueSummary,
@@ -22,6 +23,7 @@ import { canSeeReport, REPORT_TYPES, STATUS_LABEL } from "@/lib/report-rules";
 import { db } from "@/server/db";
 import { notify } from "@/server/services/notifications";
 import { activeTaskWhere } from "@/server/services/task-scope";
+import { activeTeamWhere } from "@/server/services/team-scope";
 import { pngError } from "@/server/trpc";
 
 type Tx = Prisma.TransactionClient;
@@ -39,7 +41,9 @@ function dueFields(todo: { isDone: boolean; dueDate: Date }) {
 }
 
 const programInclude = {
-  team: { select: { id: true, name: true, color: true, leaderId: true, leader: { select: { name: true } } } },
+  team: {
+    select: { id: true, name: true, color: true, leaderId: true, deletedAt: true, leader: { select: { name: true } } },
+  },
   createdBy: { select: { name: true } },
   tasks: {
     where: activeTaskWhere,
@@ -72,10 +76,33 @@ function programFlags(program: LoadedProgram, user: CurrentUser) {
   return flags;
 }
 
+function programCard(program: LoadedProgram, user: CurrentUser) {
+  const tasks = visibleTasks(program, user);
+  const done = tasks.filter((task) => task.qcApprovedAt).length;
+  return {
+    id: program.id,
+    name: program.name,
+    status: program.status,
+    team: { id: program.team.id, name: program.team.name, color: program.team.color },
+    teamDeletedOn: program.team.deletedAt ? formatShortDate(program.team.deletedAt) : null,
+    created: formatShortDate(program.createdAt),
+    doneTasks: done,
+    totalTasks: tasks.length,
+    percent: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
+    flags: programFlags(program, user),
+  };
+}
+
 export async function getProgramList(user: CurrentUser) {
-  const [programs, ledTeam] = await Promise.all([
-    db.program.findMany({ include: programInclude, orderBy: { createdAt: "asc" } }),
-    db.team.findUnique({ where: { leaderId: user.id }, select: { id: true } }),
+  const isOwner = isOwnerEmail(user.email);
+  const [programs, ledTeam, teams] = await Promise.all([
+    // Programs of a deleted team move to Riwayat Program (CHANGELOG 38).
+    db.program.findMany({ where: { team: activeTeamWhere }, include: programInclude, orderBy: { createdAt: "asc" } }),
+    db.team.findFirst({ where: { leaderId: user.id, ...activeTeamWhere }, select: { id: true } }),
+    // U-07: only owners filter by team, and only by teams that still exist.
+    isOwner
+      ? db.team.findMany({ where: activeTeamWhere, select: { id: true, name: true, color: true } })
+      : Promise.resolve([]),
   ]);
 
   const visible = programs.filter(
@@ -83,32 +110,32 @@ export async function getProgramList(user: CurrentUser) {
   );
 
   return {
-    canCreate: isOwnerEmail(user.email) || ledTeam !== null,
-    programs: visible.map((program) => {
-      const tasks = visibleTasks(program, user);
-      const done = tasks.filter((task) => task.qcApprovedAt).length;
-      return {
-        id: program.id,
-        name: program.name,
-        status: program.status,
-        team: { name: program.team.name, color: program.team.color },
-        created: formatShortDate(program.createdAt),
-        doneTasks: done,
-        totalTasks: tasks.length,
-        percent: tasks.length ? Math.round((done / tasks.length) * 100) : 0,
-        flags: programFlags(program, user),
-      };
-    }),
+    canCreate: isOwner || ledTeam !== null,
+    teams,
+    programs: visible.map((program) => programCard(program, user)),
   };
 }
 
-export type ProgramCard = Awaited<ReturnType<typeof getProgramList>>["programs"][number];
+export type ProgramCard = ReturnType<typeof programCard>;
+
+// CHANGELOG 38: programs of deleted teams, for owners only. A deleted team never has an active
+// program (U-09), so every one here is finished or cancelled. Newest deletion first.
+export async function getProgramHistory(user: CurrentUser): Promise<ProgramCard[] | null> {
+  if (!isOwnerEmail(user.email)) return null;
+  const programs = await db.program.findMany({
+    where: { team: { deletedAt: { not: null } } },
+    include: programInclude,
+    orderBy: [{ team: { deletedAt: "desc" } }, { createdAt: "desc" }],
+  });
+  return programs.map((program) => programCard(program, user));
+}
+export type ProgramTeam = Awaited<ReturnType<typeof getProgramList>>["teams"][number];
 
 export async function getProgramForm(user: CurrentUser) {
   const isOwner = isOwnerEmail(user.email);
   const [teams, ledTeam] = await Promise.all([
-    isOwner ? db.team.findMany({ orderBy: { createdAt: "asc" } }) : Promise.resolve([]),
-    db.team.findUnique({ where: { leaderId: user.id } }),
+    isOwner ? db.team.findMany({ where: activeTeamWhere, orderBy: { createdAt: "asc" } }) : Promise.resolve([]),
+    db.team.findFirst({ where: { leaderId: user.id, ...activeTeamWhere } }),
   ]);
   if (!isOwner && !ledTeam) return null;
   const pick = (team: { id: string; name: string; color: string }) => ({ id: team.id, name: team.name, color: team.color });
@@ -117,17 +144,21 @@ export async function getProgramForm(user: CurrentUser) {
 
 export async function createProgram(input: { name: string; teamId: string | null }, user: CurrentUser) {
   const isOwner = isOwnerEmail(user.email);
-  const ledTeam = await db.team.findUnique({ where: { leaderId: user.id } });
+  const ledTeam = await db.team.findFirst({ where: { leaderId: user.id, ...activeTeamWhere } });
   if (!isOwner && !ledTeam) throw pngError("PNG-PRG-04", "FORBIDDEN");
 
   const name = input.name.trim();
   if (!name) throw pngError("PNG-PRG-01");
   // K-T32: a leader can only create programs for their own team, whatever the request says.
   const teamId = isOwner ? input.teamId : (ledTeam?.id ?? null);
-  const team = teamId ? await db.team.findUnique({ where: { id: teamId } }) : null;
+  const team = teamId ? await db.team.findFirst({ where: { id: teamId, ...activeTeamWhere } }) : null;
   if (!team) throw pngError("PNG-PRG-02");
 
   return db.$transaction(async (tx) => {
+    // U-09: waits for a team delete in progress, and fails if the team is gone by then.
+    const locked = await tx.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "Team" WHERE id = ${team.id} AND "deletedAt" IS NULL FOR SHARE`;
+    if (locked.length === 0) throw pngError("PNG-PRG-02");
     const program = await tx.program.create({ data: { name, teamId: team.id, createdById: user.id } });
     await notify(tx, {
       userId: team.leaderId,
@@ -145,6 +176,8 @@ export async function getProgramDetail(id: string, user: CurrentUser) {
   const program = await db.program.findUnique({ where: { id }, include: programInclude });
   if (!program) return null;
 
+  // CHANGELOG 38: once the team is deleted, only owners open its programs, from Riwayat Program.
+  if (program.team.deletedAt && !isOwnerEmail(user.email)) return { denied: true as const };
   const manager = canManage(user, program.team.leaderId);
   const tasks = visibleTasks(program, user);
   if (!manager && tasks.length === 0) return { denied: true as const };
@@ -183,6 +216,7 @@ export async function getProgramDetail(id: string, user: CurrentUser) {
     createdBy: program.createdBy.name,
     canManage: manager,
     isLeader: program.team.leaderId === user.id,
+    teamDeleted: program.team.deletedAt !== null,
     flags: programFlags(program, user),
     openTasks: cards.filter((card) => !card.closed),
     closedTasks: cards.filter((card) => card.closed),
@@ -241,7 +275,10 @@ async function attachableReports(user: CurrentUser) {
     },
     orderBy: { number: "desc" },
   });
-  const leaders = await db.team.findMany({ select: { leaderId: true, members: { select: { userId: true } } } });
+  const leaders = await db.team.findMany({
+    where: activeTeamWhere,
+    select: { leaderId: true, members: { select: { userId: true } } },
+  });
   const isOwner = isOwnerEmail(user.email);
 
   return reports
@@ -419,6 +456,7 @@ export async function getTaskDetail(id: string, user: CurrentUser) {
 
   const { program } = task;
   const { team } = program;
+  if (team.deletedAt && !isOwnerEmail(user.email)) return { denied: true as const };
   const manager = canManage(user, team.leaderId);
   if (!isTaskVisible(manager, task.todos, user.id)) return { denied: true as const };
 
@@ -613,18 +651,20 @@ export async function updateTodo(input: TodoDraft & { todoId: string }, user: Cu
   });
 }
 
-export async function moveTodo(todoId: string, direction: -1 | 1, user: CurrentUser): Promise<void> {
+// U-08: drag and drop puts one to-do at a new position; QC stays last because it is not a row.
+export async function reorderTodo(todoId: string, toIndex: number, user: CurrentUser): Promise<void> {
   const found = await db.todo.findUnique({ where: { id: todoId }, select: { taskId: true } });
   if (!found) throw new TRPCError({ code: "NOT_FOUND" });
 
   await withTask(found.taskId, async (tx, task) => {
     assertCanEditTodos(task, user);
-    const index = task.todos.findIndex((candidate) => candidate.id === todoId);
-    const current = task.todos[index];
-    const neighbor = task.todos[index + direction];
-    if (!current || !neighbor) return;
-    await tx.todo.update({ where: { id: current.id }, data: { sortOrder: neighbor.sortOrder } });
-    await tx.todo.update({ where: { id: neighbor.id }, data: { sortOrder: current.sortOrder } });
+    const from = task.todos.findIndex((candidate) => candidate.id === todoId);
+    const current = task.todos[from];
+    const next = moveItem(task.todos, from, toIndex);
+    if (!current || next.every((todo, index) => todo.id === task.todos[index]?.id)) return;
+    for (const [sortOrder, todo] of next.entries()) {
+      if (todo.sortOrder !== sortOrder) await tx.todo.update({ where: { id: todo.id }, data: { sortOrder } });
+    }
     await taskLog(tx, task.id, user, `menggeser "${current.name}"`);
   });
 }

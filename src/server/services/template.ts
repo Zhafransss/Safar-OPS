@@ -3,12 +3,13 @@ import "server-only";
 import { TRPCError } from "@trpc/server";
 
 import { db } from "@/server/db";
+import { activeTeamWhere } from "@/server/services/team-scope";
 import { findTemplateError, normalizeTemplate, type TemplateDraft } from "@/server/services/template-rules";
 import { pngError } from "@/server/trpc";
 
 // K-T39: only a leader manages templates, and only for their own team. Owners cannot.
 async function requireLedTeam(userId: string) {
-  const team = await db.team.findUnique({ where: { leaderId: userId } });
+  const team = await db.team.findFirst({ where: { leaderId: userId, ...activeTeamWhere } });
   if (!team) throw pngError("PNG-TPL-03", "FORBIDDEN");
   return team;
 }

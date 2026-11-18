@@ -1,17 +1,23 @@
 "use client";
 
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
-import { DateInput } from "@/components/date-input";
+import { DateField } from "@/components/date-field";
+import { useLongPressDrag } from "@/components/drag-sensors";
 import { Icon } from "@/components/icon";
+import { PicField } from "@/components/pic-field";
 import { TeamChip } from "@/components/role-label";
 import { ReportPopup } from "@/components/report-popup";
 import { Sheet } from "@/components/sheet";
 import { useToast } from "@/components/toast";
 import { formatError } from "@/config/error-codes";
-import { findRevisionError, findTodoError, PROGRAM_STATUS_LABEL } from "@/lib/assignment-rules";
+import { findRevisionError, findTodoError, moveItem, PROGRAM_STATUS_LABEL } from "@/lib/assignment-rules";
 import { jakartaIsoDate } from "@/lib/date";
 import { errorText } from "@/lib/error-text";
 import { useTRPC } from "@/lib/trpc-client";
@@ -19,7 +25,6 @@ import type { TaskDetailData } from "@/server/services/assignment";
 
 type Todo = TaskDetailData["todos"][number];
 type Dialog =
-  | { kind: "menu"; todo: Todo; index: number }
   | { kind: "edit"; todo: Todo | null }
   | { kind: "deleteTodo"; todo: Todo }
   | { kind: "approve" | "revise" | "deleteTask" | "report" }
@@ -116,25 +121,42 @@ function TodoFormSheet({
           <label className="lab" htmlFor="teP">
             PIC
           </label>
-          <select id="teP" className="sel" value={picId} onChange={(e) => setPicId(e.target.value)}>
-            <option value="">Pilih</option>
-            {task.members.map((member) => (
-              <option key={member.id} value={member.id}>
-                {member.name}
-                {member.isLeader ? " (leader)" : ""}
-              </option>
-            ))}
-          </select>
+          <PicField id="teP" members={task.members} value={picId} placeholder="Pilih" onChange={setPicId} />
         </div>
         <div>
           <label className="lab" htmlFor="teD">
             DL
           </label>
-          <DateInput id="teD" value={dueIso} onChange={(e) => setDueIso(e.target.value)} />
+          <DateField id="teD" value={dueIso} placeholder="Pilih" onChange={setDueIso} />
         </div>
       </div>
       {todo?.needsReassign && <div className="alert err mt small">PIC lama sudah tidak di tim. Pilih PIC baru.</div>}
     </Sheet>
+  );
+}
+
+// U-08: a to-do row that is dragged after a long press. Dragging is the only way to reorder (U-04).
+function SortableTodo({
+  id,
+  enabled,
+  className,
+  children,
+}: {
+  id: string;
+  enabled: boolean;
+  className: string;
+  children: ReactNode;
+}) {
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !enabled });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${className} ${enabled ? "sortable" : ""} ${isDragging ? "dragging" : ""}`}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      {...(enabled ? listeners : {})}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -221,10 +243,14 @@ function ReviseSheet({ task, onClose }: { task: TaskDetailData; onClose: () => v
 // Mockup vTgsDetail.
 export function TaskDetail({ task }: { task: TaskDetailData }) {
   const [dialog, setDialog] = useState<Dialog>(null);
+  // The dropped order shows at once and gives way to the server's order once the page refreshes.
+  const serverOrder = task.todos.map((todo) => todo.id).join(",");
+  const [dragOrder, setDragOrder] = useState<{ base: string; ids: string[] } | null>(null);
   const router = useRouter();
   const toast = useToast();
   const trpc = useTRPC();
   const editable = task.canManage && !task.locked;
+  const sensors = useLongPressDrag();
 
   const refreshWith = (message?: string) => () => {
     setDialog(null);
@@ -241,7 +267,15 @@ export function TaskDetail({ task }: { task: TaskDetailData }) {
       onError,
     }),
   );
-  const move = useMutation(trpc.todo.move.mutationOptions({ onSuccess: refreshWith(), onError }));
+  const reorder = useMutation(
+    trpc.todo.reorder.mutationOptions({
+      onSuccess: refreshWith(),
+      onError: (e) => {
+        setDragOrder(null);
+        onError(e);
+      },
+    }),
+  );
   const removeTodo = useMutation(trpc.todo.remove.mutationOptions({ onSuccess: refreshWith("To-do dihapus."), onError }));
   const approve = useMutation(
     trpc.qc.approve.mutationOptions({ onSuccess: refreshWith("QC lolos. Tugas selesai."), onError }),
@@ -259,6 +293,15 @@ export function TaskDetail({ task }: { task: TaskDetailData }) {
 
   const { progress } = task;
   const qcState = task.closed ? "ok" : task.allDone ? "" : "lock";
+  const orderIds = dragOrder?.base === serverOrder ? dragOrder.ids : task.todos.map((todo) => todo.id);
+  const todos = orderIds.flatMap((id) => task.todos.find((todo) => todo.id === id) ?? []);
+
+  function drop({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
+    const to = orderIds.indexOf(String(over.id));
+    setDragOrder({ base: serverOrder, ids: moveItem(orderIds, orderIds.indexOf(String(active.id)), to) });
+    reorder.mutate({ todoId: String(active.id), toIndex: to });
+  }
 
   return (
     <div className="pad">
@@ -316,56 +359,70 @@ export function TaskDetail({ task }: { task: TaskDetailData }) {
       )}
 
       <div className="listbox mt">
-        {task.todos.map((todo, index) => {
-          const canTick = todo.mine && !task.locked;
-          return (
-            <div key={todo.id} className={`todo ${todo.isDone ? "done" : ""}`}>
-              <button
-                className={`tbox ${todo.isDone ? "on" : ""}`}
-                disabled={!canTick || toggle.isPending}
-                onClick={() => toggle.mutate({ todoId: todo.id })}
-                aria-label={`${todo.isDone ? "Batalkan centang" : "Centang"} ${todo.name}`}
-              >
-                {todo.isDone && <Icon name="check" size={16} />}
-              </button>
-              <div className="tbody">
-                <b>{todo.name}</b>
-                <div className="tmeta">
-                  <span>
-                    {todo.picName}
-                    {todo.mine ? " (saya)" : ""}
-                  </span>
-                  <span>DL {todo.dueShort}</span>
-                  {todo.due && <span className={`badge ${todo.due.badge}`}>{todo.due.label}</span>}
-                  {todo.revisionCount > 0 && <span className="badge b-gold">Revisi {todo.revisionCount}</span>}
-                  {todo.needsReassign && <span className="badge b-red">Perlu dialihkan</span>}
-                </div>
-                {todo.instruction && (
-                  <div className="arah">
-                    <b style={{ fontSize: 11, display: "inline" }}>Arahan:</b> {todo.instruction}
-                  </div>
-                )}
-                {todo.revisionNote && !todo.isDone && (
-                  <div className="revn">
-                    <b style={{ fontSize: 11, display: "inline" }}>Catatan revisi:</b> {todo.revisionNote}
-                  </div>
-                )}
-              </div>
-              {editable && (
-                <div className="tact">
-                  {/* CHANGELOG 5: one 44 px menu instead of three stacked 22 px buttons (K-T82). */}
+        <DndContext
+          id="todo-order"
+          sensors={sensors}
+          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+          onDragEnd={drop}
+        >
+          <SortableContext items={orderIds} strategy={verticalListSortingStrategy}>
+            {todos.map((todo) => {
+              const canTick = todo.mine && !task.locked;
+              return (
+                <SortableTodo
+                  key={todo.id}
+                  id={todo.id}
+                  enabled={editable && !reorder.isPending}
+                  className={`todo ${todo.isDone ? "done" : ""}`}
+                >
                   <button
-                    className="tmenu"
-                    onClick={() => setDialog({ kind: "menu", todo, index })}
-                    aria-label={`Menu ${todo.name}`}
+                    className={`tbox ${todo.isDone ? "on" : ""}`}
+                    disabled={!canTick || toggle.isPending}
+                    onClick={() => toggle.mutate({ todoId: todo.id })}
+                    aria-label={`${todo.isDone ? "Batalkan centang" : "Centang"} ${todo.name}`}
                   >
-                    ⋯
+                    {todo.isDone && <Icon name="check" size={16} />}
                   </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                  <div className="tbody">
+                    <b>{todo.name}</b>
+                    <div className="tmeta">
+                      <span>
+                        {todo.picName}
+                        {todo.mine ? " (saya)" : ""}
+                      </span>
+                      <span>DL {todo.dueShort}</span>
+                      {todo.due && <span className={`badge ${todo.due.badge}`}>{todo.due.label}</span>}
+                      {todo.revisionCount > 0 && <span className="badge b-gold">Revisi {todo.revisionCount}</span>}
+                      {todo.needsReassign && <span className="badge b-red">Perlu dialihkan</span>}
+                    </div>
+                    {todo.instruction && (
+                      <div className="arah">
+                        <b style={{ fontSize: 11, display: "inline" }}>Arahan:</b> {todo.instruction}
+                      </div>
+                    )}
+                    {todo.revisionNote && !todo.isDone && (
+                      <div className="revn">
+                        <b style={{ fontSize: 11, display: "inline" }}>Catatan revisi:</b> {todo.revisionNote}
+                      </div>
+                    )}
+                  </div>
+                  {editable && (
+                    <div className="tact">
+                      {/* U-04: the pencil opens the edit form directly; delete lives in that form. */}
+                      <button
+                        className="tmenu"
+                        onClick={() => setDialog({ kind: "edit", todo })}
+                        aria-label={`Edit ${todo.name}`}
+                      >
+                        <Icon name="pen" size={18} />
+                      </button>
+                    </div>
+                  )}
+                </SortableTodo>
+              );
+            })}
+          </SortableContext>
+        </DndContext>
         <div className="todo qc">
           <div className={`qcb ${qcState}`}>
             <Icon name={task.closed ? "check" : task.allDone ? "shield" : "lock"} size={15} />
@@ -411,29 +468,6 @@ export function TaskDetail({ task }: { task: TaskDetailData }) {
         </button>
       )}
 
-      {dialog?.kind === "menu" && (
-        <Sheet title={dialog.todo.name} onClose={() => setDialog(null)}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <button
-              className="btn sec block"
-              disabled={dialog.index === 0 || move.isPending}
-              onClick={() => move.mutate({ todoId: dialog.todo.id, direction: -1 })}
-            >
-              <Icon name="up" size={16} /> Naik
-            </button>
-            <button className="btn sec block" onClick={() => setDialog({ kind: "edit", todo: dialog.todo })}>
-              <Icon name="pen" size={16} /> Edit
-            </button>
-            <button
-              className="btn sec block"
-              disabled={dialog.index === task.todos.length - 1 || move.isPending}
-              onClick={() => move.mutate({ todoId: dialog.todo.id, direction: 1 })}
-            >
-              <Icon name="down" size={16} /> Turun
-            </button>
-          </div>
-        </Sheet>
-      )}
       {dialog?.kind === "edit" && (
         <TodoFormSheet
           task={task}

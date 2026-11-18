@@ -21,10 +21,20 @@ type TeamFormProps = {
   defaultColor: string;
   users: PickerUser[];
   openTodoCounts: Record<string, number>;
+  activePrograms: number;
+  templateCount: number;
 };
 
 // Mockup vTimEdit.
-export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts }: TeamFormProps) {
+export function TeamForm({
+  team,
+  usedColors,
+  defaultColor,
+  users,
+  openTodoCounts,
+  activePrograms,
+  templateCount,
+}: TeamFormProps) {
   const [name, setName] = useState(team?.name ?? "");
   const [color, setColor] = useState(team?.color ?? defaultColor);
   const [leaderId, setLeaderId] = useState<string | null>(team?.leaderId ?? null);
@@ -32,6 +42,7 @@ export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts
   const [error, setError] = useState("");
   const [picking, setPicking] = useState<"leader" | "staff" | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const router = useRouter();
   const toast = useToast();
@@ -46,6 +57,18 @@ export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts
   const create = useMutation(trpc.team.create.mutationOptions(handlers));
   const update = useMutation(trpc.team.update.mutationOptions(handlers));
   const saving = create.isPending || update.isPending;
+  const remove = useMutation(
+    trpc.team.remove.mutationOptions({
+      onSuccess: () => {
+        toast("Tim dihapus.");
+        router.replace("/penugasan/tim");
+      },
+      onError: (e) => {
+        setConfirmDelete(false);
+        showError(errorText(e.message));
+      },
+    }),
+  );
 
   const nameOf = (id: string) => users.find((user) => user.id === id)?.name ?? "";
   const usedBy = (candidate: string) => usedColors.find((used) => used.color === candidate);
@@ -64,6 +87,17 @@ export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts
   function removeStaff(id: string) {
     if (openTodoCounts[id]) setConfirmRemove(id);
     else setStaffIds(staffIds.filter((x) => x !== id));
+  }
+
+  function showError(message: string) {
+    setError(message);
+    document.getElementById("scr")?.scrollTo(0, 0);
+  }
+
+  // U-09: a team with an active program cannot go; the server checks again.
+  function askDelete() {
+    if (activePrograms > 0) showError(formatError("PNG-TIM-09"));
+    else setConfirmDelete(true);
   }
 
   function save() {
@@ -137,6 +171,38 @@ export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts
       <button className="btn block mt2" onClick={save} disabled={saving}>
         Simpan tim
       </button>
+      {team && (
+        <button className="btn warn block mt" onClick={askDelete}>
+          Hapus tim
+        </button>
+      )}
+
+      {confirmDelete && team && (
+        <Sheet
+          title="Hapus tim?"
+          onClose={() => setConfirmDelete(false)}
+          actions={[
+            { label: "Batal", variant: "sec", onClick: () => setConfirmDelete(false) },
+            {
+              label: "Hapus",
+              variant: "warn",
+              onClick: () => remove.mutate({ id: team.id }),
+              disabled: remove.isPending,
+            },
+          ]}
+        >
+          <p className="small" style={{ lineHeight: 1.5, margin: 0 }}>
+            <b>{team.name}</b> dihapus dari Pemetaan Tim. Leader dan staff keluar dari tim ini
+            {templateCount > 0 && (
+              <>
+                , dan <b>{templateCount} template to-do</b> tim ini ikut terhapus
+              </>
+            )}
+            . Program yang sudah selesai atau dibatalkan tetap tersimpan beserta nama timnya. Warna tim ini bisa
+            dipakai tim lain.
+          </p>
+        </Sheet>
+      )}
 
       {confirmRemove && (
         <Sheet
@@ -166,6 +232,7 @@ export function TeamForm({ team, usedColors, defaultColor, users, openTodoCounts
           title="Pilih leader"
           users={users}
           exclude={[]}
+          selectedId={leaderId}
           onClose={() => setPicking(null)}
           onPick={(id) => {
             setLeaderId(id);

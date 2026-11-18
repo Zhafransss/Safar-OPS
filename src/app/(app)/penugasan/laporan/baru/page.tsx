@@ -9,7 +9,7 @@ import { getViewer } from "@/server/services/viewer";
 export default async function NewReportPage() {
   const viewer = await getViewer();
   if (!viewer) redirect("/login");
-  const users = await getReportRecipients();
+  const users = await getReportRecipients(viewer.id);
 
   return (
     <>

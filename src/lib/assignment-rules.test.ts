@@ -6,6 +6,7 @@ import {
   findTaskError,
   findTodoError,
   isTaskVisible,
+  moveItem,
   progressOf,
   worstDue,
   worstDueSummary,
@@ -126,5 +127,23 @@ describe("isTaskVisible (K-T15)", () => {
   it("shows staff only tasks holding their to-do", () => {
     expect(isTaskVisible(false, [{ picId: "rudi" }], "rudi")).toBe(true);
     expect(isTaskVisible(false, [{ picId: "dimas" }], "rudi")).toBe(false);
+  });
+});
+
+describe("moveItem (U-08)", () => {
+  const order = ["a", "b", "c", "d"];
+
+  it("moves a to-do down past its neighbours", () => {
+    expect(moveItem(order, 0, 2)).toEqual(["b", "c", "a", "d"]);
+  });
+
+  it("moves a to-do up to the top", () => {
+    expect(moveItem(order, 3, 0)).toEqual(["d", "a", "b", "c"]);
+  });
+
+  it("keeps the order for a drop on the same place or out of range", () => {
+    expect(moveItem(order, 1, 1)).toEqual(order);
+    expect(moveItem(order, 1, 9)).toEqual(order);
+    expect(moveItem(order, -1, 0)).toEqual(order);
   });
 });

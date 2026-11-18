@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { findOwner, isOwnerEmail, OWNERS } from "@/config/owners";
+import { isOwnerEmail, OWNERS, placeholderName } from "@/config/owners";
 
 describe("developer owner", () => {
   afterEach(() => {
@@ -54,9 +54,13 @@ describe("owners (K-T72)", () => {
     expect(OWNERS).toHaveLength(4);
   });
 
-  it.each(OWNERS.map((owner) => [owner.email, owner.name]))("recognizes %s as %s", (email, name) => {
+  it.each(OWNERS.map((owner) => [owner.email]))("recognizes %s", (email) => {
     expect(isOwnerEmail(email)).toBe(true);
-    expect(findOwner(email)?.name).toBe(name);
+  });
+
+  // U-01: owners are known by email; their names come from Jubelio at login.
+  it("writes no owner name in code", () => {
+    expect(OWNERS.every((owner) => owner.name === undefined)).toBe(true);
   });
 
   it("ignores case and surrounding spaces", () => {
@@ -65,5 +69,15 @@ describe("owners (K-T72)", () => {
 
   it("rejects everyone else", () => {
     expect(isOwnerEmail("rudi@example.com")).toBe(false);
+  });
+});
+
+describe("placeholderName (U-01)", () => {
+  it("uses the email local part until the first login", () => {
+    expect(placeholderName({ email: "saefulaskarcompany@gmail.com" })).toBe("saefulaskarcompany");
+  });
+
+  it("keeps a name set for accounts that never reach Jubelio", () => {
+    expect(placeholderName({ email: "developer@safar.local", name: "Developer" })).toBe("Developer");
   });
 });

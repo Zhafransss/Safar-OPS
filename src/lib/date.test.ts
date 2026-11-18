@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  addIsoDays,
   diffDays,
   formatDate,
   formatFullDate,
+  formatIsoDate,
   formatIsoShort,
   formatShortDate,
   greeting,
@@ -64,5 +66,16 @@ describe("Asia/Jakarta dates", () => {
     ["2026-10-26T20:30:00Z", "Selamat Malam"],
   ])("greets %s with %s", (iso, expected) => {
     expect(greeting(new Date(iso))).toBe(expected);
+  });
+});
+
+describe("formatIsoDate and addIsoDays (Q-02)", () => {
+  it("formats a DL with its year", () => {
+    expect(formatIsoDate("2026-11-20")).toBe("20 Nov 2026");
+  });
+
+  it("adds calendar days across a month and a year end", () => {
+    expect(addIsoDays("2026-11-30", 1)).toBe("2026-12-01");
+    expect(addIsoDays("2026-12-28", 7)).toBe("2027-01-04");
   });
 });

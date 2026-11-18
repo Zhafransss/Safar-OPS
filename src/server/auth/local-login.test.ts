@@ -44,7 +44,7 @@ describe("loginWithLocalAccount", () => {
 
   it("logs a listed account in with its name, ignoring email case", async () => {
     useAccounts([{ email: "leader@velora.com", name: "Leader Uji", hash: HASH }]);
-    expect(await loginWithLocalAccount(" Leader@Velora.com ", PASSWORD)).toEqual({ ok: true, userName: "Leader Uji" });
+    expect(await loginWithLocalAccount(" Leader@Velora.com ", PASSWORD)).toEqual({ ok: true, name: "Leader Uji" });
   });
 
   it("rejects a wrong password as invalid credentials", async () => {

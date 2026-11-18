@@ -1,4 +1,4 @@
-// Single source for error text (NFR-10). PRD section 13 plus CHANGELOG rows 4, 16 and 19.
+// Single source for error text (NFR-10). PRD section 13 plus CHANGELOG rows 4, 16, 19 and 37.
 // [n] and [nama] are placeholders filled by formatError.
 export const ERROR_CODES = {
   "PNG-AUT-01": "Email atau password salah.",
@@ -36,6 +36,7 @@ export const ERROR_CODES = {
   "PNG-TIM-06": "Hanya pemilik yang bisa mengatur pemetaan tim.",
   "PNG-TIM-07": "Warna ini sudah dipakai [nama tim]. Pilih warna lain.",
   "PNG-TIM-08": "Semua 8 warna tim sudah dipakai. Tim baru belum bisa ditambahkan.",
+  "PNG-TIM-09": "Tim ini masih punya program aktif. Selesaikan atau batalkan dulu.",
   "PNG-TPL-01": "Nama template belum diisi.",
   "PNG-TPL-02": "Tambahkan minimal 1 to-do.",
   "PNG-TPL-03": "Template hanya bisa dikelola leader tim.",

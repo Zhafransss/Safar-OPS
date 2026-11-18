@@ -1,17 +1,15 @@
 "use client";
 
-import { useState } from "react";
-
-import { RoleLabel } from "@/components/role-label";
-import { Sheet } from "@/components/sheet";
+import { ChoiceSheet } from "@/components/choice-sheet";
 import type { PickerUser } from "@/server/services/team";
 
-// Mockup openPick with pickUsers.
+// Mockup openPick with pickUsers, laid out by U-06: names only, A to Z, like the simulation.
 export function UserPicker({
   title,
-  placeholder = "Cari",
+  placeholder = "Cari nama",
   users,
   exclude,
+  selectedId,
   onPick,
   onClose,
 }: {
@@ -19,30 +17,23 @@ export function UserPicker({
   placeholder?: string;
   users: PickerUser[];
   exclude: readonly (string | null)[];
+  selectedId?: string | null;
   onPick: (userId: string) => void;
   onClose: () => void;
 }) {
-  const [query, setQuery] = useState("");
-  const matches = users.filter(
-    (user) => !exclude.includes(user.id) && user.name.toLowerCase().includes(query.toLowerCase()),
-  );
+  const items = users
+    .filter((user) => !exclude.includes(user.id))
+    .sort((a, b) => a.name.localeCompare(b.name, "id"))
+    .map((user) => ({ key: user.id, label: user.name, search: user.name }));
 
   return (
-    <Sheet title={title} onClose={onClose}>
-      <input id="pkQ" className="inp" placeholder={placeholder} value={query} onChange={(e) => setQuery(e.target.value)} />
-      <div className="listbox mt">
-        {matches.map((user) => (
-          <div key={user.id} className="li" role="button" tabIndex={0} onClick={() => onPick(user.id)}>
-            <div className="li-b">
-              <b>{user.name}</b>
-              <small>
-                <RoleLabel viewer={user} />
-              </small>
-            </div>
-          </div>
-        ))}
-        {matches.length === 0 && <div className="empty">Tidak ada yang cocok.</div>}
-      </div>
-    </Sheet>
+    <ChoiceSheet
+      title={title}
+      placeholder={placeholder}
+      items={items}
+      selectedKey={selectedId}
+      onPick={onPick}
+      onClose={onClose}
+    />
   );
 }

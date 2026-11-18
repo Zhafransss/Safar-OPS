@@ -72,6 +72,17 @@ export function formatIsoShort(iso: string): string {
   return `${day} ${MONTH_NAMES[(month ?? 1) - 1]}`;
 }
 
+// The DL field (Q-02): "20 Nov 2026", from the date's own digits like formatIsoShort.
+export function formatIsoDate(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  return `${day} ${MONTH_NAMES[(month ?? 1) - 1]} ${year}`;
+}
+
+// Calendar days after a YYYY-MM-DD date, for the DL presets (Q-02).
+export function addIsoDays(iso: string, days: number): string {
+  return new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
+}
+
 // K-T83: the YYMM prefix of a report number.
 export function reportPeriod(date: Date): string {
   const { year, month } = jakartaParts(date);
