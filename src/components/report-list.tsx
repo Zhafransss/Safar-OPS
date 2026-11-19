@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Icon } from "@/components/icon";
 import { useReportFilters } from "@/components/report-filters";
@@ -10,8 +11,15 @@ import { useTRPC } from "@/lib/trpc-client";
 import type { ReportCard, ReportTab } from "@/server/services/report";
 
 function Card({ report }: { report: ReportCard }) {
+  const href = `/penugasan/laporan/${report.number}`;
+  // The open report is marked in the desktop list pane; on phones the list never shows beside it.
+  const open = usePathname() === href;
   return (
-    <Link className={`lapcard ${report.unread ? "unread" : ""}`} href={`/penugasan/laporan/${report.number}`}>
+    <Link
+      className={`lapcard ${report.unread ? "unread" : ""} ${open ? "is-open" : ""}`}
+      href={href}
+      aria-current={open ? "page" : undefined}
+    >
       <div className="l1">
         <span>
           {report.unread && <span className="dot" />}

@@ -241,5 +241,5 @@ Kolom **Mockup** menyebut fungsi tampilan di file mockup sebagai acuan persis.
 | A-03 | Dokumentasi login mencantumkan `token`, `userName`, `currentCompany` (dipotong ke field yang dipakai). Nama tampilan belum tentu ada | Nama di seluruh aplikasi | Uji di Sprint 0 |
 | A-04 | Diputuskan 5 November: aplikasi di Vercel, data di PostgreSQL, foto di Cloudflare R2. Risiko syarat paket Hobby sudah dijelaskan ke pengguna. Driver R2 sudah dibuat (`docs/DEPLOY.md`); penyedia PostgreSQL dipilih saat deploy | `docs/DESIGN.md` bagian 3 | Diputuskan, sisa pekerjaan sebelum deploy |
 | A-05 | Tugas salah buat bisa dihapus (FR-TGS-07, CHANGELOG 19). Tugas yang sudah Lolos QC tidak bisa dihapus agar catatan pekerjaan selesai tetap utuh | Kerapian data | Selesai diputuskan |
-| A-06 | Tampilan desktop memakai kolom tengah selebar HP, tanpa bingkai HP, karena mockup hanya menggambar HP | Tampilan desktop | Disetujui (CHANGELOG 17) |
+| A-06 | Tampilan desktop (1024 px ke atas) memakai sidebar dan laporan berdampingan; sebelumnya kolom tengah selebar HP (CHANGELOG 17) | Tampilan desktop | Diganti 19 November (CHANGELOG 44) |
 | A-07 | Skenario uji final per role (turunan 57 skenario mockup) belum diterima; tab Skenario Uji tidak ada di berkas mockup final | UAT | Draf per role di `docs/UAT.md`, perlu dicocokkan dengan berkas asli |

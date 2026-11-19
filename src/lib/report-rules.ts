@@ -36,6 +36,17 @@ export const STATUS_FILTERS: readonly { value: ReportStatus | "ALL"; label: stri
 
 export const MAX_PHOTOS = 5;
 
+export type ReportTabValue = "saya" | "tim" | "semua";
+
+// Mockup lapTabs (K-T30, K-T41): Laporan tim for a team leader, Semua laporan for owners.
+export function reportTabs(viewer: { isOwner: boolean; leadsTeam: boolean }): { value: ReportTabValue; label: string }[] {
+  return [
+    { value: "saya", label: "Laporan saya" },
+    ...(viewer.leadsTeam ? [{ value: "tim" as const, label: "Laporan tim" }] : []),
+    ...(viewer.isOwner ? [{ value: "semua" as const, label: "Semua laporan" }] : []),
+  ];
+}
+
 export type ReportParties = { fromId: string; toId: string; ccIds: readonly string[]; status: ReportStatus };
 export type ReportActor = { id: string; isOwner: boolean; recipientLeaderIds: readonly string[] };
 

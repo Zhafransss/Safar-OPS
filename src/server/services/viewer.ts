@@ -52,8 +52,9 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   };
 });
 
-// The counts on the Beranda menu cards: new reports to me and my open to-dos.
-export async function getWorkSummary(userId: string) {
+// The counts on the Beranda menu cards and the desktop sidebar: new reports to me and my open to-dos.
+// cache() lets the layout and Beranda share one lookup per request.
+export const getWorkSummary = cache(async (userId: string) => {
   const [newReports, myTodos] = await Promise.all([
     db.report.count({ where: { toId: userId, status: "SENT", recipientOpenedAt: null } }),
     db.todo.count({
@@ -61,4 +62,4 @@ export async function getWorkSummary(userId: string) {
     }),
   ]);
   return { newReports, myTodos };
-}
+});

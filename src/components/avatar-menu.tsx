@@ -1,13 +1,24 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Sheet } from "@/components/sheet";
 import { useTRPC } from "@/lib/trpc-client";
 
 // FR-AUT-05: the mockup has no logout, so it lives behind the avatar without adding anything to the screen.
-export function AvatarMenu({ initials, name }: { initials: string; name: string }) {
+// The desktop sidebar passes its own button look and content and reuses the same confirmation.
+export function AvatarMenu({
+  initials,
+  name,
+  className = "ava",
+  children,
+}: {
+  initials: string;
+  name: string;
+  className?: string;
+  children?: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const trpc = useTRPC();
   const logout = useMutation(
@@ -19,8 +30,8 @@ export function AvatarMenu({ initials, name }: { initials: string; name: string 
 
   return (
     <>
-      <button className="ava" onClick={() => setOpen(true)} aria-label={`Akun ${name}`}>
-        {initials}
+      <button className={className} onClick={() => setOpen(true)} aria-label={`Akun ${name}`}>
+        {children ?? initials}
       </button>
       {open && (
         <Sheet

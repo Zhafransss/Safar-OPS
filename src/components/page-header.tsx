@@ -25,7 +25,7 @@ export function PageHeader({
   const router = useRouter();
   return (
     <div className="hd">
-      <button className="bk" onClick={() => router.push(backHref)} aria-label="Kembali">
+      <button className="bk back" onClick={() => router.push(backHref)} aria-label="Kembali">
         <Icon name="back" />
       </button>
       <div style={{ minWidth: 0, flex: 1 }}>

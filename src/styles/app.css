@@ -69,8 +69,9 @@ a.tcard {
 }
 
 /* Report chat: the header stays on top, only the messages scroll, and the composer with its
-   pending photos is always the last thing on screen, so no message can show below it. */
-.scroll:has(> .chat-screen) {
+   pending photos is always the last thing on screen, so no message can show below it.
+   Descendant, not child: the desktop wrappers sit between them and add no box on phones. */
+.scroll:has(.chat-screen) {
   overflow: hidden;
   padding-bottom: 0;
 }
@@ -537,4 +538,335 @@ button.ava::after {
   position: relative;
   z-index: 2;
   box-shadow: var(--sh);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Desktop, 1024 px and wider. The mockup draws phones only; below 1024 px nothing here applies and
+   the wrappers below add no box, so phones keep the mockup layout exactly. #scr stays the page
+   scroller on desktop too, so scroll-to-top and the chat layout keep working.
+   --------------------------------------------------------------------------------------------- */
+.shell,
+.shell-main,
+.lap-split,
+.lap-main {
+  display: contents;
+}
+
+.sidebar,
+.lap-side,
+.lap-empty {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --frame-h: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    /* Page content keeps a readable column instead of stretching across the screen. */
+    --content-w: 880px;
+  }
+
+  .app-frame {
+    width: 100%;
+  }
+
+  /* Pages without the sidebar (masuk, offline) keep the centered phone column (CHANGELOG 17). */
+  .app-frame:not(:has(.shell)) {
+    width: 420px;
+  }
+
+  .shell {
+    display: flex;
+    min-height: 100%;
+  }
+
+  .shell-main {
+    display: block;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    width: 240px;
+    height: var(--frame-h);
+    padding: 16px 12px;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .sb-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 10px 18px;
+    text-decoration: none;
+  }
+
+  .sb-logo {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
+    color: #ffffff;
+    font: 800 18px var(--font);
+    letter-spacing: -0.02em;
+  }
+
+  .sb-brand small {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .sb-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .sb-section {
+    margin: 14px 10px 6px;
+    font: 700 11px var(--font);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .sb-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text);
+    font: 600 14px var(--font);
+    text-decoration: none;
+  }
+
+  .sb-link svg {
+    flex: none;
+    color: var(--muted);
+  }
+
+  .sb-link:hover {
+    background: var(--surface2);
+  }
+
+  .sb-link.is-current {
+    background: var(--accbg);
+    color: var(--acc);
+  }
+
+  .sb-link.is-current svg {
+    color: var(--acc);
+  }
+
+  .sb-count {
+    margin-left: auto;
+    min-width: 22px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--btn);
+    color: var(--btntext);
+    font: 700 11.5px var(--font);
+    text-align: center;
+  }
+
+  .sb-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .sb-user:hover {
+    background: var(--surface2);
+  }
+
+  .sb-user > svg {
+    flex: none;
+    color: var(--muted);
+  }
+
+  .sb-ava {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #14120d;
+    color: #ffffff;
+    font: 700 13px var(--font);
+  }
+
+  .sb-who {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sb-who b {
+    display: block;
+    overflow: hidden;
+    font-size: 13.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sb-who small {
+    display: block;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* Page column: the orange header spans the page, its content lines up with the column below. */
+  .hd {
+    padding-left: max(14px, calc((100% - var(--content-w)) / 2 + 14px));
+    padding-right: max(14px, calc((100% - var(--content-w)) / 2 + 14px));
+  }
+
+  .pad {
+    max-width: var(--content-w);
+    margin-inline: auto;
+  }
+
+  /* Beranda */
+  .home-hd {
+    padding-left: max(18px, calc((100% - var(--content-w)) / 2 + 18px));
+    padding-right: max(18px, calc((100% - var(--content-w)) / 2 + 18px));
+  }
+
+  .datecard {
+    max-width: calc(var(--content-w) - 28px);
+    margin: -52px auto 0;
+  }
+
+  .sect-t {
+    max-width: calc(var(--content-w) - 36px);
+    margin: 20px auto 10px;
+  }
+
+  .grid3 {
+    max-width: var(--content-w);
+    margin-inline: auto;
+  }
+
+  /* Laporan: list on the left, the open report or the new-report form on the right. */
+  .lap-split {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .lap-side {
+    position: sticky;
+    top: 0;
+    display: block;
+    height: var(--frame-h);
+    overflow-y: auto;
+    border-right: 1px solid var(--line);
+    background: var(--appbg);
+  }
+
+  .pane-hd {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 16px 14px 10px;
+    background: var(--appbg);
+    font: 800 17px var(--font);
+  }
+
+  .lap-main {
+    display: block;
+    min-width: 0;
+  }
+
+  /* The chat fills the right pane, so its own list of messages scrolls, as on phones. */
+  .lap-split:has(.chat-screen) .lap-main {
+    height: var(--frame-h);
+  }
+
+  .lap-split .lap-index {
+    display: none;
+  }
+
+  /* The list is beside the report, so "back to the list" has nothing to do. */
+  .lap-split .hd .back {
+    display: none;
+  }
+
+  .lap-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--frame-h);
+    padding: 24px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .lap-empty b {
+    color: var(--text);
+    font-size: 15px;
+  }
+
+  .scroll:has(.lap-empty) {
+    padding-bottom: 0;
+  }
+
+  .lapcard.is-open {
+    border-color: #e8650a;
+    background: var(--accbg);
+  }
+
+  /* Sheets open as dialogs in the middle of the screen instead of rising from the bottom edge. */
+  .layer {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sheet {
+    width: min(480px, calc(100% - 32px));
+    max-height: 85%;
+    border-radius: 18px;
+  }
+
+  .toast {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: min(380px, calc(100% - 48px));
+  }
+
+  /* The photo viewer keeps the photo inside the screen height. */
+  .fv-img {
+    width: auto;
+    height: 85%;
+    max-width: 88%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .lap-split {
+    grid-template-columns: 380px minmax(0, 1fr);
+  }
 }
