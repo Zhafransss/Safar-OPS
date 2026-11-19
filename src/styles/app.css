@@ -558,6 +558,21 @@ button.ava::after {
   display: none;
 }
 
+/* Masuk (CHANGELOG 45): phones keep the Beranda header with the form card over its edge. */
+.auth,
+.auth-main {
+  display: contents;
+}
+
+.auth-brand,
+.auth-title {
+  display: none;
+}
+
+.auth-form {
+  margin: -40px 14px 0;
+}
+
 @media (min-width: 1024px) {
   :root {
     --frame-h: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
@@ -569,9 +584,115 @@ button.ava::after {
     width: 100%;
   }
 
-  /* Pages without the sidebar (masuk, offline) keep the centered phone column (CHANGELOG 17). */
+  /* Offline keeps the centered phone column (CHANGELOG 17); masuk has its own desktop layout. */
   .app-frame:not(:has(.shell)) {
     width: 420px;
+  }
+
+  .app-frame:has(.auth) {
+    width: 100%;
+  }
+
+  /* Masuk: brand panel on the left, the form in the middle of the right half. */
+  .scroll:has(.auth) {
+    padding-bottom: 0;
+  }
+
+  .auth {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 100%;
+  }
+
+  .auth-brand {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 64px max(48px, 8%);
+    background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
+    color: #ffffff;
+  }
+
+  .auth-logo {
+    font: 800 56px/1 var(--font);
+    letter-spacing: -0.03em;
+  }
+
+  .auth-tag {
+    max-width: 30ch;
+    margin: 14px 0 0;
+    font-size: 18px;
+    line-height: 1.45;
+  }
+
+  .auth-points {
+    display: grid;
+    gap: 14px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .auth-points li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .auth-ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .auth-points b {
+    display: block;
+    font-size: 15px;
+  }
+
+  .auth-points small {
+    display: block;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .auth-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    background: var(--appbg);
+  }
+
+  .auth-phone-hd {
+    display: none;
+  }
+
+  .auth-form {
+    width: min(400px, 100%);
+    margin: 0;
+  }
+
+  .auth-title {
+    display: block;
+    margin-bottom: 18px;
+  }
+
+  .auth-title b {
+    display: block;
+    font: 800 26px var(--font);
+    letter-spacing: -0.02em;
+  }
+
+  .auth-title span {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--muted);
   }
 
   .shell {
