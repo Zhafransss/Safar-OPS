@@ -11,14 +11,14 @@ Diputuskan 19 November 2026: production pindah ke branch `main` dengan data send
 | Branch Git | `main` | `development` |
 | Jenis deploy Vercel | Production | Preview |
 | Alamat | **hris.saefulaskar.com** | Domain bawaan Vercel untuk branch `development` |
-| Database | Prisma Postgres **baru**, region Singapura | Prisma Postgres yang sudah ada |
+| Database | Database **baru** `HRIS-Production`, di proyek Prisma `safar-ops` | Database `SafarOps`, di proyek Prisma yang sama |
 | Foto | Bucket R2 **baru** | Bucket R2 `safarops` |
 | Login | Jubelio asli saja | Jubelio asli dan akun uji `LOCAL_ACCOUNTS` |
 
 | Komponen | Layanan | Catatan |
 |---|---|---|
 | Aplikasi | Vercel, region Singapura (`vercel.json`) | Paket Hobby dilarang untuk pemakaian komersial menurut syarat Vercel; risikonya sudah dijelaskan dan diterima. Log runtime Hobby hanya 1 jam |
-| Database | Prisma Postgres, Singapura | Satu alamat koneksi langsung, dipakai untuk `DATABASE_URL` dan `DIRECT_URL` |
+| Database | Prisma Postgres, Singapura, proyek `safar-ops` di console.prisma.io | Satu alamat koneksi langsung (`db.prisma.io`), dipakai untuk `DATABASE_URL` dan `DIRECT_URL`. Paket Free: tanpa backup dan kuota operasi bulanan (bagian 4) |
 | Foto | Cloudflare R2, bucket privat | Gratis sampai 10 GB. Server memeriksa hak akses lalu meneruskan foto dari R2 ke browser. HP tidak pernah membuka domain R2, karena domain R2 diblokir ISP Indonesia |
 | Domain | hris.saefulaskar.com | SSL otomatis dari Vercel |
 
@@ -26,7 +26,7 @@ Diputuskan 19 November 2026: production pindah ke branch `main` dengan data send
 
 Urutan ini menjaga development tetap jalan selama perpindahan. Semua URL database dan kunci R2 diketik langsung di dasbor atau terminal sendiri, tidak dikirim lewat chat.
 
-1. **Database production.** Buat database Prisma Postgres baru di region Singapura (bagian 4). Simpan alamat koneksinya.
+1. **Database production.** Di console.prisma.io, buat database kedua `HRIS-Production` di proyek `safar-ops` (bagian 4). Simpan alamat koneksi langsungnya.
 2. **Migrasi database production** dari terminal sendiri. Database baru menerima ketiga migrasi:
    ```
    DIRECT_URL="<alamat database production>" pnpm db:deploy
@@ -47,11 +47,21 @@ Urutan ini menjaga development tetap jalan selama perpindahan. Semua URL databas
 3. Catat **Account ID**, **Access Key ID**, dan **Secret Access Key**. Secret hanya tampil sekali.
 4. Tidak perlu aturan CORS: unggahan lewat server aplikasi, dan foto dibuka lewat tautan biasa.
 
-## 4. Menyiapkan PostgreSQL
+## 4. Menyiapkan PostgreSQL (Prisma Postgres)
 
-1. Buat database dengan encoding UTF-8, region Singapura.
-2. Siapkan dua alamat koneksi: **pooled** untuk aplikasi (`DATABASE_URL`) dan **langsung** untuk migrasi (`DIRECT_URL`). Prisma Postgres memakai satu alamat langsung untuk keduanya.
-3. Jalankan migrasi dari komputer developer: `DIRECT_URL=... pnpm db:deploy`.
+Production dan development memakai dua database di proyek Prisma `safar-ops` yang sama (diputuskan 19 November 2026). Satu proyek Prisma boleh berisi banyak database; paket Free mengizinkan 50.
+
+1. Buka console.prisma.io, proyek `safar-ops`. Biarkan pilihan **Branch** tetap `main`. Branch di Prisma Console milik Prisma Compute (hosting aplikasi Prisma) dan tidak terhubung ke branch Git aplikasi; aplikasi ini di-host di Vercel, jadi deploy mana memakai database mana ditentukan oleh `DATABASE_URL` di Vercel. Menu **Git** di Prisma juga tidak perlu disambungkan.
+2. Klik **+** di sebelah DATABASES (Create Database), isi nama `HRIS-Production`, pilih region **Singapore**, lalu buat.
+3. Pilih database itu, klik **Connect to your database**, lalu **Generate new connection string**. Salin alamat **direct** (`postgres://...@db.prisma.io:5432/postgres?sslmode=require`), bukan yang pooled (`pooled.db.prisma.io`). Alamat ini dipakai untuk `DATABASE_URL` dan `DIRECT_URL`, sama seperti development.
+4. Jalankan migrasi dari komputer developer: `DIRECT_URL=... pnpm db:deploy`.
+
+Batas paket Free yang memengaruhi production:
+
+| Hal | Paket Free | Dampak |
+|---|---|---|
+| Backup | Tidak ada | Backup otomatis penyedia tidak tersedia; pakai `pg_dump` berkala (bagian 8) atau naikkan paket |
+| Kuota | 200.000 operasi per bulan | Jika habis, database berhenti menerima baca dan tulis sampai bulan berikutnya. Dokumentasi Prisma tidak menyebut apakah kuota dihitung per database atau per workspace; pantau di Dashboard masing-masing database |
 
 ## 5. Environment variable di Vercel
 
@@ -100,7 +110,7 @@ Untuk menguji setiap peran di aplikasi online tanpa akun Jubelio (CHANGELOG 23).
 
 | Hal | Rencana |
 |---|---|
-| Database | Backup otomatis dari penyedia, ditambah `pg_dump` mingguan database production yang disimpan di luar penyedia |
+| Database | Paket Free Prisma tidak punya backup otomatis. `pg_dump` database production minimal mingguan, disimpan di luar Prisma, sampai paketnya dinaikkan |
 | Foto | Foto tidak pernah diubah setelah diunggah. Salin bucket production berkala ke tempat lain (misalnya `rclone`) jika foto dianggap penting jangka panjang |
 | Error | Log runtime Hobby hanya 1 jam, jadi error bisa terlewat. Jika butuh jejak lebih panjang, pertimbangkan layanan pencatat error gratis |
 
@@ -110,7 +120,7 @@ Untuk menguji setiap peran di aplikasi online tanpa akun Jubelio (CHANGELOG 23).
 |---|---|---|
 | Vercel Hobby | Rp0 | Berhenti sampai 30 hari jika kuota habis; melanggar syarat bila pembuatnya dibayar. Production dan development berbagi kuota satu proyek. Foto ikut memakai kuota transfer: 1.000 kali buka foto per hari sekitar 5 GB per bulan |
 | Cloudflare R2 | Rp0 sampai 10 GB | Gratis 10 GB untuk semua bucket di akun. Foto sekitar 165 KB; dengan 50 foto per hari, 10 GB cukup sekitar 3 tahun. Di atas itu sekitar US$0,015 per GB-bulan; unduh gratis |
-| PostgreSQL | Tergantung paket Prisma Postgres | Dua database (production dan uji); data teks aplikasi ini kecil |
+| Prisma Postgres | Rp0 (Free) | Dua database di satu proyek. Free: 200.000 operasi per bulan dan tanpa backup; paket berbayar diperlukan jika kuota sering habis atau backup otomatis dibutuhkan |
 | Domain | Sudah dimiliki | Subdomain hris tidak menambah biaya |
 
 Biaya pengembangan (sekali bayar) tidak termasuk di dokumen ini dan dirinci terpisah oleh Velora.
