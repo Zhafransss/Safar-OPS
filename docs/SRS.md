@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Versi** | 1.1 (5 November 2026) |
-| **Aplikasi** | ops2.saefulaskar.com, nama tampilan HRIS (sebelumnya SAFAR OPS 2, CHANGELOG 29) |
+| **Aplikasi** | hris.saefulaskar.com (sebelumnya direncanakan ops2.saefulaskar.com, CHANGELOG 43), nama tampilan HRIS (sebelumnya SAFAR OPS 2, CHANGELOG 29) |
 | **Tim developer** | Velora |
 | **Pemilik keputusan** | Chaesar Syaefuddin (Direktur) |
 | **Dokumen terkait** | `docs/RTM.md`, `docs/DESIGN.md`, `docs/PLAN.md`, `CHANGELOG-penugasan.md`, `docs/02-navigasi-penugasan.md` |

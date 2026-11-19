@@ -1,6 +1,6 @@
 # HRIS
 
-Fitur Penugasan untuk ops2.saefulaskar.com. Acuan kebenaran ada di `docs/SRS.md`, `docs/RTM.md`, dan `CHANGELOG-penugasan.md`. Tampilan mengikuti `02-mockup-final-fitur-penugasan.html`.
+Fitur Penugasan untuk hris.saefulaskar.com (production, branch `main`). Acuan kebenaran ada di `docs/SRS.md`, `docs/RTM.md`, dan `CHANGELOG-penugasan.md`. Tampilan mengikuti `02-mockup-final-fitur-penugasan.html`.
 
 ## Menjalankan di lokal
 
