@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { BrandLockup } from "@/components/brand-lockup";
 import { Icon } from "@/components/icon";
 import type { IconName } from "@/components/icons";
 import { LoginForm } from "@/components/login-form";
@@ -24,7 +25,7 @@ export default async function LoginPage() {
   return (
     <div className="auth">
       <section className="auth-brand">
-        <div className="auth-logo">HRIS</div>
+        <BrandLockup large />
         <p className="auth-tag">Laporan dan penugasan tim Saeful Askar</p>
         <ul className="auth-points">
           {FEATURES.map((feature) => (
@@ -43,7 +44,7 @@ export default async function LoginPage() {
       <div className="auth-main">
         <div className="home-hd auth-phone-hd">
           <div>
-            <div className="h1">HRIS</div>
+            <BrandLockup />
             <div className="hi">Masuk untuk melanjutkan</div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { AvatarMenu } from "@/components/avatar-menu";
 import { BellButton } from "@/components/bell-button";
+import { BrandLockup } from "@/components/brand-lockup";
 import { Icon } from "@/components/icon";
 import type { IconName } from "@/components/icons";
 import { RoleLabel } from "@/components/role-label";
@@ -51,7 +52,7 @@ export default async function HomePage() {
     <>
       <div className="home-hd">
         <div>
-          <div className="h1">HRIS</div>
+          <BrandLockup />
           <div className="hi">Hi, {viewer.name}</div>
           <div className="hi" style={{ fontSize: 12 }}>
             <RoleLabel viewer={viewer} />

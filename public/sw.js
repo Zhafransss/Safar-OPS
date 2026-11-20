@@ -1,9 +1,16 @@
 // PWA option A: caches static files and the offline page only. User data and pages always
 // go to the network, so one account can never see another account's cached data (FR-PWA-02).
 // Bump the version when the precached offline page changes, so installed apps fetch it again.
-const CACHE = "ops2-static-v2";
+const CACHE = "ops2-static-v3";
 const OFFLINE_URL = "/offline";
-const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png"];
+// The offline page shows the logo lockup, so its images are precached with it (CHANGELOG 46).
+const PRECACHE = [
+  OFFLINE_URL,
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/brand/hr-mark.png",
+  "/brand/saeful-askar.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -53,8 +60,8 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(networkOrOffline(request));
     return;
   }
-  // Hashed build files never change, so cache-first is safe here and nowhere else.
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  // Hashed build files never change; icons and brand images change only with a CACHE bump above.
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/brand/")) {
     event.respondWith(cacheFirst(request));
   }
 });

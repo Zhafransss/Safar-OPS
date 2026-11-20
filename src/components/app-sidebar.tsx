@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AvatarMenu } from "@/components/avatar-menu";
+import { BrandLockup } from "@/components/brand-lockup";
 import { Icon } from "@/components/icon";
 import type { IconName } from "@/components/icons";
 import { RoleLabel } from "@/components/role-label";
@@ -58,8 +59,7 @@ export function AppSidebar({
   return (
     <aside className="sidebar" aria-label="Navigasi">
       <Link href="/" className="sb-brand">
-        <span className="sb-logo">HRIS</span>
-        <small>Laporan dan penugasan</small>
+        <BrandLockup />
       </Link>
       <nav className="sb-nav">
         {link({ href: "/", label: "Beranda", icon: "home", match: (path) => path === "/" })}

@@ -558,6 +558,77 @@ button.ava::after {
   display: none;
 }
 
+/* Logo lockup (CHANGELOG 46): the "HR" mark on a white tile, then HRIS over SAEFUL ASKAR. It sits on
+   the header orange, so the name and the subtitle image are white. */
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lockup-tile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.lockup-tile img {
+  display: block;
+  width: 32px;
+  height: auto;
+}
+
+.lockup-words {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lockup-name {
+  color: #ffffff;
+  font: 800 24px/1 var(--font);
+  letter-spacing: -0.02em;
+}
+
+/* The subtitle spans exactly the width of HRIS, as in the logo artwork: width 0 keeps the image's own
+   1:1 width out of the column size, min-width then stretches it to the column HRIS sets. */
+.lockup-sub {
+  display: block;
+  width: 0;
+  min-width: 100%;
+  height: auto;
+}
+
+.lockup-lg {
+  gap: 16px;
+}
+
+.lockup-lg .lockup-tile {
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+}
+
+.lockup-lg .lockup-tile img {
+  width: 56px;
+}
+
+.lockup-lg .lockup-name {
+  font-size: 46px;
+}
+
+.lockup-lg .lockup-words {
+  gap: 7px;
+}
+
+.home-hd .lockup {
+  margin-bottom: 10px;
+}
+
 /* Masuk (CHANGELOG 45): phones keep the Beranda header with the form card over its edge. */
 .auth,
 .auth-main {
@@ -611,11 +682,6 @@ button.ava::after {
     padding: 64px max(48px, 8%);
     background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
     color: #ffffff;
-  }
-
-  .auth-logo {
-    font: 800 56px/1 var(--font);
-    letter-spacing: -0.03em;
   }
 
   .auth-tag {
@@ -720,28 +786,14 @@ button.ava::after {
     background: var(--surface);
   }
 
+  /* The lockup subtitle is white, so the sidebar shows it on the header orange. */
   .sb-brand {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 4px 10px 18px;
-    text-decoration: none;
-  }
-
-  .sb-logo {
-    align-self: flex-start;
-    padding: 4px 10px;
-    border-radius: 8px;
+    display: block;
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 12px;
     background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
-    color: #ffffff;
-    font: 800 18px var(--font);
-    letter-spacing: -0.02em;
-  }
-
-  .sb-brand small {
-    margin-top: 6px;
-    font-size: 12px;
-    color: var(--muted);
+    text-decoration: none;
   }
 
   .sb-nav {

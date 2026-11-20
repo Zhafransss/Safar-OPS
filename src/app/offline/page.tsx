@@ -1,10 +1,12 @@
+import { BrandLockup } from "@/components/brand-lockup";
+
 // Precached by public/sw.js, so it must stay static and free of user data (FR-PWA-02).
 export default function OfflinePage() {
   return (
     <>
       <div className="home-hd">
         <div>
-          <div className="h1">HRIS</div>
+          <BrandLockup />
           <div className="hi">Anda sedang offline</div>
         </div>
       </div>
