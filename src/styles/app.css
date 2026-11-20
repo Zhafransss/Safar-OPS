@@ -595,11 +595,13 @@ button.ava::after {
   letter-spacing: -0.02em;
 }
 
-/* Sized by height so the letters stay readable; the width follows the artwork and runs past HRIS. */
+/* Plain text, spaced out in capitals like the logo's subtitle. */
 .lockup-sub {
-  display: block;
-  width: auto;
-  height: 10px;
+  color: #ffffff;
+  font: 600 10.5px/1 var(--font);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .lockup-lg {
@@ -625,7 +627,7 @@ button.ava::after {
 }
 
 .lockup-lg .lockup-sub {
-  height: 16px;
+  font-size: 16px;
 }
 
 .home-hd .lockup {
@@ -801,7 +803,7 @@ button.ava::after {
 
   /* A little smaller, so the subtitle fits the 240 px sidebar. */
   .sb-brand .lockup-sub {
-    height: 8.5px;
+    font-size: 9.5px;
   }
 
   .sb-nav {

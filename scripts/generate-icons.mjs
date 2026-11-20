@@ -1,4 +1,4 @@
-// Regenerates the PWA icons and the header brand marks from the official logo. Run with:
+// Regenerates the PWA icons and the header "HR" mark from the official logo. Run with:
 //   node scripts/generate-icons.mjs
 // Source: public/brand/logo.png, a full-bleed orange square with "HR" (white H, dark R) above
 // "SAEFUL ASKAR" in white. Every output is cut from it, so the letterforms always match the logo.
@@ -73,9 +73,7 @@ async function recolor(box, colorOfWhite, colorOfDark, pad) {
 fs.mkdirSync("public/brand", { recursive: true });
 // Header badge: "HR" on a white tile, so the white H becomes orange and the R stays dark.
 await (await recolor(markBox, ORANGE, DARK, 0)).toFile("public/brand/hr-mark.png");
-// Wordmark subtitle: "SAEFUL ASKAR" in white on the orange header.
-await (await recolor(textBox, WHITE, WHITE, 0)).toFile("public/brand/saeful-askar.png");
-console.log("wrote public/brand/hr-mark.png, public/brand/saeful-askar.png");
+console.log("wrote public/brand/hr-mark.png");
 
 // App icons. The installed icon is cropped tighter than the logo so "HR" fills it, like a phone icon.
 const content = {
