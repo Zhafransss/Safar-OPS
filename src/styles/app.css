@@ -585,7 +585,8 @@ button.ava::after {
 .lockup-words {
   display: inline-flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 5px;
 }
 
 .lockup-name {
@@ -594,13 +595,11 @@ button.ava::after {
   letter-spacing: -0.02em;
 }
 
-/* The subtitle spans exactly the width of HRIS, as in the logo artwork: width 0 keeps the image's own
-   1:1 width out of the column size, min-width then stretches it to the column HRIS sets. */
+/* Sized by height so the letters stay readable; the width follows the artwork and runs past HRIS. */
 .lockup-sub {
   display: block;
-  width: 0;
-  min-width: 100%;
-  height: auto;
+  width: auto;
+  height: 10px;
 }
 
 .lockup-lg {
@@ -622,7 +621,11 @@ button.ava::after {
 }
 
 .lockup-lg .lockup-words {
-  gap: 7px;
+  gap: 9px;
+}
+
+.lockup-lg .lockup-sub {
+  height: 16px;
 }
 
 .home-hd .lockup {
@@ -794,6 +797,11 @@ button.ava::after {
     border-radius: 12px;
     background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
     text-decoration: none;
+  }
+
+  /* A little smaller, so the subtitle fits the 240 px sidebar. */
+  .sb-brand .lockup-sub {
+    height: 8.5px;
   }
 
   .sb-nav {

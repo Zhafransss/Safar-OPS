@@ -6,6 +6,7 @@ import { NoZoom } from "@/components/no-zoom";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
 import { ScrollReset } from "@/components/scroll-reset";
 import { ToastProvider } from "@/components/toast";
+import { THEME_KEY } from "@/lib/theme";
 import { TrpcProvider } from "@/lib/trpc-client";
 import "@/styles/app.css";
 
@@ -34,9 +35,17 @@ export const viewport: Viewport = {
   themeColor: "#EE7A1F",
 };
 
+// CHANGELOG 47: a theme picked with ThemeToggle is applied before the first paint, so the page never
+// flashes the other theme. Without a pick, the CSS follows the device setting as before.
+const APPLY_SAVED_THEME = `try{var t=localStorage.getItem("${THEME_KEY}");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="id" className={inter.variable}>
+    // The saved-theme script sets data-theme before React hydrates, so the attribute may differ.
+    <html lang="id" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: APPLY_SAVED_THEME }} />
+      </head>
       <body>
         <TrpcProvider>
           <ToastProvider>

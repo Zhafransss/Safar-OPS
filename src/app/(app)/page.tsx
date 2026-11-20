@@ -8,6 +8,7 @@ import { BrandLockup } from "@/components/brand-lockup";
 import { Icon } from "@/components/icon";
 import type { IconName } from "@/components/icons";
 import { RoleLabel } from "@/components/role-label";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { formatFullDate, greeting } from "@/lib/date";
 import { getViewer, getWorkSummary } from "@/server/services/viewer";
 
@@ -59,6 +60,7 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="hd-row">
+          <ThemeToggle />
           <BellButton count={viewer.unreadNotifications} />
           <AvatarMenu initials={viewer.initials} name={viewer.name} />
         </div>
