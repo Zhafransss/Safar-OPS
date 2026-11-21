@@ -401,6 +401,96 @@ button.ava::after {
   cursor: pointer;
 }
 
+/* Lampiran (CHANGELOG 57): a file row in a message or waiting above the box. The two composer
+   buttons are a little narrower than the mockup's single camera button, to leave the box its width. */
+.composer .icbtn {
+  width: 38px;
+}
+
+.attach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.attach-pending {
+  margin: 0;
+  padding: 10px 12px 0;
+}
+
+.attach {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 280px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.attach-pending .attach {
+  max-width: none;
+}
+
+.attach-ico {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 38px;
+  color: var(--acc);
+}
+
+.attach-ico b {
+  position: absolute;
+  bottom: 3px;
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--acc);
+  color: #fff;
+  font: 800 7.5px/1.3 var(--font);
+  letter-spacing: 0.02em;
+}
+
+.attach-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.attach-name {
+  overflow: hidden;
+  font: 600 13px/1.3 var(--font);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attach-text small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.attach-rm {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--text);
+  cursor: pointer;
+}
+
 /* U-08: a long press drags the row, so it must not select text or open the iOS callout. */
 .todo.sortable {
   -webkit-user-select: none;

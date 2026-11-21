@@ -4,6 +4,13 @@ import { TRPCError } from "@trpc/server";
 
 import { isOwnerEmail } from "@/config/owners";
 import type { Prisma } from "@/generated/prisma/client";
+import {
+  attachmentExtension,
+  attachmentPartCount,
+  MAX_ATTACHMENT_BYTES,
+  MAX_ATTACHMENTS,
+  type AttachmentExtension,
+} from "@/lib/attachment-rules";
 import { formatDate, formatShortDate, relativeAge, reportPeriod } from "@/lib/date";
 import {
   canSeeReport,
@@ -24,7 +31,13 @@ import {
   type ReportStatus,
 } from "@/lib/report-rules";
 import { db } from "@/server/db";
-import { isOwnKey, photoExists } from "@/server/integrations/photo-storage";
+import {
+  attachmentPrefix,
+  attachmentStoredSize,
+  isOwnAttachmentPrefix,
+  isOwnKey,
+  photoExists,
+} from "@/server/integrations/photo-storage";
 import { loadInitialsResolver } from "@/server/services/names";
 import { notify } from "@/server/services/notifications";
 import { activeTaskWhere } from "@/server/services/task-scope";
@@ -147,6 +160,7 @@ export async function getReportDetail(number: string, user: CurrentUser) {
           sender: { select: { name: true } },
           reads: { select: { userId: true } },
           photos: { orderBy: { sortOrder: "asc" }, select: { id: true } },
+          attachments: { orderBy: { sortOrder: "asc" }, select: { id: true, fileName: true, sizeBytes: true } },
         },
       },
     },
@@ -208,6 +222,7 @@ export async function getReportDetail(number: string, user: CurrentUser) {
         body: message.body,
         date: formatShortDate(message.createdAt),
         photoIds: message.photos.map((photo) => photo.id),
+        attachments: message.attachments,
         receipt: receipt && {
           allRead: receipt.allRead,
           title: receipt.allRead
@@ -250,6 +265,36 @@ async function assertPhotoKeys(keys: readonly string[], userId: string): Promise
 }
 
 const photoRows = (keys: readonly string[]) => keys.map((blobPath, sortOrder) => ({ blobPath, sortOrder }));
+
+export type AttachmentInput = { uploadId: string; name: string; size: number };
+type AttachmentRow = {
+  fileName: string;
+  extension: AttachmentExtension;
+  sizeBytes: number;
+  blobPrefix: string;
+  partCount: number;
+  sortOrder: number;
+};
+
+// CHANGELOG 57: every part must be the sender's own upload, and together exactly the declared size.
+async function attachmentRows(inputs: readonly AttachmentInput[], userId: string): Promise<AttachmentRow[]> {
+  if (inputs.length > MAX_ATTACHMENTS) throw pngError("PNG-LAP-09");
+  return Promise.all(
+    inputs.map(async (input, sortOrder) => {
+      const fileName = input.name.trim();
+      const extension = attachmentExtension(fileName);
+      if (!extension) throw pngError("PNG-LAP-12", "BAD_REQUEST", { nama: fileName });
+      if (input.size > MAX_ATTACHMENT_BYTES) throw pngError("PNG-LAP-10", "BAD_REQUEST", { nama: fileName });
+      const blobPrefix = attachmentPrefix(userId, input.uploadId);
+      const partCount = attachmentPartCount(input.size);
+      const stored = isOwnAttachmentPrefix(blobPrefix, userId)
+        ? await attachmentStoredSize(blobPrefix, extension, partCount)
+        : null;
+      if (stored !== input.size) throw new TRPCError({ code: "BAD_REQUEST", message: "Lampiran tidak ditemukan." });
+      return { fileName, extension, sizeBytes: input.size, blobPrefix, partCount, sortOrder };
+    }),
+  );
+}
 
 function log(tx: Tx, reportId: string, actorId: string, text: string) {
   return tx.activityLog.create({ data: { entityType: "REPORT", entityId: reportId, actorId, text } });
@@ -408,16 +453,23 @@ export async function addReportCc(number: string, userId: string, user: CurrentU
 }
 
 export async function sendReportMessage(
-  input: { number: string; body: string; photoKeys: string[] },
+  input: { number: string; body: string; photoKeys: string[]; attachments: AttachmentInput[] },
   user: CurrentUser,
 ): Promise<void> {
   const body = input.body.trim();
-  if (!body && input.photoKeys.length === 0) throw pngError("PNG-LAP-08");
+  if (!body && input.photoKeys.length === 0 && input.attachments.length === 0) throw pngError("PNG-LAP-08");
   await assertPhotoKeys(input.photoKeys, user.id);
+  const attachments = await attachmentRows(input.attachments, user.id);
 
   await withReport(input.number, user, (a) => a.canChat, async (tx, report, parties) => {
     await tx.reportMessage.create({
-      data: { reportId: report.id, senderId: user.id, body, photos: { create: photoRows(input.photoKeys) } },
+      data: {
+        reportId: report.id,
+        senderId: user.id,
+        body,
+        photos: { create: photoRows(input.photoKeys) },
+        attachments: { create: attachments },
+      },
     });
     const text = `Pesan baru dari ${user.name} di ${input.number}`;
     for (const recipient of participantsOf(parties)) await notifyReport(tx, recipient, user.id, text, input.number);

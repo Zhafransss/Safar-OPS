@@ -1,4 +1,4 @@
-// Single source for error text (NFR-10). PRD section 13 plus CHANGELOG rows 4, 16, 19 and 37.
+// Single source for error text (NFR-10). PRD section 13 plus CHANGELOG rows 4, 16, 19, 37 and 57.
 // [n] and [nama] are placeholders filled by formatError.
 export const ERROR_CODES = {
   "PNG-AUT-01": "Email atau password salah.",
@@ -11,8 +11,11 @@ export const ERROR_CODES = {
   "PNG-LAP-05": "Tidak bisa melapor ke diri sendiri.",
   "PNG-LAP-06": "Maksimal 5 foto per pesan.",
   "PNG-LAP-07": "Alasan penolakan wajib diisi.",
-  "PNG-LAP-08": "Pesan kosong. Tulis pesan atau tambah foto.",
+  "PNG-LAP-08": "Pesan kosong. Tulis pesan, tambah foto, atau lampirkan file.",
+  "PNG-LAP-09": "Maksimal 5 lampiran per pesan.",
+  "PNG-LAP-10": "Lampiran \"[nama]\" lebih dari 5 MB.",
   "PNG-LAP-11": "Anda tidak punya akses ke laporan ini.",
+  "PNG-LAP-12": "Format \"[nama]\" tidak didukung. Gunakan PDF, Word, Excel, PowerPoint, CSV, atau Markdown.",
   "PNG-PRG-01": "Nama program belum diisi.",
   "PNG-PRG-02": "Pilih tim penanggung jawab.",
   "PNG-PRG-03": "Masih ada tugas yang belum selesai.",

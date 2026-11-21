@@ -14,6 +14,8 @@ import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
 import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-rules";
+import { ATTACHMENT_ACCEPT, attachmentExtension, formatFileSize } from "@/lib/attachment-rules";
+import { attachmentProblem, uploadAttachments } from "@/lib/attachment-upload";
 import { copyImage, copyImages, copyText, photoFiles } from "@/lib/clipboard";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
@@ -176,6 +178,15 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
       {!message.mine && <div className="who">{message.senderName}</div>}
       {message.body}
       {message.photoIds.length > 0 && <PhotoThumbs sources={message.photoIds.map(photoUrl)} />}
+      {message.attachments.length > 0 && (
+        <div className="attach-list">
+          {message.attachments.map((attachment) => (
+            <a key={attachment.id} className="attach" href={`/api/attachments/${attachment.id}`} download={attachment.fileName}>
+              <AttachmentLine name={attachment.fileName} size={attachment.sizeBytes} />
+            </a>
+          ))}
+        </div>
+      )}
       <div className="foot">
         {message.date}{" "}
         {receipt && (
@@ -193,6 +204,22 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
   );
 }
 
+// CHANGELOG 57: the file icon with its format, then the name and size.
+function AttachmentLine({ name, size }: { name: string; size: number }) {
+  return (
+    <>
+      <span className="attach-ico">
+        <Icon name="file" size={18} />
+        <b>{attachmentExtension(name)?.toUpperCase()}</b>
+      </span>
+      <span className="attach-text">
+        <span className="attach-name">{name}</span>
+        <small>{formatFileSize(size)}</small>
+      </span>
+    </>
+  );
+}
+
 // Mockup vLapDetail.
 export function ReportDetail({
   report,
@@ -205,12 +232,14 @@ export function ReportDetail({
 }) {
   const [messageText, setMessageText] = useState("");
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState<Dialog>(null);
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [sending, setSending] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const attachmentInput = useRef<HTMLInputElement>(null);
   const chatScroll = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
@@ -313,12 +342,29 @@ export function ReportDetail({
     }
   }
 
+  // CHANGELOG 57: picked files wait above the box like photos; the rules are checked per file.
+  function addAttachments(event: ChangeEvent<HTMLInputElement>) {
+    const files = [...(event.target.files ?? [])];
+    event.target.value = "";
+    let picked = [...attachments];
+    for (const file of files) {
+      const problem = attachmentProblem(file, picked.length);
+      if (problem) return setError(problem);
+      picked = [...picked, file];
+    }
+    setAttachments(picked);
+    setError("");
+  }
+
   async function send() {
-    if (!messageText.trim() && photos.length === 0) return setError(formatError("PNG-LAP-08"));
+    if (!messageText.trim() && photos.length === 0 && attachments.length === 0) {
+      return setError(formatError("PNG-LAP-08"));
+    }
     setSending(true);
     try {
-      const photoKeys = await uploadPhotos(photos);
-      await sendMessage.mutateAsync({ number, body: messageText, photoKeys });
+      const [photoKeys, uploaded] = await Promise.all([uploadPhotos(photos), uploadAttachments(attachments)]);
+      await sendMessage.mutateAsync({ number, body: messageText, photoKeys, attachments: uploaded });
+      setAttachments([]);
       setMessageText("");
       setPhotos([]);
       setError("");
@@ -467,11 +513,38 @@ export function ReportDetail({
               />
             </div>
           )}
+          {attachments.length > 0 && (
+            <div className="attach-list attach-pending">
+              {attachments.map((file, index) => (
+                <div key={`${file.name}-${index}`} className="attach">
+                  <AttachmentLine name={file.name} size={file.size} />
+                  <button
+                    className="attach-rm"
+                    onClick={() => setAttachments((current) => current.filter((_, position) => position !== index))}
+                    aria-label={`Hapus lampiran ${file.name}`}
+                  >
+                    <Icon name="x" size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="composer">
             <button className="icbtn" onClick={() => fileInput.current?.click()} aria-label="Tambah foto">
-              <Icon name="cam" />
+              <Icon name="cam" size={18} />
+            </button>
+            <button className="icbtn" onClick={() => attachmentInput.current?.click()} aria-label="Lampirkan file">
+              <Icon name="paperclip" size={18} />
             </button>
             <input ref={fileInput} type="file" accept="image/*" multiple hidden onChange={addPhotos} />
+            <input
+              ref={attachmentInput}
+              type="file"
+              accept={ATTACHMENT_ACCEPT}
+              multiple
+              hidden
+              onChange={addAttachments}
+            />
             <textarea
               id="msgIn"
               placeholder="Tulis pesan"

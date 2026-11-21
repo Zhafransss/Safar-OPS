@@ -170,10 +170,11 @@ model ReportMessage {
   isSystem  Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  report Report              @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  sender User?               @relation(fields: [senderId], references: [id])
-  reads  ReportMessageRead[]
-  photos Photo[]
+  report      Report              @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sender      User?               @relation(fields: [senderId], references: [id])
+  reads       ReportMessageRead[]
+  photos      Photo[]
+  attachments Attachment[]
 
   @@index([reportId, createdAt])
 }
@@ -201,6 +202,23 @@ model Photo {
   message ReportMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([reportId])
+  @@index([messageId])
+}
+
+// CHANGELOG 57: a document sent in the report chat. Uploads go through the app in parts under the
+// Vercel request limit, stored as <blobPrefix>/<index>.<extension>; downloads join them again.
+model Attachment {
+  id         String @id @default(cuid())
+  messageId  String
+  fileName   String
+  extension  String
+  sizeBytes  Int
+  blobPrefix String
+  partCount  Int
+  sortOrder  Int    @default(0)
+
+  message ReportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
   @@index([messageId])
 }
 

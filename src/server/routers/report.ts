@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { MAX_ATTACHMENTS } from "@/lib/attachment-rules";
 import { MAX_PHOTOS } from "@/lib/report-rules";
 import {
   addReportCc,
@@ -20,6 +21,10 @@ const typeEnum = z.enum(["CASE_FINDING", "REQUEST", "QUESTION", "GENERAL"]);
 const number = z.string().max(20);
 // One above the limit so the rule reports PNG-LAP-06 instead of a generic validation error.
 const photoKeys = z.array(z.string().max(200)).max(MAX_PHOTOS + 1);
+// Same idea for PNG-LAP-09. Size and format are checked by the rule, so it can name the file.
+const attachments = z
+  .array(z.object({ uploadId: z.string().max(40), name: z.string().min(1).max(200), size: z.number().int().positive() }))
+  .max(MAX_ATTACHMENTS + 1);
 
 export const reportRouter = router({
   list: protectedProcedure
@@ -67,7 +72,7 @@ export const reportRouter = router({
     .mutation(({ input, ctx }) => addReportCc(input.number, input.userId, ctx.user)),
 
   sendMessage: protectedProcedure
-    .input(z.object({ number, body: z.string().max(5000), photoKeys }))
+    .input(z.object({ number, body: z.string().max(5000), photoKeys, attachments: attachments.default([]) }))
     .mutation(({ input, ctx }) => sendReportMessage(input, ctx.user)),
 
   markOpened: protectedProcedure
