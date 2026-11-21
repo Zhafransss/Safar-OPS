@@ -43,12 +43,16 @@ function rolesOf(userId: string, teams: readonly LoadedTeam[]): TeamRole[] {
 }
 
 // Owner emails are known up front, so they are listed and selectable before their first login.
-// Their name is a placeholder until that login brings Jubelio's name (U-01).
+// Their name is a placeholder until that login brings Jubelio's name (U-01). A fixed owner name
+// also replaces whatever an earlier version stored, without waiting for a login (CHANGELOG 49).
 async function ensureOwnerUsers() {
   await db.user.createMany({
     data: OWNERS.map((owner) => ({ email: owner.email, name: placeholderName(owner) })),
     skipDuplicates: true,
   });
+  for (const { email, name } of OWNERS) {
+    if (name) await db.user.updateMany({ where: { email, NOT: { name } }, data: { name } });
+  }
 }
 
 export async function getTeamChart() {

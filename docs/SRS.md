@@ -76,7 +76,7 @@ Ukuran di bawah adalah **usulan** karena PRD tidak menetapkan angka selain kelul
 | Staff | Minimal 1 per tim, boleh di beberapa tim | Pemetaan tim |
 | Pengguna tanpa tim | Pengguna Jubelio yang belum dipetakan | Bisa membuat dan menerima Laporan |
 
-Email pemilik: `sesar040301@gmail.com`, `wahyudinst@gmail.com`, `nasurohazzam@gmail.com`, `saefulaskarcompany@gmail.com`.
+Email pemilik: `wahyudinst@gmail.com`, `nasurohazzam@gmail.com`, `saefulaskarcompany@gmail.com`. (`sesar040301@gmail.com` bukan pemilik lagi sejak 21 November 2026, CHANGELOG 50.)
 
 ### 1.6 Batasan
 

@@ -9,11 +9,21 @@ describe("registerUserAtLogin (U-01)", () => {
   beforeEach(() => upsert.mockClear());
 
   it("stores and refreshes the Jubelio name, owners included", async () => {
+    await registerUserAtLogin(" WahyudinST@gmail.com ", "Wahyudin ST");
+    expect(upsert).toHaveBeenCalledWith({
+      where: { email: "wahyudinst@gmail.com" },
+      create: { email: "wahyudinst@gmail.com", name: "Wahyudin ST" },
+      update: { isActive: true, name: "Wahyudin ST" },
+    });
+  });
+
+  // CHANGELOG 49.
+  it("keeps a fixed owner name over the Jubelio name", async () => {
     await registerUserAtLogin(" SaefulAskarCompany@gmail.com ", "Saeful Askar");
     expect(upsert).toHaveBeenCalledWith({
       where: { email: "saefulaskarcompany@gmail.com" },
-      create: { email: "saefulaskarcompany@gmail.com", name: "Saeful Askar" },
-      update: { isActive: true, name: "Saeful Askar" },
+      create: { email: "saefulaskarcompany@gmail.com", name: "Chaesar Syaefuddin" },
+      update: { isActive: true, name: "Chaesar Syaefuddin" },
     });
   });
 

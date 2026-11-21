@@ -22,7 +22,7 @@ describe("developer owner", () => {
   it("does not exist in production", async () => {
     const owners = await loadWith("production");
     expect(owners.isOwnerEmail("developer@safar.local")).toBe(false);
-    expect(owners.OWNERS).toHaveLength(4);
+    expect(owners.OWNERS).toHaveLength(3);
   });
 });
 
@@ -43,24 +43,32 @@ describe("local test owners (CHANGELOG no. 23)", () => {
       ]),
     );
     const owners = await import("@/config/owners");
-    expect(owners.OWNERS).toHaveLength(5);
+    expect(owners.OWNERS).toHaveLength(4);
     expect(owners.findOwner("owner@velora.com")?.name).toBe("Owner Uji");
     expect(owners.isOwnerEmail("leader@velora.com")).toBe(false);
   });
 });
 
 describe("owners (K-T72)", () => {
-  it("has exactly four accounts", () => {
-    expect(OWNERS).toHaveLength(4);
+  it("has exactly three accounts", () => {
+    expect(OWNERS).toHaveLength(3);
+  });
+
+  // CHANGELOG 50.
+  it("no longer lists sesar040301@gmail.com", () => {
+    expect(isOwnerEmail("sesar040301@gmail.com")).toBe(false);
   });
 
   it.each(OWNERS.map((owner) => [owner.email]))("recognizes %s", (email) => {
     expect(isOwnerEmail(email)).toBe(true);
   });
 
-  // U-01: owners are known by email; their names come from Jubelio at login.
-  it("writes no owner name in code", () => {
-    expect(OWNERS.every((owner) => owner.name === undefined)).toBe(true);
+  // U-01: owners are known by email; their names come from Jubelio at login. CHANGELOG 49 fixes
+  // one name in code.
+  it("fixes only the saefulaskarcompany name", () => {
+    expect(OWNERS.filter((owner) => owner.name !== undefined)).toEqual([
+      { email: "saefulaskarcompany@gmail.com", name: "Chaesar Syaefuddin" },
+    ]);
   });
 
   it("ignores case and surrounding spaces", () => {
@@ -74,7 +82,7 @@ describe("owners (K-T72)", () => {
 
 describe("placeholderName (U-01)", () => {
   it("uses the email local part until the first login", () => {
-    expect(placeholderName({ email: "saefulaskarcompany@gmail.com" })).toBe("saefulaskarcompany");
+    expect(placeholderName({ email: "wahyudinst@gmail.com" })).toBe("wahyudinst");
   });
 
   it("keeps a name set for accounts that never reach Jubelio", () => {
