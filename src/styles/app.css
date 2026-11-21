@@ -292,6 +292,8 @@ button.ava::after {
 .msg-copy {
   display: none;
   position: absolute;
+  /* Above the hover strip (.msg.copyable::after) that covers the gap and the button's spot. */
+  z-index: 1;
   top: 50%;
   right: -36px;
   place-items: center;
@@ -318,6 +320,22 @@ button.ava::after {
   .msg.copyable:hover .msg-copy,
   .msg-copy:focus-visible {
     display: grid;
+  }
+
+  /* An invisible strip over the gap to the button, as tall as the bubble, so the pointer stays on
+     the bubble on its way to the button and the button does not vanish. */
+  .msg.copyable::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 40px;
+  }
+
+  .msg.copyable.me::after {
+    left: auto;
+    right: 100%;
   }
 }
 

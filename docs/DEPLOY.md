@@ -1,6 +1,6 @@
 # Rencana Deploy — HRIS
 
-Versi 1.1, 19 November 2026 (versi 1.0: 5 November 2026). Keputusan hosting (SRS A-04): aplikasi di **Vercel**, data di **PostgreSQL** (Prisma Postgres), foto di **Cloudflare R2**.
+Versi 1.2, 22 November 2026 (versi 1.1: 19 November 2026; versi 1.0: 5 November 2026). Keputusan hosting (SRS A-04): aplikasi di **Vercel**, data di **PostgreSQL** (Prisma Postgres), foto di **Cloudflare R2**.
 
 ## 1. Susunan lingkungan
 
@@ -19,7 +19,7 @@ Diputuskan 19 November 2026: production pindah ke branch `main` dengan data send
 | Komponen | Layanan | Catatan |
 |---|---|---|
 | Aplikasi | Vercel, region Singapura (`vercel.json`) | Paket Hobby dilarang untuk pemakaian komersial menurut syarat Vercel; risikonya sudah dijelaskan dan diterima. Log runtime Hobby hanya 1 jam |
-| Database | Prisma Postgres, Singapura, proyek `safar-ops` di console.prisma.io | Satu alamat koneksi langsung (`db.prisma.io`), dipakai untuk `DATABASE_URL` dan `DIRECT_URL`. Paket Free: tanpa backup dan kuota operasi bulanan (bagian 4) |
+| Database | Prisma Postgres, Singapura, proyek `safar-ops` di console.prisma.io | Dua alamat per database: **pooled** (`pooled.db.prisma.io`) untuk `DATABASE_URL` yang dipakai aplikasi, dan **direct** (`db.prisma.io`) untuk `DIRECT_URL` yang dipakai migrasi (sejak v1.2, CHANGELOG 53). Paket Free: tanpa backup, kuota operasi bulanan, dan batas koneksi (bagian 4) |
 | Foto | Cloudflare R2, bucket privat | Gratis sampai 10 GB. Server memeriksa hak akses lalu meneruskan foto dari R2 ke browser. HP tidak pernah membuka domain R2, karena domain R2 diblokir ISP Indonesia |
 | Domain | hris.saefulaskar.com | SSL otomatis dari Vercel |
 
@@ -55,7 +55,8 @@ Production dan development memakai dua database di proyek Prisma `safar-ops` yan
 
 1. Buka console.prisma.io, proyek `safar-ops`. Biarkan pilihan **Branch** tetap `main`. Branch di Prisma Console milik Prisma Compute (hosting aplikasi Prisma) dan tidak terhubung ke branch Git aplikasi; aplikasi ini di-host di Vercel, jadi deploy mana memakai database mana ditentukan oleh `DATABASE_URL` di Vercel. Menu **Git** di Prisma juga tidak perlu disambungkan.
 2. Klik **+** di sebelah DATABASES (Create Database), isi nama `HRIS-Production`, pilih region **Singapore**, lalu buat.
-3. Pilih database itu, klik **Connect to your database**, lalu **Generate new connection string**. Salin alamat **direct** (`postgres://...@db.prisma.io:5432/postgres?sslmode=require`), bukan yang pooled (`pooled.db.prisma.io`). Alamat ini dipakai untuk `DATABASE_URL` dan `DIRECT_URL`, sama seperti development.
+3. Pilih database itu, klik **Connect to your database**, lalu **Generate new connection string**. Salin dua alamat: **pooled** (`postgres://...@pooled.db.prisma.io:5432/postgres?sslmode=require`) untuk `DATABASE_URL`, dan **direct** (`postgres://...@db.prisma.io:5432/postgres?sslmode=require`) untuk `DIRECT_URL`. Sama seperti development.
+   - Sampai v1.1 kedua variabel memakai alamat direct. Di Vercel itu menimbulkan error `Too many database connections opened` (22 November 2026): paket Free hanya memberi 10 koneksi direct, 5 di antaranya dipakai Prisma sendiri, sedangkan setiap instance Vercel membuka koneksinya sendiri. Lewat alamat pooled, koneksi aplikasi dibagi oleh PgBouncer Prisma.
 4. Jalankan migrasi dari komputer developer: `DIRECT_URL=... pnpm db:deploy`.
 
 Batas paket Free yang memengaruhi production:
@@ -63,6 +64,7 @@ Batas paket Free yang memengaruhi production:
 | Hal | Paket Free | Dampak |
 |---|---|---|
 | Backup | Tidak ada | Backup otomatis penyedia tidak tersedia; pakai `pg_dump` berkala (bagian 8) atau naikkan paket |
+| Koneksi | 10 pooled dan 10 direct (5 direct dipakai Prisma) | Aplikasi memakai alamat pooled, paling banyak 5 koneksi per instance Vercel, dan menutup koneksi yang menganggur 5 detik (`src/server/db.ts`). Migrasi, Prisma Studio, dan `pg_dump` memakai alamat direct |
 | Kuota | 200.000 operasi per bulan | Jika habis, database berhenti menerima baca dan tulis sampai bulan berikutnya. Dokumentasi Prisma tidak menyebut apakah kuota dihitung per database atau per workspace; pantau di Dashboard masing-masing database |
 
 ## 5. Environment variable di Vercel
@@ -71,8 +73,8 @@ Setiap proyek hanya memakai scope **Production** (Preview dan Development tidak 
 
 | Variabel | Proyek production | Proyek development (`safarops`) |
 |---|---|---|
-| `DATABASE_URL` | `HRIS-Production` | `SafarOps` |
-| `DIRECT_URL` | `HRIS-Production` | `SafarOps` |
+| `DATABASE_URL` | `HRIS-Production`, alamat **pooled** | `SafarOps`, alamat **pooled** |
+| `DIRECT_URL` | `HRIS-Production`, alamat direct | `SafarOps`, alamat direct |
 | `R2_ACCOUNT_ID` | Akun Cloudflare | Sama |
 | `R2_ACCESS_KEY_ID` | Token bucket `hris-production` | Token bucket `safarops` |
 | `R2_SECRET_ACCESS_KEY` | Token bucket `hris-production` | Token bucket `safarops` |
