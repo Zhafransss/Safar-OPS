@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type Cl
 
 import { AttachmentSheet, opensInSheet } from "@/components/attachment-sheet";
 import { ComposerAddMenu } from "@/components/composer-add-menu";
+import { EmojiPicker } from "@/components/emoji-picker";
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
 import { PhotoThumbs, photoUrl } from "@/components/photo-thumbs";
@@ -28,6 +29,8 @@ type Dialog = "reject" | "finish" | "forward" | "cc" | null;
 const POLL_MS = 10_000;
 // Within this distance of the end, the user counts as reading the newest messages.
 const NEAR_BOTTOM_PX = 80;
+// CHANGELOG 60: the message box grows with its text up to this height (the mockup's max-height).
+const MESSAGE_BOX_MAX_PX = 110;
 // CHANGELOG 51: holding a message this long on a phone opens its Salin menu, unless the finger moves.
 // With a mouse, the button beside the message opens the same menu (CHANGELOG 54).
 const LONG_PRESS_MS = 450;
@@ -266,6 +269,11 @@ export function ReportDetail({
   const [reason, setReason] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [sending, setSending] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const messageBox = useRef<HTMLTextAreaElement>(null);
+  // Where an emoji goes: the caret as last seen, kept while the box is not focused.
+  const caret = useRef<[number, number] | null>(null);
+  const emojiArea = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const cameraInput = useRef<HTMLInputElement>(null);
   const attachmentInput = useRef<HTMLInputElement>(null);
@@ -301,6 +309,58 @@ export function ReportDetail({
   // Mockup render: a report opens at the newest message. New messages and a growing composer keep it
   // there, unless the user scrolled up to read older messages.
   const stickToBottom = useRef(true);
+
+  // One line high at rest, like the + and send buttons; longer text makes the box taller. A new
+  // width wraps the text differently, so a resize or rotation measures again.
+  useLayoutEffect(() => {
+    const fit = () => {
+      const box = messageBox.current;
+      if (!box) return;
+      box.style.height = "auto";
+      const border = box.offsetHeight - box.clientHeight;
+      box.style.height = `${Math.min(box.scrollHeight + border, MESSAGE_BOX_MAX_PX)}px`;
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [messageText]);
+
+  // The emoji panel closes on a touch outside it and its button, or on Escape.
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const outside = (event: Event) => {
+      if (!emojiArea.current?.contains(event.target as Node)) setEmojiOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => event.key === "Escape" && setEmojiOpen(false);
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [emojiOpen]);
+
+  function rememberCaret() {
+    const box = messageBox.current;
+    if (box) caret.current = [box.selectionStart, box.selectionEnd];
+  }
+
+  // The panel stays open for more emoji. With a mouse the caret returns to the box; on a phone the
+  // box is left unfocused so the keyboard does not cover the panel.
+  function insertEmoji(emoji: string) {
+    const length = messageText.length;
+    const start = Math.min(caret.current?.[0] ?? length, length);
+    const end = Math.min(caret.current?.[1] ?? length, length);
+    setMessageText(messageText.slice(0, start) + emoji + messageText.slice(end));
+    const after = start + emoji.length;
+    caret.current = [after, after];
+    if (window.matchMedia("(pointer: fine)").matches) {
+      requestAnimationFrame(() => {
+        messageBox.current?.focus();
+        messageBox.current?.setSelectionRange(after, after);
+      });
+    }
+  }
   useEffect(() => {
     if (!stickToBottom.current) return;
     const frame = requestAnimationFrame(() => {
@@ -395,6 +455,7 @@ export function ReportDetail({
       await sendMessage.mutateAsync({ number, body: messageText, photoKeys, attachments: uploaded });
       setAttachments([]);
       setMessageText("");
+      caret.current = null;
       setPhotos([]);
       setError("");
       stickToBottom.current = true;
@@ -574,13 +635,33 @@ export function ReportDetail({
               hidden
               onChange={addAttachments}
             />
-            <textarea
-              id="msgIn"
-              placeholder="Tulis pesan"
-              value={messageText}
-              onChange={(event) => setMessageText(event.target.value)}
-              onPaste={pastePhotos}
-            />
+            <div className="msg-box" ref={emojiArea}>
+              {emojiOpen && <EmojiPicker onPick={insertEmoji} />}
+              <textarea
+                ref={messageBox}
+                id="msgIn"
+                rows={1}
+                placeholder="Tulis pesan"
+                value={messageText}
+                onChange={(event) => {
+                  setMessageText(event.target.value);
+                  rememberCaret();
+                }}
+                onSelect={rememberCaret}
+                onBlur={rememberCaret}
+                // On a phone the keyboard takes the panel's place, as in WhatsApp.
+                onFocus={() => window.matchMedia("(pointer: coarse)").matches && setEmojiOpen(false)}
+                onPaste={pastePhotos}
+              />
+              <button
+                className={`emoji-btn ${emojiOpen ? "is-open" : ""}`}
+                onClick={() => setEmojiOpen((open) => !open)}
+                aria-label={emojiOpen ? "Tutup emoji" : "Pilih emoji"}
+                aria-expanded={emojiOpen}
+              >
+                <Icon name="smile" size={20} />
+              </button>
+            </div>
             <button className="send" onClick={send} disabled={sending} aria-label="Kirim">
               <Icon name="send" size={18} />
             </button>

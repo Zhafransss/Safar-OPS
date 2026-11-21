@@ -106,7 +106,7 @@ a.tcard {
 }
 
 .dock .composer {
-  position: static;
+  position: relative;
   border-top: 0;
 }
 
@@ -554,6 +554,101 @@ button.ava::after {
   border-radius: 50%;
   background: var(--accbg);
   color: var(--acc);
+}
+
+/* Kolom pesan (CHANGELOG 60): a pill one line high, the same 42 px as the + and send buttons, with
+   the emoji button inside on the right. The emoji panel spans the composer above it. */
+.msg-box {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.composer .msg-box textarea {
+  min-height: 42px;
+  padding: 10px 44px 10px 16px;
+  border-radius: 21px;
+  line-height: 20px;
+  overflow-y: auto;
+}
+
+.emoji-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.emoji-btn.is-open {
+  color: var(--acc);
+}
+
+/* Lined up with the composer's right edge: past the send button (42 px) and the gap (8 px). */
+.emoji-panel {
+  position: absolute;
+  right: -50px;
+  bottom: calc(100% + 10px);
+  z-index: 5;
+  width: min(340px, calc(100vw - 24px));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--sh);
+  overflow: hidden;
+}
+
+.emoji-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 8px 0;
+  overflow-x: auto;
+}
+
+.emoji-tabs button {
+  flex: none;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: 600 12px/1 var(--font);
+  cursor: pointer;
+}
+
+.emoji-tabs button.is-on {
+  background: var(--accbg);
+  color: var(--acc);
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  max-height: 210px;
+  padding: 6px 8px 8px;
+  overflow-y: auto;
+}
+
+.emoji-grid button {
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.emoji-grid button:hover {
+  background: var(--surface2);
 }
 
 /* U-08: a long press drags the row, so it must not select text or open the iOS callout. */
