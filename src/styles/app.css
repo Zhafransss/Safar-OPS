@@ -282,6 +282,81 @@ button.ava::after {
   text-align: center;
 }
 
+/* Salin pesan (CHANGELOG 51). With a mouse, a copy button shows beside the hovered bubble; on a
+   phone, a long press opens the Salin menu above it, so the bubble does not also start the system
+   text selection there. */
+.msg.copyable {
+  position: relative;
+}
+
+.msg-copy {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: -36px;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-top: -14px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.msg.me .msg-copy {
+  right: auto;
+  left: -36px;
+}
+
+.msg-copy:hover {
+  color: var(--acc);
+}
+
+@media (hover: hover) {
+  .msg.copyable:hover .msg-copy,
+  .msg-copy:focus-visible {
+    display: grid;
+  }
+}
+
+@media (hover: none) {
+  .msg.copyable {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+.msg-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--sh);
+}
+
+.msg.me .msg-menu {
+  left: auto;
+  right: 0;
+}
+
+.msg-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: 600 14px/1 var(--font);
+  cursor: pointer;
+}
+
 /* U-08: a long press drags the row, so it must not select text or open the iOS callout. */
 .todo.sortable {
   -webkit-user-select: none;

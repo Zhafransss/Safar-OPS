@@ -42,6 +42,7 @@ export const ICONS = {
   "flag": "<path d=\"M5 21V4h11l-2 4 2 4H5\"/>",
   "tpl": "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><path d=\"M8 8h8M8 12h8M8 16h5\"/>",
   "grip": "<circle cx=\"9\" cy=\"6\" r=\"1.3\"/><circle cx=\"15\" cy=\"6\" r=\"1.3\"/><circle cx=\"9\" cy=\"12\" r=\"1.3\"/><circle cx=\"15\" cy=\"12\" r=\"1.3\"/><circle cx=\"9\" cy=\"18\" r=\"1.3\"/><circle cx=\"15\" cy=\"18\" r=\"1.3\"/>",
+  "copy": "<rect x=\"9\" y=\"9\" width=\"11\" height=\"11\" rx=\"2\"/><path d=\"M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1\"/>",
   "moon": "<path d=\"M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z\"/>",
   "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4\"/>",
   "home": "<path d=\"M3 11l9-8 9 8\"/><path d=\"M5 10v10h5v-6h4v6h5V10\"/>",

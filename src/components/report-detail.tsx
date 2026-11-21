@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
 
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
@@ -14,6 +14,7 @@ import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
 import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-rules";
+import { copyText } from "@/lib/copy-text";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
 import type { PickerUser } from "@/server/services/team";
@@ -23,8 +24,49 @@ type Dialog = "reject" | "finish" | "forward" | "cc" | null;
 const POLL_MS = 10_000;
 // Within this distance of the end, the user counts as reading the newest messages.
 const NEAR_BOTTOM_PX = 80;
+// CHANGELOG 51: holding a message this long on a phone opens its Salin menu, unless the finger moves.
+const LONG_PRESS_MS = 450;
+const LONG_PRESS_SLOP_PX = 10;
 
 function Message({ message }: { message: ReportDetailData["messages"][number] }) {
+  const toast = useToast();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const press = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | null>(null);
+  const lastTouch = useRef(false);
+  const bubble = useRef<HTMLDivElement>(null);
+
+  // The menu closes on any touch outside the bubble.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: Event) => {
+      if (!bubble.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [menuOpen]);
+
+  function cancelPress() {
+    if (press.current) clearTimeout(press.current.timer);
+    press.current = null;
+  }
+
+  function startPress(event: PointerEvent) {
+    lastTouch.current = event.pointerType === "touch";
+    if (!lastTouch.current) return;
+    cancelPress();
+    press.current = { timer: setTimeout(() => setMenuOpen(true), LONG_PRESS_MS), x: event.clientX, y: event.clientY };
+  }
+
+  function movePress(event: PointerEvent) {
+    const start = press.current;
+    if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > LONG_PRESS_SLOP_PX) cancelPress();
+  }
+
+  async function copy() {
+    setMenuOpen(false);
+    toast((await copyText(message.body)) ? "Pesan disalin" : "Pesan tidak bisa disalin");
+  }
+
   if (message.isSystem) {
     return (
       <div className="sysmsg">
@@ -33,8 +75,31 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
     );
   }
   const { receipt } = message;
+  const canCopy = message.body.trim() !== "";
   return (
-    <div className={`msg ${message.mine ? "me" : ""}`}>
+    <div
+      ref={bubble}
+      className={`msg ${message.mine ? "me" : ""} ${canCopy ? "copyable" : ""}`}
+      onPointerDown={canCopy ? startPress : undefined}
+      onPointerMove={canCopy ? movePress : undefined}
+      onPointerUp={cancelPress}
+      onPointerCancel={cancelPress}
+      // Android opens its own menu on a long press; the Salin menu takes its place.
+      onContextMenu={canCopy ? (event) => lastTouch.current && event.preventDefault() : undefined}
+    >
+      {canCopy && (
+        <button className="msg-copy" onClick={copy} aria-label="Salin pesan" title="Salin pesan">
+          <Icon name="copy" size={15} />
+        </button>
+      )}
+      {menuOpen && (
+        <div className="msg-menu" role="menu">
+          <button role="menuitem" onClick={copy}>
+            <Icon name="copy" size={16} />
+            Salin
+          </button>
+        </div>
+      )}
       {!message.mine && <div className="who">{message.senderName}</div>}
       {message.body}
       {message.photoIds.length > 0 && <PhotoThumbs sources={message.photoIds.map(photoUrl)} />}
@@ -151,6 +216,20 @@ export function ReportDetail({
   async function addPhotos(event: ChangeEvent<HTMLInputElement>) {
     const files = [...(event.target.files ?? [])];
     event.target.value = "";
+    await addFiles(files);
+  }
+
+  // CHANGELOG 51: an image pasted into the message box joins the photos to send, like one picked
+  // with the camera button. Pasted text still goes into the box as usual.
+  async function pastePhotos(event: ClipboardEvent<HTMLTextAreaElement>) {
+    const images = [...event.clipboardData.files].filter((file) => file.type.startsWith("image/"));
+    if (images.length === 0) return;
+    if (!event.clipboardData.getData("text/plain")) event.preventDefault();
+    await addFiles(images);
+  }
+
+  async function addFiles(files: File[]) {
+    if (files.length === 0) return;
     if (photos.length + files.length > MAX_PHOTOS) return setError(formatError("PNG-LAP-06"));
     try {
       const prepared = await Promise.all(files.map(preparePhoto));
@@ -325,6 +404,7 @@ export function ReportDetail({
               placeholder="Tulis pesan"
               value={messageText}
               onChange={(event) => setMessageText(event.target.value)}
+              onPaste={pastePhotos}
             />
             <button className="send" onClick={send} disabled={sending} aria-label="Kirim">
               <Icon name="send" size={18} />
