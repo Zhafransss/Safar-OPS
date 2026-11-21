@@ -433,7 +433,8 @@ button.ava::after {
   text-decoration: none;
 }
 
-.attach-pending .attach {
+.attach-pending .attach,
+.attach-sheet {
   max-width: none;
 }
 

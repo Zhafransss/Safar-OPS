@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
 
+import { AttachmentSheet, opensInSheet } from "@/components/attachment-sheet";
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
 import { PhotoThumbs, photoUrl } from "@/components/photo-thumbs";
@@ -35,6 +36,9 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
   const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuBelow, setMenuBelow] = useState(false);
+  const [openAttachment, setOpenAttachment] = useState<ReportDetailData["messages"][number]["attachments"][number] | null>(
+    null,
+  );
   const press = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | null>(null);
   const lastTouch = useRef(false);
   const longPressed = useRef(false);
@@ -124,83 +128,106 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
   const photoCount = message.photoIds.length;
   const canCopy = hasText || photoCount > 0;
   return (
-    <div
-      ref={bubble}
-      className={`msg ${message.mine ? "me" : ""} ${canCopy ? "copyable" : ""} ${menuOpen ? "menu-open" : ""}`}
-      onPointerDown={canCopy ? startPress : undefined}
-      onPointerMove={canCopy ? movePress : undefined}
-      onPointerUp={cancelPress}
-      onPointerCancel={cancelPress}
-      // Android opens its own menu on a long press; the Salin menu takes its place.
-      onContextMenu={canCopy ? (event) => lastTouch.current && event.preventDefault() : undefined}
-      // Lifting the finger after a long press is not a tap: it must not also open a photo.
-      onClickCapture={(event) => {
-        if (!longPressed.current) return;
-        longPressed.current = false;
-        event.preventDefault();
-        event.stopPropagation();
-      }}
-    >
-      {canCopy && (
-        <button
-          className="msg-copy"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-label="Salin"
-          aria-haspopup="menu"
-          aria-expanded={menuOpen}
-          title="Salin"
-        >
-          <Icon name="copy" size={15} />
-        </button>
-      )}
-      {menuOpen && (
-        <div className={`msg-menu ${menuBelow ? "below" : ""}`} role="menu">
-          {hasText && (
-            <button role="menuitem" onClick={copyBody}>
-              <Icon name="copy" size={16} />
-              Salin teks
-            </button>
-          )}
-          {photoCount > 1 && (
-            <button role="menuitem" onClick={copyAllPhotos}>
-              <Icon name="layers" size={16} />
-              Salin semua foto
-            </button>
-          )}
-          {photoCount === 1 && (
-            <button role="menuitem" onClick={() => copyPhoto(message.photoIds[0] ?? "")}>
-              <Icon name="cam" size={16} />
-              Salin foto
-            </button>
-          )}
-        </div>
-      )}
-      {!message.mine && <div className="who">{message.senderName}</div>}
-      {message.body}
-      {message.photoIds.length > 0 && <PhotoThumbs sources={message.photoIds.map(photoUrl)} />}
-      {message.attachments.length > 0 && (
-        <div className="attach-list">
-          {message.attachments.map((attachment) => (
-            <a key={attachment.id} className="attach" href={`/api/attachments/${attachment.id}`} download={attachment.fileName}>
-              <AttachmentLine name={attachment.fileName} size={attachment.sizeBytes} />
-            </a>
-          ))}
-        </div>
-      )}
-      <div className="foot">
-        {message.date}{" "}
-        {receipt && (
-          <>
-            <span className={`tick ${receipt.allRead ? "read" : ""}`} title={receipt.title}>
-              <Icon name="tick" size={14} />
-            </span>
-            {receipt.initials.length > 0 && (
-              <span className={`rdby ${receipt.allRead ? "all" : ""}`}>{receipt.initials.join(" ")}</span>
-            )}
-          </>
+    <>
+      <div
+        ref={bubble}
+        className={`msg ${message.mine ? "me" : ""} ${canCopy ? "copyable" : ""} ${menuOpen ? "menu-open" : ""}`}
+        onPointerDown={canCopy ? startPress : undefined}
+        onPointerMove={canCopy ? movePress : undefined}
+        onPointerUp={cancelPress}
+        onPointerCancel={cancelPress}
+        // Android opens its own menu on a long press; the Salin menu takes its place.
+        onContextMenu={canCopy ? (event) => lastTouch.current && event.preventDefault() : undefined}
+        // Lifting the finger after a long press is not a tap: it must not also open a photo.
+        onClickCapture={(event) => {
+          if (!longPressed.current) return;
+          longPressed.current = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+      >
+        {canCopy && (
+          <button
+            className="msg-copy"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="Salin"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            title="Salin"
+          >
+            <Icon name="copy" size={15} />
+          </button>
         )}
+        {menuOpen && (
+          <div className={`msg-menu ${menuBelow ? "below" : ""}`} role="menu">
+            {hasText && (
+              <button role="menuitem" onClick={copyBody}>
+                <Icon name="copy" size={16} />
+                Salin teks
+              </button>
+            )}
+            {photoCount > 1 && (
+              <button role="menuitem" onClick={copyAllPhotos}>
+                <Icon name="layers" size={16} />
+                Salin semua foto
+              </button>
+            )}
+            {photoCount === 1 && (
+              <button role="menuitem" onClick={() => copyPhoto(message.photoIds[0] ?? "")}>
+                <Icon name="cam" size={16} />
+                Salin foto
+              </button>
+            )}
+          </div>
+        )}
+        {!message.mine && <div className="who">{message.senderName}</div>}
+        {message.body}
+        {message.photoIds.length > 0 && <PhotoThumbs sources={message.photoIds.map(photoUrl)} />}
+        {message.attachments.length > 0 && (
+          <div className="attach-list">
+            {message.attachments.map((attachment) => (
+              <a
+                key={attachment.id}
+                className="attach"
+                href={`/api/attachments/${attachment.id}`}
+                download={attachment.fileName}
+                onClick={(event) => {
+                  if (!opensInSheet()) return;
+                  event.preventDefault();
+                  setOpenAttachment(attachment);
+                }}
+              >
+                <AttachmentLine name={attachment.fileName} size={attachment.sizeBytes} />
+              </a>
+            ))}
+          </div>
+        )}
+        <div className="foot">
+          {message.date}{" "}
+          {receipt && (
+            <>
+              <span className={`tick ${receipt.allRead ? "read" : ""}`} title={receipt.title}>
+                <Icon name="tick" size={14} />
+              </span>
+              {receipt.initials.length > 0 && (
+                <span className={`rdby ${receipt.allRead ? "all" : ""}`}>{receipt.initials.join(" ")}</span>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {/* Outside the bubble: React passes events from a portal up its own tree, so inside the bubble
+          a touch in the sheet would also start the bubble's long press. */}
+      {openAttachment && (
+        <AttachmentSheet
+          href={`/api/attachments/${openAttachment.id}`}
+          fileName={openAttachment.fileName}
+          onClose={() => setOpenAttachment(null)}
+        >
+          <AttachmentLine name={openAttachment.fileName} size={openAttachment.sizeBytes} />
+        </AttachmentSheet>
+      )}
+    </>
   );
 }
 
