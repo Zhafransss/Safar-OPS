@@ -318,6 +318,7 @@ button.ava::after {
 
 @media (hover: hover) {
   .msg.copyable:hover .msg-copy,
+  .msg.copyable.menu-open .msg-copy,
   .msg-copy:focus-visible {
     display: grid;
   }
@@ -365,6 +366,8 @@ button.ava::after {
 
 .msg-menu button {
   display: flex;
+  width: 100%;
+  white-space: nowrap;
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
@@ -372,6 +375,24 @@ button.ava::after {
   background: none;
   color: var(--text);
   font: 600 14px/1 var(--font);
+  cursor: pointer;
+}
+
+/* Salin foto in the photo viewer (CHANGELOG 54), top left, opposite the close button. */
+.fv-copy {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font: 600 13px/1 var(--font);
   cursor: pointer;
 }
 

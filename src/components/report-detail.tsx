@@ -14,7 +14,7 @@ import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
 import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-rules";
-import { copyText } from "@/lib/copy-text";
+import { copyImage, copyText } from "@/lib/clipboard";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
 import type { PickerUser } from "@/server/services/team";
@@ -25,6 +25,7 @@ const POLL_MS = 10_000;
 // Within this distance of the end, the user counts as reading the newest messages.
 const NEAR_BOTTOM_PX = 80;
 // CHANGELOG 51: holding a message this long on a phone opens its Salin menu, unless the finger moves.
+// With a mouse, the button beside the message opens the same menu (CHANGELOG 54).
 const LONG_PRESS_MS = 450;
 const LONG_PRESS_SLOP_PX = 10;
 
@@ -62,9 +63,16 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
     if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > LONG_PRESS_SLOP_PX) cancelPress();
   }
 
-  async function copy() {
+  async function copyBody() {
     setMenuOpen(false);
-    toast((await copyText(message.body)) ? "Pesan disalin" : "Pesan tidak bisa disalin");
+    toast((await copyText(message.body)) ? "Teks disalin" : "Teks tidak bisa disalin");
+  }
+
+  // The clipboard holds one image at a time, so each photo has its own item (CHANGELOG 54).
+  async function copyPhoto(id: string) {
+    const copied = copyImage(photoUrl(id));
+    setMenuOpen(false);
+    toast((await copied) ? "Foto disalin" : "Foto tidak bisa disalin di browser ini");
   }
 
   if (message.isSystem) {
@@ -75,11 +83,13 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
     );
   }
   const { receipt } = message;
-  const canCopy = message.body.trim() !== "";
+  const hasText = message.body.trim() !== "";
+  const photoCount = message.photoIds.length;
+  const canCopy = hasText || photoCount > 0;
   return (
     <div
       ref={bubble}
-      className={`msg ${message.mine ? "me" : ""} ${canCopy ? "copyable" : ""}`}
+      className={`msg ${message.mine ? "me" : ""} ${canCopy ? "copyable" : ""} ${menuOpen ? "menu-open" : ""}`}
       onPointerDown={canCopy ? startPress : undefined}
       onPointerMove={canCopy ? movePress : undefined}
       onPointerUp={cancelPress}
@@ -88,16 +98,31 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
       onContextMenu={canCopy ? (event) => lastTouch.current && event.preventDefault() : undefined}
     >
       {canCopy && (
-        <button className="msg-copy" onClick={copy} aria-label="Salin pesan" title="Salin pesan">
+        <button
+          className="msg-copy"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label="Salin"
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          title="Salin"
+        >
           <Icon name="copy" size={15} />
         </button>
       )}
       {menuOpen && (
         <div className="msg-menu" role="menu">
-          <button role="menuitem" onClick={copy}>
-            <Icon name="copy" size={16} />
-            Salin
-          </button>
+          {hasText && (
+            <button role="menuitem" onClick={copyBody}>
+              <Icon name="copy" size={16} />
+              Salin teks
+            </button>
+          )}
+          {message.photoIds.map((id, index) => (
+            <button key={id} role="menuitem" onClick={() => copyPhoto(id)}>
+              <Icon name="cam" size={16} />
+              {photoCount > 1 ? `Salin foto ${index + 1}` : "Salin foto"}
+            </button>
+          ))}
         </div>
       )}
       {!message.mine && <div className="who">{message.senderName}</div>}

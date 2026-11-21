@@ -4,18 +4,29 @@ import { useRef, useState, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { Icon } from "@/components/icon";
+import { copyImage } from "@/lib/clipboard";
 
 const SWIPE_PX = 40;
+const COPIED_MS = 1800;
 
 // Mockup renderLayer kind "foto" (K-T76): swipe or arrows, "2 / 3", close with X or a tap outside.
 export function PhotoViewer({ sources, start, onClose }: { sources: string[]; start: number; onClose: () => void }) {
   const [index, setIndex] = useState(start);
+  const [copyState, setCopyState] = useState<"idle" | "done" | "failed">("idle");
   const swipeFrom = useRef<number | null>(null);
   const root = document.getElementById("app");
   if (!root) return null;
 
   const total = sources.length;
   const go = (step: number) => setIndex((current) => Math.max(0, Math.min(total - 1, current + step)));
+
+  // CHANGELOG 54: copies the photo on screen. The result shows on the button, since the viewer
+  // covers the toast.
+  async function copy() {
+    const copied = await copyImage(sources[index] ?? "");
+    setCopyState(copied ? "done" : "failed");
+    setTimeout(() => setCopyState("idle"), COPIED_MS);
+  }
 
   function endSwipe(event: PointerEvent) {
     if (swipeFrom.current === null) return;
@@ -35,6 +46,10 @@ export function PhotoViewer({ sources, start, onClose }: { sources: string[]; st
     >
       <button className="fv-x" onClick={onClose} aria-label="Tutup foto">
         <Icon name="x" size={22} />
+      </button>
+      <button className="fv-copy" onClick={copy}>
+        <Icon name="copy" size={16} />
+        {copyState === "done" ? "Foto disalin" : copyState === "failed" ? "Tidak bisa disalin" : "Salin foto"}
       </button>
       <div
         className="fv-img"
