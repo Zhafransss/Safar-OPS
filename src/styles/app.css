@@ -401,11 +401,7 @@ button.ava::after {
   cursor: pointer;
 }
 
-/* Lampiran (CHANGELOG 57): a file row in a message or waiting above the box. The two composer
-   buttons are a little narrower than the mockup's single camera button, to leave the box its width. */
-.composer .icbtn {
-  width: 38px;
-}
+/* Lampiran (CHANGELOG 57): a file row in a message or waiting above the box. */
 
 .attach-list {
   display: flex;
@@ -490,6 +486,74 @@ button.ava::after {
   background: var(--line);
   color: var(--text);
   cursor: pointer;
+}
+
+/* The + button and its menu above the message box (CHANGELOG 59). */
+.add-menu-wrap {
+  position: relative;
+  flex: none;
+}
+
+.add-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.add-btn svg {
+  transition: transform 0.15s ease;
+}
+
+.add-btn.is-open {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+
+.add-btn.is-open svg {
+  transform: rotate(45deg);
+}
+
+.add-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--sh);
+}
+
+.add-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font: 600 14px/1 var(--font);
+  text-align: left;
+  cursor: pointer;
+}
+
+.add-menu button:hover {
+  background: var(--surface2);
+}
+
+.add-menu-ico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accbg);
+  color: var(--acc);
 }
 
 /* U-08: a long press drags the row, so it must not select text or open the iOS callout. */

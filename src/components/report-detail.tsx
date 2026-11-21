@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
 
 import { AttachmentSheet, opensInSheet } from "@/components/attachment-sheet";
+import { ComposerAddMenu } from "@/components/composer-add-menu";
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
 import { PhotoThumbs, photoUrl } from "@/components/photo-thumbs";
@@ -266,6 +267,7 @@ export function ReportDetail({
   const [reasonError, setReasonError] = useState("");
   const [sending, setSending] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const cameraInput = useRef<HTMLInputElement>(null);
   const attachmentInput = useRef<HTMLInputElement>(null);
   const chatScroll = useRef<HTMLDivElement>(null);
 
@@ -557,12 +559,12 @@ export function ReportDetail({
             </div>
           )}
           <div className="composer">
-            <button className="icbtn" onClick={() => fileInput.current?.click()} aria-label="Tambah foto">
-              <Icon name="cam" size={18} />
-            </button>
-            <button className="icbtn" onClick={() => attachmentInput.current?.click()} aria-label="Lampirkan file">
-              <Icon name="paperclip" size={18} />
-            </button>
+            <ComposerAddMenu
+              onCamera={() => cameraInput.current?.click()}
+              onGallery={() => fileInput.current?.click()}
+              onFile={() => attachmentInput.current?.click()}
+            />
+            <input ref={cameraInput} type="file" accept="image/*" capture="environment" hidden onChange={addPhotos} />
             <input ref={fileInput} type="file" accept="image/*" multiple hidden onChange={addPhotos} />
             <input
               ref={attachmentInput}
