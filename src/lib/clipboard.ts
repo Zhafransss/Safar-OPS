@@ -1,4 +1,4 @@
-// Copies to the clipboard (CHANGELOG 51, 54). The Clipboard API needs HTTPS or localhost.
+// Copies to the clipboard (CHANGELOG 51, 54, 55). The Clipboard API needs HTTPS or localhost.
 
 // Text: older browsers fall back to a hidden text field. Returns whether the copy worked.
 export async function copyText(text: string): Promise<boolean> {
@@ -34,6 +34,42 @@ export async function copyImage(url: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export type CopyAllResult = "copied" | "shared" | "cancelled" | "failed";
+
+// Several photos at once (CHANGELOG 55). Safari takes several images; Chrome holds only one
+// ("Support for multiple ClipboardItems is not implemented", Chrome 157). Where the clipboard
+// refuses, the photos open in the system share sheet instead, to send them all to WhatsApp or save
+// them. `files` should be fetched before the tap, so the share sheet opens while the tap still
+// counts as the user's action.
+export async function copyImages(urls: string[], files: Promise<File[]>): Promise<CopyAllResult> {
+  if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+    try {
+      await navigator.clipboard.write(urls.map((url) => new ClipboardItem({ "image/png": pngOf(url) })));
+      return "copied";
+    } catch {
+      // Falls through to the share sheet.
+    }
+  }
+  try {
+    const list = await files;
+    if (!navigator.canShare?.({ files: list })) return "failed";
+    await navigator.share({ files: list });
+    return "shared";
+  } catch (error) {
+    return error instanceof DOMException && error.name === "AbortError" ? "cancelled" : "failed";
+  }
+}
+
+// The stored photos (JPEG) as files for the share sheet.
+export function photoFiles(urls: string[]): Promise<File[]> {
+  return Promise.all(
+    urls.map(async (url, index) => {
+      const blob = await (await fetch(url)).blob();
+      return new File([blob], `foto-${index + 1}.jpg`, { type: blob.type || "image/jpeg" });
+    }),
+  );
 }
 
 async function pngOf(url: string): Promise<Blob> {

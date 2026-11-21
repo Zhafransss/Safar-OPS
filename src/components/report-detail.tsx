@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
 
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
@@ -14,7 +14,7 @@ import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
 import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-rules";
-import { copyImage, copyText } from "@/lib/clipboard";
+import { copyImage, copyImages, copyText, photoFiles } from "@/lib/clipboard";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
 import type { PickerUser } from "@/server/services/team";
@@ -32,9 +32,28 @@ const LONG_PRESS_SLOP_PX = 10;
 function Message({ message }: { message: ReportDetailData["messages"][number] }) {
   const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuBelow, setMenuBelow] = useState(false);
   const press = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | null>(null);
   const lastTouch = useRef(false);
+  const longPressed = useRef(false);
+  const shareFiles = useRef<Promise<File[]> | null>(null);
   const bubble = useRef<HTMLDivElement>(null);
+
+  // The menu opens above the message, or below it when the page header would cover it.
+  useLayoutEffect(() => {
+    if (!menuOpen) return setMenuBelow(false);
+    const menu = bubble.current?.querySelector(".msg-menu");
+    const headerBottom = document.querySelector(".hd")?.getBoundingClientRect().bottom ?? 0;
+    if (menu && menu.getBoundingClientRect().top < headerBottom + 8) setMenuBelow(true);
+  }, [menuOpen]);
+
+  // Salin semua foto may fall back to the share sheet, which needs the files ready at the tap.
+  useEffect(() => {
+    if (!menuOpen || message.photoIds.length < 2) return;
+    const files = photoFiles(message.photoIds.map(photoUrl));
+    files.catch(() => {});
+    shareFiles.current = files;
+  }, [menuOpen, message.photoIds]);
 
   // The menu closes on any touch outside the bubble.
   useEffect(() => {
@@ -55,7 +74,12 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
     lastTouch.current = event.pointerType === "touch";
     if (!lastTouch.current) return;
     cancelPress();
-    press.current = { timer: setTimeout(() => setMenuOpen(true), LONG_PRESS_MS), x: event.clientX, y: event.clientY };
+    longPressed.current = false;
+    const open = () => {
+      longPressed.current = true;
+      setMenuOpen(true);
+    };
+    press.current = { timer: setTimeout(open, LONG_PRESS_MS), x: event.clientX, y: event.clientY };
   }
 
   function movePress(event: PointerEvent) {
@@ -68,7 +92,18 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
     toast((await copyText(message.body)) ? "Teks disalin" : "Teks tidak bisa disalin");
   }
 
-  // The clipboard holds one image at a time, so each photo has its own item (CHANGELOG 54).
+  // CHANGELOG 55.
+  async function copyAllPhotos() {
+    const urls = message.photoIds.map(photoUrl);
+    const result = copyImages(urls, shareFiles.current ?? photoFiles(urls));
+    setMenuOpen(false);
+    const outcome = await result;
+    if (outcome === "copied") toast(`${urls.length} foto disalin`);
+    if (outcome === "failed") toast("Browser ini tidak bisa menyalin semua foto sekaligus. Salin satu per satu.");
+  }
+
+  // A message with one photo copies it directly; single photos of a larger set are copied from the
+  // photo viewer (CHANGELOG 56).
   async function copyPhoto(id: string) {
     const copied = copyImage(photoUrl(id));
     setMenuOpen(false);
@@ -96,6 +131,13 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
       onPointerCancel={cancelPress}
       // Android opens its own menu on a long press; the Salin menu takes its place.
       onContextMenu={canCopy ? (event) => lastTouch.current && event.preventDefault() : undefined}
+      // Lifting the finger after a long press is not a tap: it must not also open a photo.
+      onClickCapture={(event) => {
+        if (!longPressed.current) return;
+        longPressed.current = false;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
     >
       {canCopy && (
         <button
@@ -110,19 +152,25 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
         </button>
       )}
       {menuOpen && (
-        <div className="msg-menu" role="menu">
+        <div className={`msg-menu ${menuBelow ? "below" : ""}`} role="menu">
           {hasText && (
             <button role="menuitem" onClick={copyBody}>
               <Icon name="copy" size={16} />
               Salin teks
             </button>
           )}
-          {message.photoIds.map((id, index) => (
-            <button key={id} role="menuitem" onClick={() => copyPhoto(id)}>
-              <Icon name="cam" size={16} />
-              {photoCount > 1 ? `Salin foto ${index + 1}` : "Salin foto"}
+          {photoCount > 1 && (
+            <button role="menuitem" onClick={copyAllPhotos}>
+              <Icon name="layers" size={16} />
+              Salin semua foto
             </button>
-          ))}
+          )}
+          {photoCount === 1 && (
+            <button role="menuitem" onClick={() => copyPhoto(message.photoIds[0] ?? "")}>
+              <Icon name="cam" size={16} />
+              Salin foto
+            </button>
+          )}
         </div>
       )}
       {!message.mine && <div className="who">{message.senderName}</div>}
