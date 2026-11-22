@@ -2,7 +2,16 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type PointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ClipboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent,
+} from "react";
 
 import { AttachmentSheet, opensInSheet } from "@/components/attachment-sheet";
 import { ComposerAddMenu } from "@/components/composer-add-menu";
@@ -20,6 +29,7 @@ import { isClosed, MAX_PHOTOS, STATUS_BADGE, STATUS_LABEL } from "@/lib/report-r
 import { ATTACHMENT_ACCEPT, attachmentExtension, formatFileSize } from "@/lib/attachment-rules";
 import { attachmentProblem, uploadAttachments } from "@/lib/attachment-upload";
 import { copyImage, copyImages, copyText, photoFiles } from "@/lib/clipboard";
+import { listTextFromHtml } from "@/lib/text-layout";
 import { useTRPC } from "@/lib/trpc-client";
 import type { ReportDetailData } from "@/server/services/report";
 import type { PickerUser } from "@/server/services/team";
@@ -185,7 +195,7 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
           </div>
         )}
         {!message.mine && <div className="who">{message.senderName}</div>}
-        {message.body}
+        {message.body && <span className="msg-text">{message.body}</span>}
         {message.photoIds.length > 0 && <PhotoThumbs sources={message.photoIds.map(photoUrl)} />}
         {message.attachments.length > 0 && (
           <div className="attach-list">
@@ -233,6 +243,15 @@ function Message({ message }: { message: ReportDetailData["messages"][number] })
       )}
     </>
   );
+}
+
+// Types text at the caret like the keyboard does, so the browser's undo still works and React sees the
+// change. execCommand is deprecated but still the only way to keep undo in a text field.
+function typeIntoBox(box: HTMLTextAreaElement, text: string) {
+  box.focus();
+  if (document.execCommand("insertText", false, text)) return;
+  box.setRangeText(text, box.selectionStart, box.selectionEnd, "end");
+  box.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 // CHANGELOG 57: the file icon with its format, then the name and size.
@@ -414,9 +433,29 @@ export function ReportDetail({
   // with the camera button. Pasted text still goes into the box as usual.
   async function pastePhotos(event: ClipboardEvent<HTMLTextAreaElement>) {
     const images = [...event.clipboardData.files].filter((file) => file.type.startsWith("image/"));
+    // CHANGELOG 61: a copied list keeps its numbers or bullets, which its plain text may have lost.
+    const listText = listTextFromHtml(event.clipboardData.getData("text/html"));
+    if (listText) {
+      event.preventDefault();
+      typeIntoBox(event.currentTarget, listText);
+    }
     if (images.length === 0) return;
-    if (!event.clipboardData.getData("text/plain")) event.preventDefault();
+    if (!listText && !event.clipboardData.getData("text/plain")) event.preventDefault();
     await addFiles(images);
+  }
+
+  // CHANGELOG 61: Tab puts a tab at the caret, to open a paragraph or indent a list line, as in Word;
+  // Shift+Tab takes one back from the start of the line. Enter already starts a new line.
+  function indentWithTab(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Tab" || event.ctrlKey || event.metaKey || event.altKey) return;
+    event.preventDefault();
+    const box = event.currentTarget;
+    if (!event.shiftKey) return typeIntoBox(box, "\t");
+    const lineStart = box.value.lastIndexOf("\n", box.selectionStart - 1) + 1;
+    const indent = /^(\t| {1,4})/.exec(box.value.slice(lineStart))?.[0];
+    if (!indent) return;
+    box.setSelectionRange(lineStart, lineStart + indent.length);
+    typeIntoBox(box, "");
   }
 
   async function addFiles(files: File[]) {
@@ -505,7 +544,9 @@ export function ReportDetail({
               <b style={{ fontSize: 15, lineHeight: 1.3 }}>{report.title}</b>
               <span className={`badge ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
             </div>
-            <p style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>{report.body}</p>
+            <p className="report-text" style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>
+              {report.body}
+            </p>
             {report.photoIds.length > 0 && <PhotoThumbs sources={report.photoIds.map(photoUrl)} />}
             <div className="mt">
               <div className="row">
@@ -652,6 +693,7 @@ export function ReportDetail({
                 // On a phone the keyboard takes the panel's place, as in WhatsApp.
                 onFocus={() => window.matchMedia("(pointer: coarse)").matches && setEmojiOpen(false)}
                 onPaste={pastePhotos}
+                onKeyDown={indentWithTab}
               />
               <button
                 className={`emoji-btn ${emojiOpen ? "is-open" : ""}`}

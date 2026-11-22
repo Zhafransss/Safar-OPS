@@ -651,6 +651,19 @@ button.ava::after {
   background: var(--surface2);
 }
 
+/* CHANGELOG 61: message and report text keep their line breaks, tabs and list indents. A tab is four
+   spaces wide, like the start of a paragraph; long words still wrap inside the bubble. */
+.msg-text,
+.report-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+}
+
+.composer textarea {
+  tab-size: 4;
+}
+
 /* U-08: a long press drags the row, so it must not select text or open the iOS callout. */
 .todo.sortable {
   -webkit-user-select: none;

@@ -30,6 +30,7 @@ import {
   type ReportParties,
   type ReportStatus,
 } from "@/lib/report-rules";
+import { tidyText } from "@/lib/text-layout";
 import { db } from "@/server/db";
 import {
   attachmentPrefix,
@@ -342,7 +343,7 @@ export async function createReport(
         number: reportNumber,
         title: input.title.trim(),
         type,
-        body: input.body.trim(),
+        body: tidyText(input.body),
         fromId: user.id,
         toId,
         ccs: { create: validCcIds.map((userId) => ({ userId })) },
@@ -456,7 +457,7 @@ export async function sendReportMessage(
   input: { number: string; body: string; photoKeys: string[]; attachments: AttachmentInput[] },
   user: CurrentUser,
 ): Promise<void> {
-  const body = input.body.trim();
+  const body = tidyText(input.body);
   if (!body && input.photoKeys.length === 0 && input.attachments.length === 0) throw pngError("PNG-LAP-08");
   await assertPhotoKeys(input.photoKeys, user.id);
   const attachments = await attachmentRows(input.attachments, user.id);

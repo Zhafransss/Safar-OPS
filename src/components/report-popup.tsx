@@ -13,7 +13,9 @@ export function ReportPopup({ report, onClose }: { report: ReportPopupData; onCl
       <div className="small muted" style={{ marginTop: 2 }}>
         {report.typeLabel} · dari {report.fromName} ke {report.toName} · {report.created}
       </div>
-      <p style={{ fontSize: 13.5, lineHeight: 1.5 }}>{report.body}</p>
+      <p className="report-text" style={{ fontSize: 13.5, lineHeight: 1.5 }}>
+        {report.body}
+      </p>
       {report.photoIds.length > 0 && <PhotoThumbs sources={report.photoIds.map(photoUrl)} />}
       <div className="mt">
         <span className={`badge ${STATUS_BADGE[report.status]}`}>{STATUS_LABEL[report.status]}</span>
