@@ -1033,76 +1033,21 @@ button.ava::after {
   display: none;
 }
 
-/* Logo lockup (CHANGELOG 46): the "HR" mark on a white tile, then HRIS over SAEFUL ASKAR. It sits on
-   the header orange, so the name and the subtitle image are white. */
+/* Logo lockup (CHANGELOG 46, 63): one image cut from the lockup artwork (the HR tile, HRIS and SAEFUL
+   ASKAR) with a transparent background, so it sits on the header orange. Sized by height; the width
+   follows the artwork (954 x 300). */
 .lockup {
   display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
-.lockup-tile {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: #ffffff;
-}
-
-.lockup-tile img {
+.lockup img {
   display: block;
-  width: 32px;
-  height: auto;
+  width: auto;
+  height: 44px;
 }
 
-.lockup-words {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-}
-
-.lockup-name {
-  color: #ffffff;
-  font: 800 24px/1 var(--font);
-  letter-spacing: -0.02em;
-}
-
-/* Plain text, spaced out in capitals like the logo's subtitle. */
-.lockup-sub {
-  color: #ffffff;
-  font: 600 10.5px/1 var(--font);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.lockup-lg {
-  gap: 16px;
-}
-
-.lockup-lg .lockup-tile {
-  width: 76px;
+.lockup-lg img {
   height: 76px;
-  border-radius: 16px;
-}
-
-.lockup-lg .lockup-tile img {
-  width: 56px;
-}
-
-.lockup-lg .lockup-name {
-  font-size: 46px;
-}
-
-.lockup-lg .lockup-words {
-  gap: 9px;
-}
-
-.lockup-lg .lockup-sub {
-  font-size: 16px;
 }
 
 .home-hd .lockup {
@@ -1266,7 +1211,7 @@ button.ava::after {
     background: var(--surface);
   }
 
-  /* The lockup subtitle is white, so the sidebar shows it on the header orange. */
+  /* The lockup is white on transparent, so the sidebar shows it on the header orange. */
   .sb-brand {
     display: block;
     margin-bottom: 14px;
@@ -1274,11 +1219,6 @@ button.ava::after {
     border-radius: 12px;
     background: linear-gradient(180deg, #ee7a1f 0%, #dc5f0a 100%);
     text-decoration: none;
-  }
-
-  /* A little smaller, so the subtitle fits the 240 px sidebar. */
-  .sb-brand .lockup-sub {
-    font-size: 9.5px;
   }
 
   .sb-nav {

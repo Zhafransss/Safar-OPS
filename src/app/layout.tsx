@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "HRIS",
   description: "Laporan dan penugasan tim Saeful Askar",
   appleWebApp: { capable: true, title: "HRIS", statusBarStyle: "default" },
-  // Generated from public/brand/logo.png by scripts/generate-icons.mjs (CHANGELOG 46).
+  // Generated from public/icons/Icon.png by scripts/generate-icons.mjs (CHANGELOG 64).
   icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
 };
 

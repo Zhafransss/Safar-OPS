@@ -1,16 +1,11 @@
-// The HRIS logo lockup: the "HR" mark on a white tile, then "HRIS" over "SAEFUL ASKAR". The mark is cut
-// from public/brand/logo.png by scripts/generate-icons.mjs; both words are plain text in the app font.
-// The text is white, so the lockup sits on the orange header color.
+// The HRIS logo lockup: the "HR" tile, HRIS and SAEFUL ASKAR, as one image cut from the lockup artwork
+// (public/icons/Icon-new.jpeg) by scripts/generate-icons.mjs. Its background is transparent and its
+// letters white, so it sits on the orange header color (CHANGELOG 63).
 export function BrandLockup({ large = false }: { large?: boolean }) {
   return (
     <div className={`lockup ${large ? "lockup-lg" : ""}`}>
-      <span className="lockup-tile">
-        <img src="/brand/hr-mark.png" alt="" />
-      </span>
-      <span className="lockup-words">
-        <span className="lockup-name">HRIS</span>
-        <span className="lockup-sub">Saeful Askar</span>
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- a small static logo, also cached for offline */}
+      <img src="/brand/lockup.png" alt="HRIS Saeful Askar" width={954} height={300} />
     </div>
   );
 }

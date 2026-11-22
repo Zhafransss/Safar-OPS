@@ -1,7 +1,9 @@
-// Regenerates the PWA icons and the header "HR" mark from the official logo. Run with:
+// Regenerates the app icons and the header lockup. Run with:
 //   node scripts/generate-icons.mjs
-// Source: public/brand/logo.png, a full-bleed orange square with "HR" (white H, dark R) above
-// "SAEFUL ASKAR" in white. Every output is cut from it, so the letterforms always match the logo.
+// Sources (CHANGELOG 63, 64):
+// - public/icons/Icon.png, the app icon artwork: a full-bleed orange square with "HR" above
+//   "SAEFUL ASKAR". The installed icons are this image, resized.
+// - public/icons/Icon-new.jpeg, the lockup artwork: the HR tile, HRIS and SAEFUL ASKAR on orange.
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -9,21 +11,16 @@ import { createRequire } from "node:module";
 const require = createRequire(path.resolve("node_modules/next/package.json"));
 const sharp = require("sharp");
 
-const SOURCE = "public/brand/logo.png";
-const ORANGE = [232, 101, 10];
+const ICON_SOURCE = "public/icons/Icon.png";
 const WHITE = [255, 255, 255];
 const DARK = [31, 27, 18];
 
-const { data, info } = await sharp(SOURCE).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-const { width, height } = info;
-const pixel = (x, y) => data.subarray((y * width + x) * 4, (y * width + x) * 4 + 3);
-
 // Each pixel is a blend of the logo's three colors (anti-aliased edges sit between two of them).
 // Least squares on c - O = w * (W - O) + d * (D - O) gives the white and dark shares.
-function shares([r, g, b]) {
-  const c = [r - ORANGE[0], g - ORANGE[1], b - ORANGE[2]];
-  const u = WHITE.map((v, i) => v - ORANGE[i]);
-  const v = DARK.map((x, i) => x - ORANGE[i]);
+function shares([r, g, b], orange) {
+  const c = [r - orange[0], g - orange[1], b - orange[2]];
+  const u = WHITE.map((v, i) => v - orange[i]);
+  const v = DARK.map((x, i) => x - orange[i]);
   const dot = (a, b2) => a[0] * b2[0] + a[1] * b2[1] + a[2] * b2[2];
   const [uu, uv, vv, cu, cv] = [dot(u, u), dot(u, v), dot(v, v), dot(c, u), dot(c, v)];
   const det = uu * vv - uv * uv;
@@ -31,82 +28,76 @@ function shares([r, g, b]) {
   return { white: clamp((cu * vv - cv * uv) / det), dark: clamp((cv * uu - cu * uv) / det) };
 }
 
-// Rows of the two content bands: "HR", then "SAEFUL ASKAR".
-const isInk = (x, y) => {
-  const { white, dark } = shares(pixel(x, y));
-  return white + dark > 0.25;
-};
-function bbox(top, bottom) {
-  let minX = width, maxX = 0, minY = height, maxY = 0;
-  for (let y = top; y <= bottom; y++)
-    for (let x = 0; x < width; x++)
-      if (isInk(x, y)) [minX, maxX, minY, maxY] = [Math.min(minX, x), Math.max(maxX, x), Math.min(minY, y), Math.max(maxY, y)];
-  return { left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
-}
-const inkRows = [...Array(height).keys()].map((y) => [...Array(width).keys()].some((x) => isInk(x, y)));
-const bands = [];
-inkRows.forEach((ink, y) => {
-  if (ink && (y === 0 || !inkRows[y - 1])) bands.push([y, y]);
-  if (ink) bands[bands.length - 1][1] = y;
-});
-if (bands.length !== 2) throw new Error(`Expected 2 content bands in the logo, found ${bands.length}`);
-const markBox = bbox(...bands[0]);
-const textBox = bbox(...bands[1]);
+fs.mkdirSync("public/brand", { recursive: true });
 
-// Recolors a region onto a transparent background with the given colors for white and dark ink.
-async function recolor(box, colorOfWhite, colorOfDark, pad) {
-  const w = box.width + pad * 2;
-  const h = box.height + pad * 2;
+// Header lockup (CHANGELOG 63): the "HR" tile, HRIS and SAEFUL ASKAR as drawn in the lockup artwork,
+// cut from its orange background, which becomes transparent so the app's own orange shows through
+// (also in the H, which the artwork leaves orange). White and the dark R keep their colors; JPEG
+// noise is kept from drawing a halo around the letters.
+{
+  const LOCKUP_SOURCE = "public/icons/Icon-new.jpeg";
+  const LOCKUP_ORANGE = [215, 120, 52];
+  const { data: src, info: meta } = await sharp(LOCKUP_SOURCE).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const at = (x, y) => src.subarray((y * meta.width + x) * 3, (y * meta.width + x) * 3 + 3);
+  const inked = (x, y) => {
+    const { white, dark } = shares(at(x, y), LOCKUP_ORANGE);
+    return white + dark > 0.25;
+  };
+  let [left, right, top, bottom] = [meta.width, 0, meta.height, 0];
+  for (let y = 0; y < meta.height; y++)
+    for (let x = 0; x < meta.width; x++)
+      if (inked(x, y)) [left, right, top, bottom] = [Math.min(left, x), Math.max(right, x), Math.min(top, y), Math.max(bottom, y)];
+  const pad = 2;
+  const w = right - left + 1 + pad * 2;
+  const h = bottom - top + 1 + pad * 2;
   const out = Buffer.alloc(w * h * 4);
-  for (let y = 0; y < box.height; y++)
-    for (let x = 0; x < box.width; x++) {
-      const { white, dark } = shares(pixel(box.left + x, box.top + y));
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const sx = left - pad + x;
+      const sy = top - pad + y;
+      if (sx < 0 || sy < 0 || sx >= meta.width || sy >= meta.height) continue;
+      let { white, dark } = shares(at(sx, sy), LOCKUP_ORANGE);
+      // Edges between white and orange pick up a little "dark" from JPEG ringing, which would draw
+      // a grey fringe. Below 0.3 the pixel counts as white over orange only.
+      if (dark < 0.3) {
+        const c = at(sx, sy);
+        const u = WHITE.map((v, k) => v - LOCKUP_ORANGE[k]);
+        const projected = u.reduce((sum, v, k) => sum + v * (c[k] - LOCKUP_ORANGE[k]), 0) / u.reduce((sum, v) => sum + v * v, 0);
+        white = Math.min(1, Math.max(0, projected));
+        dark = 0;
+      }
+      if (white < 0.06) white = 0;
       const alpha = Math.min(1, white + dark);
       if (alpha === 0) continue;
-      const i = ((y + pad) * w + x + pad) * 4;
-      for (let k = 0; k < 3; k++) out[i + k] = Math.round((white * colorOfWhite[k] + dark * colorOfDark[k]) / alpha);
+      const i = (y * w + x) * 4;
+      for (let k = 0; k < 3; k++) out[i + k] = Math.round((white * WHITE[k] + dark * DARK[k]) / alpha);
       out[i + 3] = Math.round(alpha * 255);
     }
-  return sharp(out, { raw: { width: w, height: h, channels: 4 } }).png();
+  await sharp(out, { raw: { width: w, height: h, channels: 4 } }).png({ compressionLevel: 9 }).toFile("public/brand/lockup.png");
+  console.log(`wrote public/brand/lockup.png (${w}x${h})`);
 }
 
-fs.mkdirSync("public/brand", { recursive: true });
-// Header badge: "HR" on a white tile, so the white H becomes orange and the R stays dark.
-await (await recolor(markBox, ORANGE, DARK, 0)).toFile("public/brand/hr-mark.png");
-console.log("wrote public/brand/hr-mark.png");
-
-// App icons. The installed icon is cropped tighter than the logo so "HR" fills it, like a phone icon.
-const content = {
-  left: Math.min(markBox.left, textBox.left),
-  top: markBox.top,
-  right: Math.max(markBox.left + markBox.width, textBox.left + textBox.width),
-  bottom: textBox.top + textBox.height,
-};
-const side = Math.round((content.right - content.left) * 1.2);
-const crop = {
-  left: Math.max(0, Math.round((content.left + content.right) / 2 - side / 2)),
-  top: Math.max(0, Math.round((content.top + content.bottom) / 2 - side / 2)),
-  width: side,
-  height: side,
-};
-const cropped = () => sharp(SOURCE).extract(crop);
+// App icons: the icon artwork as it is. Its own orange fills what the artwork does not cover.
+const { dominant } = await sharp(ICON_SOURCE).stats();
+const background = { r: dominant.r, g: dominant.g, b: dominant.b, alpha: 1 };
+const icon = (size) => sharp(ICON_SOURCE).flatten({ background }).resize(size, size);
 const rounded = (size) =>
   Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${Math.round(size * 0.1875)}"/></svg>`);
 
 const out = "public/icons";
-fs.mkdirSync(out, { recursive: true });
 for (const size of [192, 512]) {
-  const square = await cropped().resize(size, size).png().toBuffer();
+  const square = await icon(size).png().toBuffer();
   await sharp(square).composite([{ input: rounded(size), blend: "dest-in" }]).png().toFile(path.join(out, `icon-${size}.png`));
   console.log(`wrote icon-${size}.png`);
 }
 // iOS rounds the corners itself and needs an opaque square.
-await cropped().resize(180, 180).flatten({ background: { r: ORANGE[0], g: ORANGE[1], b: ORANGE[2] } }).png().toFile(path.join(out, "apple-touch-icon.png"));
+await icon(180).png().toFile(path.join(out, "apple-touch-icon.png"));
 console.log("wrote apple-touch-icon.png");
-// Maskable: Android may cut the icon to a circle, so the whole logo sits inside the safe zone.
-const inner = await sharp(SOURCE).resize(440, 440).png().toBuffer();
-await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: ORANGE[0], g: ORANGE[1], b: ORANGE[2], alpha: 1 } } })
-  .composite([{ input: inner, left: 36, top: 36 }])
+// Maskable: Android may cut the icon to a circle (the safe zone is the middle 80%). The artwork's
+// corners reach that edge exactly, so it is drawn at 90% on its own orange to stay clear of it.
+const inner = await icon(460).png().toBuffer();
+await sharp({ create: { width: 512, height: 512, channels: 4, background } })
+  .composite([{ input: inner, left: 26, top: 26 }])
   .png()
   .toFile(path.join(out, "icon-maskable-512.png"));
 console.log("wrote icon-maskable-512.png");
