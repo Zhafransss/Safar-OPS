@@ -20,6 +20,7 @@ import {
 } from "@/lib/assignment-rules";
 import { formatDate, formatIsoShort, formatShortDate, jakartaIsoDate } from "@/lib/date";
 import { canSeeReport, REPORT_TYPES, STATUS_LABEL } from "@/lib/report-rules";
+import { parseRichDoc } from "@/lib/rich-text";
 import { db } from "@/server/db";
 import { notify } from "@/server/services/notifications";
 import { activeTaskWhere } from "@/server/services/task-scope";
@@ -302,6 +303,7 @@ function reportPopup(report: {
   title: string;
   type: string;
   body: string;
+  bodyDoc: unknown;
   status: keyof typeof STATUS_LABEL;
   createdAt: Date;
   from: { name: string };
@@ -313,6 +315,7 @@ function reportPopup(report: {
     title: report.title,
     typeLabel: REPORT_TYPES.find((type) => type.value === report.type)?.label ?? report.type,
     body: report.body,
+    bodyDoc: parseRichDoc(report.bodyDoc),
     status: report.status,
     fromName: report.from.name,
     toName: report.to.name,

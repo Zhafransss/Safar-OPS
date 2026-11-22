@@ -30,6 +30,7 @@ import {
   type ReportParties,
   type ReportStatus,
 } from "@/lib/report-rules";
+import { parseRichDoc, richDocText, trimRichDoc } from "@/lib/rich-text";
 import { tidyText } from "@/lib/text-layout";
 import { db } from "@/server/db";
 import {
@@ -188,6 +189,7 @@ export async function getReportDetail(number: string, user: CurrentUser) {
     status: report.status,
     title: report.title,
     body: report.body,
+    bodyDoc: parseRichDoc(report.bodyDoc),
     fromId: report.fromId,
     fromName: report.from.name,
     toId: report.toId,
@@ -320,9 +322,16 @@ async function nextReportNumber(tx: Tx): Promise<string> {
 }
 
 export async function createReport(
-  input: ReportDraft & { ccIds: string[]; photoKeys: string[] },
+  rawInput: ReportDraft & { ccIds: string[]; photoKeys: string[]; bodyDoc?: unknown },
   user: CurrentUser,
 ): Promise<{ number: string; toName: string }> {
+  // CHANGELOG 62: a formatted body must follow the schema; its plain text is worked out here, not
+  // taken from the browser, so the two always match.
+  const parsedDoc = rawInput.bodyDoc == null ? null : parseRichDoc(rawInput.bodyDoc);
+  if (rawInput.bodyDoc != null && !parsedDoc) throw new TRPCError({ code: "BAD_REQUEST", message: "Format isi laporan tidak dikenali." });
+  const bodyDoc = parsedDoc && trimRichDoc(parsedDoc);
+  const input = bodyDoc ? { ...rawInput, body: richDocText(bodyDoc) } : rawInput;
+  if (input.body.length > 5000) throw new TRPCError({ code: "BAD_REQUEST", message: "Isi laporan terlalu panjang." });
   const code = findReportError(input, user.id);
   if (code) throw pngError(code);
   await assertPhotoKeys(input.photoKeys, user.id);
@@ -344,6 +353,7 @@ export async function createReport(
         title: input.title.trim(),
         type,
         body: tidyText(input.body),
+        ...(bodyDoc ? { bodyDoc } : {}),
         fromId: user.id,
         toId,
         ccs: { create: validCcIds.map((userId) => ({ userId })) },

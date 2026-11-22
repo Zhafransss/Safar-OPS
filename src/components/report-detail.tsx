@@ -15,6 +15,7 @@ import {
 
 import { AttachmentSheet, opensInSheet } from "@/components/attachment-sheet";
 import { ComposerAddMenu } from "@/components/composer-add-menu";
+import { RichTextView } from "@/components/rich-text-view";
 import { EmojiPicker } from "@/components/emoji-picker";
 import { Icon } from "@/components/icon";
 import { PageHeader } from "@/components/page-header";
@@ -544,9 +545,13 @@ export function ReportDetail({
               <b style={{ fontSize: 15, lineHeight: 1.3 }}>{report.title}</b>
               <span className={`badge ${STATUS_BADGE[status]}`}>{STATUS_LABEL[status]}</span>
             </div>
-            <p className="report-text" style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>
-              {report.body}
-            </p>
+            {report.bodyDoc ? (
+              <RichTextView doc={report.bodyDoc}/>
+            ) : (
+              <p className="report-text" style={{ fontSize: 13.5, lineHeight: 1.5, margin: "8px 0 0" }}>
+                {report.body}
+              </p>
+            )}
             {report.photoIds.length > 0 && <PhotoThumbs sources={report.photoIds.map(photoUrl)} />}
             <div className="mt">
               <div className="row">

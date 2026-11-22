@@ -48,6 +48,8 @@ export const reportRouter = router({
         title: z.string().max(200),
         type: typeEnum.nullable(),
         body: z.string().max(5000),
+        // Checked against the schema by the service (src/lib/rich-text.ts), which can answer in Indonesian.
+        bodyDoc: z.unknown().optional(),
         toId: z.string().nullable(),
         ccIds: z.array(z.string()).max(100),
         photoKeys,

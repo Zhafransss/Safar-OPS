@@ -127,6 +127,9 @@ model Report {
   title             String
   type              ReportType
   body              String
+  // CHANGELOG 62: the formatted body (src/lib/rich-text.ts). Null for reports from before it; body
+  // keeps the plain text for search and previews.
+  bodyDoc           Json?
   status            ReportStatus @default(SENT)
   fromId            String
   toId              String

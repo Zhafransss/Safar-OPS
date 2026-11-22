@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type ChangeEvent } from "react";
 
@@ -12,6 +13,7 @@ import { formatError } from "@/config/error-codes";
 import { errorText } from "@/lib/error-text";
 import { PHOTO_ERROR, preparePhoto, uploadPhotos, withoutPhoto, type PendingPhoto } from "@/lib/photo-upload";
 import { findReportError, MAX_PHOTOS, REPORT_TYPES, type ReportType } from "@/lib/report-rules";
+import type { RichDoc } from "@/lib/rich-text";
 import { useTRPC } from "@/lib/trpc-client";
 import type { PickerUser } from "@/server/services/team";
 
@@ -20,11 +22,19 @@ const TOO_MANY_PHOTOS = "PNG-LAP-06: Maksimal 5 foto.";
 
 const scrollToTop = () => document.getElementById("scr")?.scrollTo(0, 0);
 
+// CHANGELOG 62: the editor library loads only on this page, after it opens. The empty box keeps
+// the layout steady meanwhile.
+const RichTextEditor = dynamic(() => import("@/components/rich-text-editor").then((module) => module.RichTextEditor), {
+  ssr: false,
+  loading: () => <div className="rt-editor rt-loading" aria-hidden="true" />,
+});
+
 // Mockup vLapNew.
 export function ReportForm({ users, meId }: { users: PickerUser[]; meId: string }) {
   const [title, setTitle] = useState("");
   const [type, setType] = useState<ReportType | null>(null);
   const [body, setBody] = useState("");
+  const [bodyDoc, setBodyDoc] = useState<RichDoc | null>(null);
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [toId, setToId] = useState<string | null>(null);
   const [ccIds, setCcIds] = useState<string[]>([]);
@@ -65,7 +75,7 @@ export function ReportForm({ users, meId }: { users: PickerUser[]; meId: string 
     setSending(true);
     try {
       const photoKeys = await uploadPhotos(photos);
-      const created = await create.mutateAsync({ title, type, body, toId, ccIds, photoKeys });
+      const created = await create.mutateAsync({ title, type, body, bodyDoc: bodyDoc ?? undefined, toId, ccIds, photoKeys });
       toast(`${created.number} terkirim ke ${created.toName}.`);
       router.replace(`/penugasan/laporan/${created.number}`);
     } catch (e) {
@@ -105,12 +115,13 @@ export function ReportForm({ users, meId }: { users: PickerUser[]; meId: string 
         <label className="lab mt" htmlFor="lI">
           Isi
         </label>
-        <textarea
+        <RichTextEditor
           id="lI"
-          className="inp"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
           placeholder="Tulis laporan"
+          onChange={(doc, text) => {
+            setBodyDoc(doc);
+            setBody(text);
+          }}
         />
 
         <label className="lab mt">Foto (opsional)</label>
