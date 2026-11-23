@@ -2,7 +2,7 @@
 //   node scripts/generate-icons.mjs
 // Sources (CHANGELOG 63, 64):
 // - public/icons/Icon.png, the app icon artwork: a full-bleed orange square with "HR" above
-//   "SAEFUL ASKAR". The installed icons are this image, resized.
+//   "SAEFUL ASKAR". The installed icons and src/app/favicon.ico are this image, resized.
 // - public/icons/Icon-new.jpeg, the lockup artwork: the HR tile, HRIS and SAEFUL ASKAR on orange.
 import fs from "node:fs";
 import path from "node:path";
@@ -101,3 +101,34 @@ await sharp({ create: { width: 512, height: 512, channels: 4, background } })
   .png()
   .toFile(path.join(out, "icon-maskable-512.png"));
 console.log("wrote icon-maskable-512.png");
+
+// Favicon (CHANGELOG 65): src/app/favicon.ico, which Next.js links on every page and serves at
+// /favicon.ico, where browsers and search engines look for it. An ICO file here is a small index
+// followed by PNG images, one per size.
+{
+  const sizes = [16, 32, 48];
+  const pngs = await Promise.all(
+    sizes.map(async (size) => {
+      const square = await icon(size).png().toBuffer();
+      return sharp(square).composite([{ input: rounded(size), blend: "dest-in" }]).png().toBuffer();
+    }),
+  );
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(sizes.length, 4);
+  let offset = 6 + 16 * sizes.length;
+  const entries = sizes.map((size, index) => {
+    const entry = Buffer.alloc(16);
+    entry.writeUInt8(size, 0); // width
+    entry.writeUInt8(size, 1); // height
+    entry.writeUInt16LE(1, 4); // colour planes
+    entry.writeUInt16LE(32, 6); // bits per pixel
+    entry.writeUInt32LE(pngs[index].length, 8);
+    entry.writeUInt32LE(offset, 12);
+    offset += pngs[index].length;
+    return entry;
+  });
+  fs.writeFileSync("src/app/favicon.ico", Buffer.concat([header, ...entries, ...pngs]));
+  console.log("wrote src/app/favicon.ico (16, 32, 48)");
+}
